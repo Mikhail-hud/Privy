@@ -9,18 +9,34 @@ import {
     FAVORITES_PAGE_PATH,
     NOT_FOUND_PAGE_PATH,
     DASHBOARD_PAGE_PATH,
+    RESET_PASSWORD_PATH,
     SIGN_OUT_ACTION_ONLY_PATH,
 } from "@app/core/constants/pathConstants";
 import { AppLayout, RequireAdmin } from "@app/core/components";
-import { appLayoutLoader, signInAction, signOutAction } from "@app/core/api";
 import { createBrowserRouter, RouterProvider, Navigate, redirect } from "react-router-dom";
-import { SignIn, NotFound, Profile, Dialogs, Settings, Favorites, Dashboard } from "@app/features";
+import {
+    SignIn,
+    NotFound,
+    Profile,
+    Dialogs,
+    Settings,
+    Favorites,
+    Dashboard,
+    ResetPassword,
+    signInAction,
+    signOutAction,
+    appLayoutLoader,
+} from "@app/features";
 
 const router = createBrowserRouter([
     {
         path: SIGN_IN_PAGE_PATH,
         action: signInAction,
         element: <SignIn />,
+    },
+    {
+        path: RESET_PASSWORD_PATH,
+        element: <ResetPassword />,
     },
     {
         // Action only route, no element

@@ -1,15 +1,26 @@
-import { FC, MouseEvent, useState } from "react";
-import { useFormContext } from "react-hook-form";
+import { MouseEvent, useState } from "react";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
-import { SignInFormFields, SignInFormValues } from "@app/features/signIn/SignInForm";
+import { useFormContext, FieldValues, Path, RegisterOptions } from "react-hook-form";
 import { FormLabel, TextField, IconButton, FormControl, InputAdornment } from "@mui/material";
 
-export const Password: FC = () => {
+interface PasswordProps<T extends FieldValues> {
+    name: Path<T>;
+    label: string;
+    autoComplete?: string;
+    registerOptions?: RegisterOptions<T, Path<T>>;
+}
+
+export const Password = <T extends FieldValues>({
+    name,
+    label,
+    registerOptions,
+    autoComplete = "current-password",
+}: PasswordProps<T>) => {
     const {
         register,
         formState: { errors },
-    } = useFormContext<SignInFormValues>();
+    } = useFormContext<T>();
 
     const [showPassword, setShowPassword] = useState<boolean>(false);
 
@@ -19,18 +30,18 @@ export const Password: FC = () => {
 
     return (
         <FormControl required>
-            <FormLabel htmlFor="password">Password</FormLabel>
+            <FormLabel htmlFor={name}>{label}</FormLabel>
             <TextField
                 required
                 fullWidth
-                id="password"
-                name="password"
+                id={name}
+                name={name}
                 variant="outlined"
-                placeholder="••••••"
-                autoComplete="current-password"
+                placeholder="••••••••"
                 type={showPassword ? "text" : "password"}
-                error={!!errors.password}
-                helperText={errors.password?.message}
+                autoComplete={autoComplete}
+                error={!!errors[name]}
+                helperText={errors[name]?.message as string}
                 slotProps={{
                     input: {
                         endAdornment: (
@@ -47,10 +58,7 @@ export const Password: FC = () => {
                         ),
                     },
                 }}
-                {...register(SignInFormFields.PASSWORD, {
-                    required: "Password is required",
-                    minLength: { value: 6, message: "Password must be at least 6 characters" },
-                })}
+                {...register(name, registerOptions)}
             />
         </FormControl>
     );

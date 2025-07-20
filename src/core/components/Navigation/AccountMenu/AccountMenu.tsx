@@ -25,6 +25,7 @@ export const AccountMenu: FC = () => {
     const handleSignOut = (): void => {
         submit(null, { method: "post", action: SIGN_OUT_ACTION_ONLY_PATH });
     };
+
     return (
         <>
             <Box sx={{ display: "flex", alignItems: "center", textAlign: "center" }}>

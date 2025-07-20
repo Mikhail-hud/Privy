@@ -2,7 +2,7 @@ import { FC } from "react";
 import { useFormContext } from "react-hook-form";
 import { FormLabel, TextField, FormControl } from "@mui/material";
 import { isValidEmail, isValidUsername } from "@app/core/utils/authUtils";
-import { SignInFormFields, SignInFormValues } from "@app/features/signIn/SignInForm";
+import { SIGN_IN_FORM_FIELDS, SignInFormValues } from "@app/features/auth/signIn/SignInForm";
 
 export const Identifier: FC = () => {
     const {
@@ -11,18 +11,18 @@ export const Identifier: FC = () => {
     } = useFormContext<SignInFormValues>();
     return (
         <FormControl required>
-            <FormLabel>Identifier</FormLabel>
+            <FormLabel>{SIGN_IN_FORM_FIELDS.identifier.label}</FormLabel>
             <TextField
                 autoFocus
                 required
                 fullWidth
-                id="identifier"
-                name="identifier"
                 variant="outlined"
                 error={!!errors.identifier}
+                id={SIGN_IN_FORM_FIELDS.identifier.name}
+                name={SIGN_IN_FORM_FIELDS.identifier.name}
                 placeholder="Enter your Email or Username"
                 helperText={errors.identifier?.message}
-                {...register(SignInFormFields.IDENTIFIER, {
+                {...register(SIGN_IN_FORM_FIELDS.identifier.name, {
                     required: "Identifier is required",
                     validate: (value: string) => {
                         if (value.includes("@")) {
