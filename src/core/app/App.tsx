@@ -11,6 +11,7 @@ import {
     DASHBOARD_PAGE_PATH,
     RESET_PASSWORD_PATH,
     SIGN_OUT_ACTION_ONLY_PATH,
+    SIGN_UP_PAGE_PATH,
 } from "@app/core/constants/pathConstants";
 import { AppLayout, RequireAdmin } from "@app/core/components";
 import { createBrowserRouter, RouterProvider, Navigate, redirect } from "react-router-dom";
@@ -19,6 +20,7 @@ import {
     NotFound,
     Profile,
     Dialogs,
+    SignUp,
     Settings,
     Favorites,
     Dashboard,
@@ -26,6 +28,7 @@ import {
     signInAction,
     signOutAction,
     appLayoutLoader,
+    signUpAction,
 } from "@app/features";
 
 const router = createBrowserRouter([
@@ -33,6 +36,11 @@ const router = createBrowserRouter([
         path: SIGN_IN_PAGE_PATH,
         action: signInAction,
         element: <SignIn />,
+    },
+    {
+        path: SIGN_UP_PAGE_PATH,
+        action: signUpAction,
+        element: <SignUp />,
     },
     {
         path: RESET_PASSWORD_PATH,

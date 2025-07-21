@@ -1,26 +1,22 @@
 import { MouseEvent, useState } from "react";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
-import { useFormContext, FieldValues, Path, RegisterOptions } from "react-hook-form";
+import { Control, FieldValues, Path, RegisterOptions, useController } from "react-hook-form";
 import { FormLabel, TextField, IconButton, FormControl, InputAdornment } from "@mui/material";
 
-interface PasswordProps<T extends FieldValues> {
+interface PasswordProps<T extends FieldValues = FieldValues> {
     name: Path<T>;
     label: string;
+    rules?: RegisterOptions<T>;
+    control: Control<T>;
     autoComplete?: string;
-    registerOptions?: RegisterOptions<T, Path<T>>;
 }
 
-export const Password = <T extends FieldValues>({
-    name,
-    label,
-    registerOptions,
-    autoComplete = "current-password",
-}: PasswordProps<T>) => {
+export const Password = <T extends FieldValues>({ name, label, rules, control, autoComplete }: PasswordProps<T>) => {
     const {
-        register,
-        formState: { errors },
-    } = useFormContext<T>();
+        field,
+        fieldState: { error },
+    } = useController({ name, control, rules });
 
     const [showPassword, setShowPassword] = useState<boolean>(false);
 
@@ -32,16 +28,17 @@ export const Password = <T extends FieldValues>({
         <FormControl required>
             <FormLabel htmlFor={name}>{label}</FormLabel>
             <TextField
+                {...field}
                 required
                 fullWidth
                 id={name}
                 name={name}
+                error={!!error}
                 variant="outlined"
                 placeholder="••••••••"
-                type={showPassword ? "text" : "password"}
                 autoComplete={autoComplete}
-                error={!!errors[name]}
-                helperText={errors[name]?.message as string}
+                helperText={error?.message}
+                type={showPassword ? "text" : "password"}
                 slotProps={{
                     input: {
                         endAdornment: (
@@ -58,7 +55,6 @@ export const Password = <T extends FieldValues>({
                         ),
                     },
                 }}
-                {...register(name, registerOptions)}
             />
         </FormControl>
     );
