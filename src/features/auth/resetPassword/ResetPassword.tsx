@@ -10,16 +10,13 @@ export const ResetPassword: FC = () => {
     const handleSignInClick = (): void => navigate(SIGN_IN_PAGE_PATH, { replace: true });
     return (
         <AuthContainer>
-            <Typography component="h1" variant="h2">
+            <Typography component="h1" variant="h3">
                 Password Recovery
             </Typography>
             <ResetPasswordForm />
-            <Typography sx={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 1 }}>
-                Remembered your password?{" "}
-                <Link variant="body2" component="button" onClick={handleSignInClick}>
-                    Sign in
-                </Link>
-            </Typography>
+            <Link variant="body2" component="button" onClick={handleSignInClick}>
+                Remembered your password?
+            </Link>
         </AuthContainer>
     );
 };

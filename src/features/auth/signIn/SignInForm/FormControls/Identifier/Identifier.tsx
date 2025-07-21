@@ -1,6 +1,6 @@
 import { FC } from "react";
 import { useFormContext } from "react-hook-form";
-import { FormLabel, TextField, FormControl } from "@mui/material";
+import { TextField, FormControl } from "@mui/material";
 import { isValidEmail, isValidUsername } from "@app/core/utils/authUtils";
 import { SIGN_IN_FORM_FIELDS, SignInFormValues } from "@app/features/auth/signIn/SignInForm";
 
@@ -11,12 +11,13 @@ export const Identifier: FC = () => {
     } = useFormContext<SignInFormValues>();
     return (
         <FormControl required>
-            <FormLabel>{SIGN_IN_FORM_FIELDS.identifier.label}</FormLabel>
             <TextField
                 autoFocus
                 required
                 fullWidth
-                variant="outlined"
+                label={SIGN_IN_FORM_FIELDS.identifier.label}
+                variant="standard"
+                autoComplete="username"
                 error={!!errors.identifier}
                 id={SIGN_IN_FORM_FIELDS.identifier.name}
                 name={SIGN_IN_FORM_FIELDS.identifier.name}

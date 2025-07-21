@@ -6,11 +6,12 @@ const MuiCard = styled(Card)(({ theme }) => ({
     flexDirection: "column",
     alignSelf: "center",
     width: "100%",
+    // boxShadow: `0px 0px 0px  ${brand[400]}, 0px 0px 300px ${brand[300]}`,
     padding: theme.spacing(4),
     gap: theme.spacing(2),
     margin: "auto",
     [theme.breakpoints.up("sm")]: {
-        maxWidth: "450px",
+        maxWidth: "500px",
     },
 }));
 

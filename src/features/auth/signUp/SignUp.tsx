@@ -10,16 +10,13 @@ export const SignUp: FC = () => {
     const handleSignUpClick = (): void => navigate(SIGN_IN_PAGE_PATH);
     return (
         <AuthContainer>
-            <Typography component="h1" variant="h2">
+            <Typography component="h1" variant="h3">
                 Sign Up
             </Typography>
             <SignUpForm />
-            <Typography sx={{ textAlign: "center", display: "flex", justifyContent: "center", gap: 1 }}>
-                Looking to sign in?{" "}
-                <Link variant="body2" component="button" onClick={handleSignUpClick}>
-                    Sign In
-                </Link>
-            </Typography>
+            <Link variant="body2" component="button" onClick={handleSignUpClick}>
+                Looking to Sign In?
+            </Link>
         </AuthContainer>
     );
 };

@@ -26,7 +26,7 @@ export const ForgotPassword: FC<ForgotPasswordProps> = ({ open, handleClose }) =
     };
     return (
         <Dialog open={open} onClose={handleClose} slotProps={{ paper: { component: "form", onSubmit: handleSubmit } }}>
-            <DialogTitle>Reset password</DialogTitle>
+            <DialogTitle variant="h3">Reset password</DialogTitle>
             <DialogContent sx={{ display: "flex", flexDirection: "column", gap: 2, width: "100%" }}>
                 <DialogContentText>
                     Enter your account&apos;s email address, and we&apos;ll send you a link to reset your password.
@@ -40,7 +40,7 @@ export const ForgotPassword: FC<ForgotPasswordProps> = ({ open, handleClose }) =
                     label="Email address"
                     placeholder="Email address"
                     type="email"
-                    variant="outlined"
+                    variant="standard"
                     fullWidth
                     disabled={isLoading}
                 />

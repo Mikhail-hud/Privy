@@ -1,5 +1,5 @@
 export const MAX_PASSWORD_LENGTH = 128;
-export const MIN_PASSWORD_LENGTH = 8;
+export const MIN_PASSWORD_LENGTH = 6;
 
 export const VALIDATE_RELES = {
     PASSWORD: {

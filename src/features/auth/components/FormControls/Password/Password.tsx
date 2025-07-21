@@ -1,18 +1,26 @@
 import { MouseEvent, useState } from "react";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
+import { TextField, IconButton, FormControl, InputAdornment } from "@mui/material";
 import { Control, FieldValues, Path, RegisterOptions, useController } from "react-hook-form";
-import { FormLabel, TextField, IconButton, FormControl, InputAdornment } from "@mui/material";
 
 interface PasswordProps<T extends FieldValues = FieldValues> {
     name: Path<T>;
     label: string;
+    autoFocus?: boolean;
     rules?: RegisterOptions<T>;
     control: Control<T>;
     autoComplete?: string;
 }
 
-export const Password = <T extends FieldValues>({ name, label, rules, control, autoComplete }: PasswordProps<T>) => {
+export const Password = <T extends FieldValues>({
+    name,
+    label,
+    rules,
+    control,
+    autoComplete,
+    autoFocus,
+}: PasswordProps<T>) => {
     const {
         field,
         fieldState: { error },
@@ -26,7 +34,6 @@ export const Password = <T extends FieldValues>({ name, label, rules, control, a
 
     return (
         <FormControl required>
-            <FormLabel htmlFor={name}>{label}</FormLabel>
             <TextField
                 {...field}
                 required
@@ -34,8 +41,9 @@ export const Password = <T extends FieldValues>({ name, label, rules, control, a
                 id={name}
                 name={name}
                 error={!!error}
-                variant="outlined"
-                placeholder="••••••••"
+                label={label}
+                variant="standard"
+                autoFocus={autoFocus}
                 autoComplete={autoComplete}
                 helperText={error?.message}
                 type={showPassword ? "text" : "password"}

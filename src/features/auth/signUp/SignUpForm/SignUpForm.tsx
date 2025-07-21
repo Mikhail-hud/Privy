@@ -51,7 +51,7 @@ export const SignUpForm: FC = () => {
                     control={control}
                     name={SIGN_UP_FORM_FIELDS.password.name}
                     label={SIGN_UP_FORM_FIELDS.password.label}
-                    autoComplete="current-password"
+                    autoComplete="new-password"
                     rules={{
                         required: "Password is required",
                         minLength: VALIDATE_RELES.PASSWORD.minLength,

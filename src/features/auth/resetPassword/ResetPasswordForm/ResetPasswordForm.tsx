@@ -54,6 +54,7 @@ export const ResetPasswordForm: FC = () => {
             sx={{ display: "flex", flexDirection: "column", width: "100%", gap: 2 }}
         >
             <Password<ResetPasswordFormValues>
+                autoFocus
                 control={control}
                 autoComplete="new-password"
                 label={RESET_PASSWORD_FORM_FIELDS.password.label}
