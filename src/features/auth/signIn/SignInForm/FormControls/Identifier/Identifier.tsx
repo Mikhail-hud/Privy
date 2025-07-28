@@ -15,10 +15,10 @@ export const Identifier: FC = () => {
                 autoFocus
                 required
                 fullWidth
-                label={SIGN_IN_FORM_FIELDS.identifier.label}
                 variant="standard"
                 autoComplete="username"
                 error={!!errors.identifier}
+                label={SIGN_IN_FORM_FIELDS.identifier.label}
                 id={SIGN_IN_FORM_FIELDS.identifier.name}
                 name={SIGN_IN_FORM_FIELDS.identifier.name}
                 placeholder="Enter your Email or Username"

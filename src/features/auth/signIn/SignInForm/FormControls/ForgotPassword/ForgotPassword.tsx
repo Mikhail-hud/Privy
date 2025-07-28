@@ -10,6 +10,9 @@ interface ForgotPasswordProps {
 
 export const ForgotPassword: FC<ForgotPasswordProps> = ({ open, handleClose }) => {
     const [resetPassword, { isLoading }] = useResetPasswordMutation();
+    const emailInputRef = useRef<HTMLInputElement>(null);
+
+    const handleDialogEntered = (): void => emailInputRef.current?.focus();
 
     const handleSubmit = async (event: FormEvent<HTMLFormElement>): Promise<void> => {
         event.stopPropagation();
@@ -25,24 +28,31 @@ export const ForgotPassword: FC<ForgotPasswordProps> = ({ open, handleClose }) =
         }
     };
     return (
-        <Dialog open={open} onClose={handleClose} slotProps={{ paper: { component: "form", onSubmit: handleSubmit } }}>
+        <Dialog
+            open={open}
+            onClose={handleClose}
+            slotProps={{
+                transition: { onEntered: handleDialogEntered },
+                paper: { component: "form", onSubmit: handleSubmit },
+            }}
+        >
             <DialogTitle variant="h3">Reset password</DialogTitle>
             <DialogContent sx={{ display: "flex", flexDirection: "column", gap: 2, width: "100%" }}>
                 <DialogContentText>
                     Enter your account&apos;s email address, and we&apos;ll send you a link to reset your password.
                 </DialogContentText>
                 <TextField
-                    autoFocus
                     required
-                    margin="dense"
                     id="email"
-                    name="email"
-                    label="Email address"
-                    placeholder="Email address"
-                    type="email"
-                    variant="standard"
                     fullWidth
+                    name="email"
+                    type="email"
+                    margin="dense"
+                    variant="standard"
+                    label="Email address"
                     disabled={isLoading}
+                    placeholder="Enter Email address"
+                    inputRef={emailInputRef}
                 />
             </DialogContent>
             <DialogActions sx={{ pb: 3, px: 3 }}>

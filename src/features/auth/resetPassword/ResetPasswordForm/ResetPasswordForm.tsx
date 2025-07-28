@@ -57,21 +57,19 @@ export const ResetPasswordForm: FC = () => {
                 autoFocus
                 control={control}
                 autoComplete="new-password"
+                placeholder="Enter your new password"
                 label={RESET_PASSWORD_FORM_FIELDS.password.label}
                 name={RESET_PASSWORD_FORM_FIELDS.password.name}
-                rules={{
-                    required: "Password is required",
-                    minLength: VALIDATE_RELES.PASSWORD.minLength,
-                    maxLength: VALIDATE_RELES.PASSWORD.maxLength,
-                }}
+                rules={VALIDATE_RELES.PASSWORD}
             />
             <Password<ResetPasswordFormValues>
                 control={control}
                 autoComplete="new-password"
+                placeholder="Repeat your new password"
                 label={RESET_PASSWORD_FORM_FIELDS.passwordRepeat.label}
                 name={RESET_PASSWORD_FORM_FIELDS.passwordRepeat.name}
                 rules={{
-                    required: "Repeat Password is required",
+                    ...VALIDATE_RELES.PASSWORD_REPEAT,
                     validate: value => {
                         if (value !== getValues(RESET_PASSWORD_FORM_FIELDS.password.name)) {
                             return "Passwords do not match";

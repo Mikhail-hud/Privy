@@ -10,6 +10,7 @@ interface PasswordProps<T extends FieldValues = FieldValues> {
     autoFocus?: boolean;
     rules?: RegisterOptions<T>;
     control: Control<T>;
+    placeholder?: string;
     autoComplete?: string;
 }
 
@@ -18,6 +19,7 @@ export const Password = <T extends FieldValues>({
     label,
     rules,
     control,
+    placeholder,
     autoComplete,
     autoFocus,
 }: PasswordProps<T>) => {
@@ -44,6 +46,7 @@ export const Password = <T extends FieldValues>({
                 label={label}
                 variant="standard"
                 autoFocus={autoFocus}
+                placeholder={placeholder}
                 autoComplete={autoComplete}
                 helperText={error?.message}
                 type={showPassword ? "text" : "password"}

@@ -1,9 +1,33 @@
-import { SESSIONS_TAG, TAG_TYPES, unthreadsApi, USER_TAG } from "@app/core/services";
+import { SESSIONS_TAG, TAG_TYPES, unthreadsApi, USER_NAME_TAG, USER_TAG } from "@app/core/services";
 
 export interface SignInPayload {
     identifier: string;
     password: string;
     rememberMe?: boolean;
+}
+
+export interface SignUpPayload {
+    userName: string;
+    email: string;
+    password: string;
+    passwordRepeat: string;
+    age: number;
+    gender?: UserGender;
+    fullName?: string;
+    biography?: string;
+    rememberMe?: boolean;
+}
+
+export interface TwoFactorSignInPayload {
+    twoFactorCode: string;
+}
+
+export interface UserNameAvailabilityPayload {
+    userName: string;
+}
+
+export interface UserNameAvailabilityResponse {
+    isAvailable: boolean;
 }
 
 export interface Session {
@@ -24,10 +48,20 @@ export enum UserRole {
     MODERATOR = "MODERATOR",
 }
 
+export enum UserGender {
+    MALE = "MALE",
+    FEMALE = "FEMALE",
+    OTHER = "OTHER",
+}
+
 export interface User {
     id: number;
     username: string;
     role: UserRole;
+}
+
+export interface UserWithTwoFactor extends User {
+    twoFactorRequired?: boolean;
 }
 
 export interface ChangePasswordPayload {
@@ -52,7 +86,7 @@ export const authApi = unthreadsApi.injectEndpoints({
             query: () => "auth/me",
             providesTags: () => [USER_TAG],
         }),
-        signIn: builder.mutation<User, SignInPayload>({
+        signIn: builder.mutation<UserWithTwoFactor, SignInPayload>({
             query: body => ({
                 url: "auth/sign-in",
                 method: "POST",
@@ -61,7 +95,32 @@ export const authApi = unthreadsApi.injectEndpoints({
             invalidatesTags: (_, err) => (err ? [] : TAG_TYPES),
             async onQueryStarted(_a: never, { dispatch, queryFulfilled }): Promise<void> {
                 const { data } = await queryFulfilled;
-                // Update the 'me' query data with the signed-in user
+                // If two-factor authentication is required, we do not update the user data
+                if (data?.twoFactorRequired) return;
+                dispatch(authApi.util.upsertQueryData("me", undefined, data));
+            },
+        }),
+        signUp: builder.mutation<User, SignUpPayload>({
+            query: body => ({
+                url: "auth/sign-up",
+                method: "POST",
+                body,
+            }),
+            invalidatesTags: (_, err) => (err ? [] : TAG_TYPES),
+            async onQueryStarted(_a: never, { dispatch, queryFulfilled }): Promise<void> {
+                const { data } = await queryFulfilled;
+                dispatch(authApi.util.upsertQueryData("me", undefined, data));
+            },
+        }),
+        twoFactorSignIn: builder.mutation<User, TwoFactorSignInPayload>({
+            query: body => ({
+                url: "auth/sign-in/two-factor",
+                method: "POST",
+                body,
+            }),
+            invalidatesTags: (_, err) => (err ? [] : TAG_TYPES),
+            async onQueryStarted(_a: never, { dispatch, queryFulfilled }): Promise<void> {
+                const { data } = await queryFulfilled;
                 dispatch(authApi.util.upsertQueryData("me", undefined, data));
             },
         }),
@@ -72,6 +131,15 @@ export const authApi = unthreadsApi.injectEndpoints({
             }),
             invalidatesTags: (_, err) => (err ? [] : [USER_TAG]),
         }),
+        checkUserNameAvailability: builder.query<UserNameAvailabilityResponse, UserNameAvailabilityPayload>({
+            query: payload => ({
+                url: `auth/user-name/availability`,
+                method: "GET",
+                params: payload,
+            }),
+            providesTags: () => [USER_NAME_TAG],
+        }),
+
         getSessions: builder.query<Session[], void>({
             query: (): string => "auth/sessions",
             providesTags: () => [SESSIONS_TAG],
@@ -122,6 +190,7 @@ export const authApi = unthreadsApi.injectEndpoints({
 
 export const {
     useGetSessionsQuery,
+    useLazyCheckUserNameAvailabilityQuery,
     useRevokeSessionMutation,
     useRevokeAllSessionsMutation,
     useResetPasswordMutation,

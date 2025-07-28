@@ -1,16 +1,25 @@
 import { Checkbox, FormControlLabel } from "@mui/material";
-import { FieldValues, Path, RegisterOptions, useFormContext } from "react-hook-form";
+import { Control, Controller, FieldValues, Path, RegisterOptions } from "react-hook-form";
 
 interface RememberMeProps<T extends FieldValues> {
     name: Path<T>;
     label: string;
-    autoComplete?: string;
-    registerOptions?: RegisterOptions<T, Path<T>>;
+    control: Control<T>;
+    rules?: RegisterOptions<T>;
 }
 
-export const RememberMe = <T extends FieldValues>({ name, label, registerOptions }: RememberMeProps<T>) => {
-    const { register } = useFormContext<T>();
+export const RememberMe = <T extends FieldValues>({ name, label, rules, control }: RememberMeProps<T>) => {
     return (
-        <FormControlLabel control={<Checkbox {...register(name, registerOptions)} color="primary" />} label={label} />
+        <Controller
+            name={name}
+            control={control}
+            rules={rules}
+            render={({ field }) => (
+                <FormControlLabel
+                    control={<Checkbox {...field} checked={!!field.value} color="primary" />}
+                    label={label}
+                />
+            )}
+        />
     );
 };

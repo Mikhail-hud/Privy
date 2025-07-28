@@ -3,9 +3,10 @@ import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
 export const PROFILE_TAG = "ProfileTag";
 export const SESSIONS_TAG = "SessionsTag";
+export const USER_NAME_TAG = "UserNameTag";
 export const USER_TAG = "UserTag";
 
-export const TAG_TYPES = [PROFILE_TAG, SESSIONS_TAG, USER_TAG];
+export const TAG_TYPES = [PROFILE_TAG, SESSIONS_TAG, USER_TAG, USER_NAME_TAG];
 
 export const unthreadsApi = createApi({
     reducerPath: "console",
