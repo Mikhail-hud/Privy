@@ -1,6 +1,7 @@
 import { FC, FormEvent } from "react";
 import { enqueueSnackbar } from "notistack";
 import { useResetPasswordMutation } from "@app/core/services";
+import { GENERIC_ERROR_MESSAGE } from "@app/core/constants/general";
 import { Button, Dialog, DialogTitle, DialogContent, DialogActions, DialogContentText, TextField } from "@mui/material";
 
 interface ForgotPasswordProps {
@@ -24,7 +25,7 @@ export const ForgotPassword: FC<ForgotPasswordProps> = ({ open, handleClose }) =
             enqueueSnackbar("Password Reset link sent to your email address.", { variant: "success" });
             handleClose();
         } catch (error) {
-            enqueueSnackbar(error.data.message?.toString(), { variant: "error" });
+            enqueueSnackbar(error?.data?.message?.toString() || GENERIC_ERROR_MESSAGE, { variant: "error" });
         }
     };
     return (

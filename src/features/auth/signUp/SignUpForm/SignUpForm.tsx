@@ -50,7 +50,6 @@ export const SignUpForm: FC = () => {
 
     const form = useForm<SignUpFormValues>({
         defaultValues: DEFAULT_SIGN_UP_FORM_VALUES,
-        reValidateMode: "onBlur",
         mode: "onChange",
     });
     const { handleSubmit, setError, getValues, control } = form;
@@ -76,7 +75,7 @@ export const SignUpForm: FC = () => {
                 method="post"
                 component="form"
                 onSubmit={handleSubmit(onValidSubmit)}
-                sx={{ display: "flex", flexDirection: "column", width: "100%", gap: 2 }}
+                sx={{ display: "flex", flexDirection: "column", width: "100%", gap: 1 }}
             >
                 <UserName />
                 <Age />

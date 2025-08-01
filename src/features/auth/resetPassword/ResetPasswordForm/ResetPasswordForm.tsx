@@ -3,6 +3,7 @@ import { Box, Button } from "@mui/material";
 import { enqueueSnackbar } from "notistack";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { VALIDATE_RELES } from "@app/core/constants/rulesConstants";
+import { GENERIC_ERROR_MESSAGE } from "@app/core/constants/general";
 import { Password } from "@app/features/auth/components/FormControls";
 import { NavigateFunction, useSearchParams } from "react-router-dom";
 import { newPasswordPayload, useSetNewPasswordMutation } from "@app/core/services";
@@ -42,7 +43,7 @@ export const ResetPasswordForm: FC = () => {
             enqueueSnackbar("Password has been reset successfully.", { variant: "success" });
             navigate(SIGN_IN_PAGE_PATH, { replace: true });
         } catch (error) {
-            enqueueSnackbar(error.data.message?.toString(), { variant: "error" });
+            enqueueSnackbar(error.data.message?.toString() || GENERIC_ERROR_MESSAGE, { variant: "error" });
         }
     };
     return (
