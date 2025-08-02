@@ -1,6 +1,7 @@
 import { store } from "@app/core/store";
 import { redirect } from "react-router-dom";
 import { enqueueSnackbar } from "notistack";
+import { QueryError } from "@app/core/interfaces";
 import { authApi, SignUpPayload } from "@app/core/services";
 import { GENERIC_ERROR_MESSAGE } from "@app/core/constants/general";
 import { PROFILE_PAGE_PATH } from "@app/core/constants/pathConstants";
@@ -18,8 +19,8 @@ export const signUpAction = async ({ request }: { request: Request }): Promise<R
         await promise.unwrap();
         return redirect(PROFILE_PAGE_PATH);
     } catch (error) {
-        const errorMessage = error?.data?.message?.toString() || GENERIC_ERROR_MESSAGE;
+        const errorMessage = (error as QueryError)?.data?.message?.toString() || GENERIC_ERROR_MESSAGE;
         enqueueSnackbar(errorMessage, { variant: "error" });
-        return { error: errorMessage, errors: error?.data?.errors };
+        return { error: errorMessage, errors: (error as QueryError)?.data?.errors };
     }
 };

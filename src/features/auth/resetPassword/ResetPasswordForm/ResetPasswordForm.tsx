@@ -1,12 +1,14 @@
 import { FC } from "react";
-import { Box, Button } from "@mui/material";
+import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
 import { enqueueSnackbar } from "notistack";
+import { Password } from "@app/core/components";
+import { QueryError } from "@app/core/interfaces";
 import { SubmitHandler, useForm } from "react-hook-form";
+import { useSetNewPasswordMutation } from "@app/core/services";
 import { VALIDATE_RELES } from "@app/core/constants/rulesConstants";
 import { GENERIC_ERROR_MESSAGE } from "@app/core/constants/general";
-import { Password } from "@app/features/auth/components/FormControls";
 import { NavigateFunction, useSearchParams } from "react-router-dom";
-import { newPasswordPayload, useSetNewPasswordMutation } from "@app/core/services";
 import { SIGN_IN_PAGE_PATH, TOKEN_PARAM_KEY } from "@app/core/constants/pathConstants";
 
 export const RESET_PASSWORD_FORM_FIELDS = {
@@ -24,14 +26,14 @@ export const ResetPasswordForm: FC = () => {
     const [searchParams] = useSearchParams();
     const [setNewPassword, { isLoading }] = useSetNewPasswordMutation();
     const form = useForm<ResetPasswordFormValues>({
-        mode: "onTouched",
+        mode: "onChange",
     });
     const { handleSubmit, getValues, control } = form;
 
     const onValidSubmit: SubmitHandler<ResetPasswordFormValues> = async ({
         password,
         passwordRepeat,
-    }: newPasswordPayload): Promise<void> => {
+    }: ResetPasswordFormValues): Promise<void> => {
         const token: string | null = searchParams.get(TOKEN_PARAM_KEY);
 
         if (!token) {
@@ -43,7 +45,9 @@ export const ResetPasswordForm: FC = () => {
             enqueueSnackbar("Password has been reset successfully.", { variant: "success" });
             navigate(SIGN_IN_PAGE_PATH, { replace: true });
         } catch (error) {
-            enqueueSnackbar(error.data.message?.toString() || GENERIC_ERROR_MESSAGE, { variant: "error" });
+            enqueueSnackbar((error as QueryError)?.data?.message?.toString() || GENERIC_ERROR_MESSAGE, {
+                variant: "error",
+            });
         }
     };
     return (

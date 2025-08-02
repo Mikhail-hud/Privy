@@ -1,5 +1,6 @@
 import { FC } from "react";
-import { Link, Typography } from "@mui/material";
+import Link from "@mui/material/Link";
+import Typography from "@mui/material/Typography";
 import { Link as RouterLink } from "react-router-dom";
 import { AuthContainer } from "@app/features/auth/components";
 import { SignUpForm } from "@app/features/auth/signUp/SignUpForm";

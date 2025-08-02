@@ -3,7 +3,7 @@ import { redirect } from "react-router-dom";
 import { authApi } from "@app/core/services";
 import { PROFILE_PAGE_PATH } from "@app/core/constants/pathConstants";
 
-export const guestOnlyLoader = async (): Promise<Response> | null => {
+export const guestOnlyLoader = async (): Promise<Promise<Response> | null> => {
     const promise = store.dispatch(authApi.endpoints.me.initiate());
     try {
         await promise.unwrap();

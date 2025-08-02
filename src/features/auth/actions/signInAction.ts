@@ -1,6 +1,7 @@
 import { store } from "@app/core/store";
 import { redirect } from "react-router-dom";
 import { enqueueSnackbar } from "notistack";
+import { QueryError } from "@app/core/interfaces";
 import { GENERIC_ERROR_MESSAGE } from "@app/core/constants/general";
 import { PROFILE_PAGE_PATH } from "@app/core/constants/pathConstants";
 import { authApi, SignInPayload, TwoFactorSignInPayload, UserWithTwoFactor } from "@app/core/services";
@@ -40,7 +41,7 @@ export const signInAction = async ({ request }: { request: Request }): Promise<R
             }
             return redirect(PROFILE_PAGE_PATH);
         } catch (error) {
-            const errorMessage = error?.data?.message?.toString() || GENERIC_ERROR_MESSAGE;
+            const errorMessage = (error as QueryError)?.data?.message?.toString() || GENERIC_ERROR_MESSAGE;
             enqueueSnackbar(errorMessage, { variant: "error" });
             return { credentialsError: errorMessage };
         }
@@ -53,7 +54,7 @@ export const signInAction = async ({ request }: { request: Request }): Promise<R
             await promise.unwrap();
             return redirect(PROFILE_PAGE_PATH);
         } catch (error) {
-            const errorMessage = error?.data?.message?.toString() || GENERIC_ERROR_MESSAGE;
+            const errorMessage = (error as QueryError)?.data?.message?.toString() || GENERIC_ERROR_MESSAGE;
             enqueueSnackbar(errorMessage, { variant: "error" });
             return { twoFactorError: errorMessage };
         }

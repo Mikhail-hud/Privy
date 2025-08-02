@@ -1,6 +1,8 @@
 import { FC } from "react";
+import Link from "@mui/material/Link";
+import Divider from "@mui/material/Divider";
+import Typography from "@mui/material/Typography";
 import { Link as RouterLink } from "react-router-dom";
-import { Divider, Link, Typography } from "@mui/material";
 import { AuthContainer } from "@app/features/auth/components";
 import { SignInForm } from "@app/features/auth/signIn/SignInForm";
 import { SIGN_UP_PAGE_PATH } from "@app/core/constants/pathConstants";

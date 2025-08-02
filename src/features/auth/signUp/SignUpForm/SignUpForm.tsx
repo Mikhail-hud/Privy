@@ -1,11 +1,11 @@
 import { FC } from "react";
-import { Box, Button } from "@mui/material";
+import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
 import { UserGender } from "@app/core/services";
+import { SubmitHandler, useForm } from "react-hook-form";
 import { VALIDATE_RELES } from "@app/core/constants/rulesConstants";
-import { FormProvider, SubmitHandler, useForm } from "react-hook-form";
-import { Password, RememberMe } from "@app/features/auth/components/FormControls";
 import { Navigation, SubmitFunction, useActionData, useNavigation, useSubmit } from "react-router-dom";
-import { Age, Biography, Email, FullName, Gender, UserName } from "@app/features/auth/signUp/SignUpForm/FormControls";
+import { Age, UserName, Email, Password, RememberMe, FullName, Biography, Gender } from "@app/core/components";
 
 export const SIGN_UP_FORM_FIELDS = {
     gender: { name: "gender", label: "Gender" },
@@ -21,7 +21,7 @@ export const SIGN_UP_FORM_FIELDS = {
 
 export interface SignUpFormValues {
     [SIGN_UP_FORM_FIELDS.gender.name]: UserGender;
-    [SIGN_UP_FORM_FIELDS.age.name]: number;
+    [SIGN_UP_FORM_FIELDS.age.name]: number | null;
     [SIGN_UP_FORM_FIELDS.biography.name]: string;
     [SIGN_UP_FORM_FIELDS.fullName.name]: string;
     [SIGN_UP_FORM_FIELDS.userName.name]: string;
@@ -69,53 +69,80 @@ export const SignUpForm: FC = () => {
     }, [actionData]);
 
     return (
-        <FormProvider {...form}>
-            <Box
-                noValidate
-                method="post"
-                component="form"
-                onSubmit={handleSubmit(onValidSubmit)}
-                sx={{ display: "flex", flexDirection: "column", width: "100%", gap: 1 }}
-            >
-                <UserName />
-                <Age />
-                <Email />
-                <Password<SignUpFormValues>
-                    control={control}
-                    rules={VALIDATE_RELES.PASSWORD}
-                    name={SIGN_UP_FORM_FIELDS.password.name}
-                    label={SIGN_UP_FORM_FIELDS.password.label}
-                    autoComplete="new-password"
-                    placeholder="Password must be at least 6 characters long"
-                />
-                <Password<SignUpFormValues>
-                    control={control}
-                    autoComplete="new-password"
-                    placeholder="Repeat your password"
-                    label={SIGN_UP_FORM_FIELDS.passwordRepeat.label}
-                    name={SIGN_UP_FORM_FIELDS.passwordRepeat.name}
-                    rules={{
-                        ...VALIDATE_RELES.PASSWORD_REPEAT,
-                        validate: value => {
-                            if (value !== getValues(SIGN_UP_FORM_FIELDS.password.name)) {
-                                return "Passwords do not match";
-                            }
-                            return true;
-                        },
-                    }}
-                />
-                <FullName />
-                <Biography />
-                <Gender />
-                <RememberMe
-                    label={SIGN_UP_FORM_FIELDS.rememberMe.label}
-                    name={SIGN_UP_FORM_FIELDS.rememberMe.name}
-                    control={control}
-                />
-                <Button type="submit" fullWidth variant="contained" loadingPosition="start" loading={isSubmitting}>
-                    Sign Up
-                </Button>
-            </Box>
-        </FormProvider>
+        <Box
+            noValidate
+            method="post"
+            component="form"
+            onSubmit={handleSubmit(onValidSubmit)}
+            sx={{ display: "flex", flexDirection: "column", width: "100%", gap: 1 }}
+        >
+            <UserName<SignUpFormValues>
+                control={control}
+                rules={VALIDATE_RELES.USER_NAME}
+                name={SIGN_UP_FORM_FIELDS.userName.name}
+                label={SIGN_UP_FORM_FIELDS.userName.label}
+            />
+            <Age<SignUpFormValues>
+                control={control}
+                rules={VALIDATE_RELES.AGE}
+                name={SIGN_UP_FORM_FIELDS.age.name}
+                label={SIGN_UP_FORM_FIELDS.age.label}
+            />
+            <Email<SignUpFormValues>
+                control={control}
+                rules={VALIDATE_RELES.EMAIL}
+                label={SIGN_UP_FORM_FIELDS.email.label}
+                name={SIGN_UP_FORM_FIELDS.email.name}
+            />
+            <Password<SignUpFormValues>
+                control={control}
+                rules={VALIDATE_RELES.PASSWORD}
+                name={SIGN_UP_FORM_FIELDS.password.name}
+                label={SIGN_UP_FORM_FIELDS.password.label}
+                autoComplete="new-password"
+                placeholder="Password must be at least 6 characters long"
+            />
+            <Password<SignUpFormValues>
+                control={control}
+                autoComplete="new-password"
+                placeholder="Repeat your password"
+                label={SIGN_UP_FORM_FIELDS.passwordRepeat.label}
+                name={SIGN_UP_FORM_FIELDS.passwordRepeat.name}
+                rules={{
+                    ...VALIDATE_RELES.PASSWORD_REPEAT,
+                    validate: value => {
+                        if (value !== getValues(SIGN_UP_FORM_FIELDS.password.name)) {
+                            return "Passwords do not match";
+                        }
+                        return true;
+                    },
+                }}
+            />
+            <FullName<SignUpFormValues>
+                control={control}
+                rules={VALIDATE_RELES.FULL_NAME}
+                name={SIGN_UP_FORM_FIELDS.fullName.name}
+                label={SIGN_UP_FORM_FIELDS.fullName.label}
+            />
+            <Biography<SignUpFormValues>
+                control={control}
+                rules={VALIDATE_RELES.BIOGRAPHY}
+                name={SIGN_UP_FORM_FIELDS.biography.name}
+                label={SIGN_UP_FORM_FIELDS.biography.label}
+            />
+            <Gender<SignUpFormValues>
+                control={control}
+                name={SIGN_UP_FORM_FIELDS.gender.name}
+                label={SIGN_UP_FORM_FIELDS.gender.label}
+            />
+            <RememberMe<SignUpFormValues>
+                control={control}
+                label={SIGN_UP_FORM_FIELDS.rememberMe.label}
+                name={SIGN_UP_FORM_FIELDS.rememberMe.name}
+            />
+            <Button type="submit" fullWidth variant="contained" loadingPosition="start" loading={isSubmitting}>
+                Sign Up
+            </Button>
+        </Box>
     );
 };

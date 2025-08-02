@@ -3,7 +3,7 @@ import { App } from "@app/core/app";
 import { AppProviders } from "@app/core/providers";
 import { createRoot, Root } from "react-dom/client";
 
-const container: HTMLElement = document.getElementById("app");
+const container: HTMLElement | null = document.getElementById("app");
 const root: Root = createRoot(container!);
 
 root.render(

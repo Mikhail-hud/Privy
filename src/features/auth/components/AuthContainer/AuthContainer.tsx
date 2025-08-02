@@ -1,5 +1,7 @@
+import Card from "@mui/material/Card";
+import { styled } from "@mui/material";
+import Container from "@mui/material/Container";
 import { FC, PropsWithChildren } from "react";
-import { Container, Card, styled } from "@mui/material";
 
 const MuiCard = styled(Card)(({ theme }) => ({
     display: "flex",

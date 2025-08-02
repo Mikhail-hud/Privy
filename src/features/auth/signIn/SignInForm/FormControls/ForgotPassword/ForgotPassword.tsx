@@ -1,8 +1,15 @@
 import { FC, FormEvent } from "react";
+import Button from "@mui/material/Button";
+import Dialog from "@mui/material/Dialog";
 import { enqueueSnackbar } from "notistack";
+import TextField from "@mui/material/TextField";
+import { QueryError } from "@app/core/interfaces";
+import DialogTitle from "@mui/material/DialogTitle";
+import DialogContent from "@mui/material/DialogContent";
+import DialogActions from "@mui/material/DialogActions";
 import { useResetPasswordMutation } from "@app/core/services";
+import DialogContentText from "@mui/material/DialogContentText";
 import { GENERIC_ERROR_MESSAGE } from "@app/core/constants/general";
-import { Button, Dialog, DialogTitle, DialogContent, DialogActions, DialogContentText, TextField } from "@mui/material";
 
 interface ForgotPasswordProps {
     open: boolean;
@@ -25,7 +32,9 @@ export const ForgotPassword: FC<ForgotPasswordProps> = ({ open, handleClose }) =
             enqueueSnackbar("Password Reset link sent to your email address.", { variant: "success" });
             handleClose();
         } catch (error) {
-            enqueueSnackbar(error?.data?.message?.toString() || GENERIC_ERROR_MESSAGE, { variant: "error" });
+            enqueueSnackbar((error as QueryError)?.data?.message?.toString() || GENERIC_ERROR_MESSAGE, {
+                variant: "error",
+            });
         }
     };
     return (
@@ -44,11 +53,9 @@ export const ForgotPassword: FC<ForgotPasswordProps> = ({ open, handleClose }) =
                 </DialogContentText>
                 <TextField
                     required
-                    id="email"
                     fullWidth
                     name="email"
                     type="email"
-                    margin="dense"
                     variant="standard"
                     label="Email address"
                     disabled={isLoading}
