@@ -34,11 +34,11 @@ export const GenderFormControl = <T extends FieldValues>({ control, name, label,
             field: ControllerRenderProps<T, Path<T>>;
             fieldState: ControllerFieldState;
         }) => (
-            <FormControl error={!!error} sx={{ mt: 2 }}>
+            <FormControl error={!!error}>
                 <FormLabel>{label}</FormLabel>
                 <RadioGroup {...field} {...rest} row>
-                    <FormControlLabel value={UserGender.FEMALE} control={<Radio size="small" />} label="Female" />
                     <FormControlLabel value={UserGender.MALE} control={<Radio size="small" />} label="Male" />
+                    <FormControlLabel value={UserGender.FEMALE} control={<Radio size="small" />} label="Female" />
                     <FormControlLabel value={UserGender.OTHER} control={<Radio size="small" />} label="Other" />
                 </RadioGroup>
                 {error && <FormHelperText>{error?.message}</FormHelperText>}

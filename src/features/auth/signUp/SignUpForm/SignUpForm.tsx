@@ -3,6 +3,7 @@ import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import { UserGender } from "@app/core/services";
 import { SubmitHandler, useForm } from "react-hook-form";
+import { transformServerErrors } from "@app/core/utils/general";
 import { VALIDATE_RELES } from "@app/core/constants/rulesConstants";
 import { Navigation, SubmitFunction, useActionData, useNavigation, useSubmit } from "react-router-dom";
 import { Age, UserName, Email, Password, RememberMe, FullName, Biography, Gender } from "@app/core/components";
@@ -21,7 +22,7 @@ export const SIGN_UP_FORM_FIELDS = {
 
 export interface SignUpFormValues {
     [SIGN_UP_FORM_FIELDS.gender.name]: UserGender;
-    [SIGN_UP_FORM_FIELDS.age.name]: number | null;
+    [SIGN_UP_FORM_FIELDS.age.name]: number | string;
     [SIGN_UP_FORM_FIELDS.biography.name]: string;
     [SIGN_UP_FORM_FIELDS.fullName.name]: string;
     [SIGN_UP_FORM_FIELDS.userName.name]: string;
@@ -33,7 +34,7 @@ export interface SignUpFormValues {
 
 const DEFAULT_SIGN_UP_FORM_VALUES: SignUpFormValues = {
     [SIGN_UP_FORM_FIELDS.gender.name]: UserGender.OTHER,
-    [SIGN_UP_FORM_FIELDS.age.name]: null,
+    [SIGN_UP_FORM_FIELDS.age.name]: "",
     [SIGN_UP_FORM_FIELDS.fullName.name]: "",
     [SIGN_UP_FORM_FIELDS.userName.name]: "",
     [SIGN_UP_FORM_FIELDS.email.name]: "",
@@ -49,10 +50,11 @@ export const SignUpForm: FC = () => {
     const actionData = useActionData() as { error: string; errors: Record<string, string> };
 
     const form = useForm<SignUpFormValues>({
-        defaultValues: DEFAULT_SIGN_UP_FORM_VALUES,
         mode: "onChange",
+        defaultValues: DEFAULT_SIGN_UP_FORM_VALUES,
+        errors: transformServerErrors<SignUpFormValues>(actionData?.errors),
     });
-    const { handleSubmit, setError, getValues, control } = form;
+    const { handleSubmit, getValues, control } = form;
 
     const isSubmitting: boolean = navigation.state === "submitting";
 
@@ -60,21 +62,13 @@ export const SignUpForm: FC = () => {
         submit({ ...data }, { method: "post" });
     };
 
-    useEffect((): void => {
-        if (actionData?.errors) {
-            for (const [field, message] of Object.entries(actionData.errors)) {
-                setError(field as keyof SignUpFormValues, { message });
-            }
-        }
-    }, [actionData]);
-
     return (
         <Box
             noValidate
             method="post"
             component="form"
             onSubmit={handleSubmit(onValidSubmit)}
-            sx={{ display: "flex", flexDirection: "column", width: "100%", gap: 1 }}
+            sx={{ display: "flex", flexDirection: "column", width: "100%", gap: 2 }}
         >
             <UserName<SignUpFormValues>
                 control={control}

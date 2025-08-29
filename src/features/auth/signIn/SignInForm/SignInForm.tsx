@@ -1,9 +1,9 @@
 import Box from "@mui/material/Box";
 import Link from "@mui/material/Link";
 import Button from "@mui/material/Button";
-import { SubmitHandler, useForm } from "react-hook-form";
-import { FC, useState, MouseEvent, useEffect } from "react";
+import { FC, useState, MouseEvent } from "react";
 import { VALIDATE_RELES } from "@app/core/constants/rulesConstants";
+import { FieldErrors, SubmitHandler, useForm } from "react-hook-form";
 import { Identifier, Password, RememberMe } from "@app/core/components";
 import { isValidEmail, isValidUsername } from "@app/core/utils/authUtils";
 import { AuthActionData, SIGN_IN_ACTION_KEY, SIGN_IN_WITH_CREDENTIALS } from "@app/features";
@@ -25,13 +25,32 @@ export interface SignInFormValues {
     [SIGN_IN_FORM_FIELDS.rememberMe.name]: boolean;
 }
 
+const DEFAULT_SIGN_IN_FORM_VALUES: SignInFormValues = {
+    [SIGN_IN_FORM_FIELDS.identifier.name]: "",
+    [SIGN_IN_FORM_FIELDS.password.name]: "",
+    [SIGN_IN_FORM_FIELDS.rememberMe.name]: false,
+};
+
+const transformErrors = (credentialsError?: string): FieldErrors<SignInFormValues> | undefined => {
+    if (!credentialsError) return undefined;
+
+    return {
+        [SIGN_IN_FORM_FIELDS.identifier.name]: { type: "manual", message: credentialsError },
+        [SIGN_IN_FORM_FIELDS.password.name]: { type: "manual", message: credentialsError },
+    };
+};
+
 export const SignInForm: FC = () => {
     const submit: SubmitFunction = useSubmit();
     const navigation: Navigation = useNavigation();
     const actionData = useActionData() as AuthActionData;
 
-    const form = useForm<SignInFormValues>();
-    const { handleSubmit, setError, control } = form;
+    const form = useForm<SignInFormValues>({
+        defaultValues: DEFAULT_SIGN_IN_FORM_VALUES,
+        errors: transformErrors(actionData?.credentialsError),
+    });
+
+    const { handleSubmit, control } = form;
     const [open, setOpen] = useState<boolean>(false);
 
     const handleClickOpen = (e: MouseEvent<HTMLButtonElement>): void => {
@@ -42,15 +61,8 @@ export const SignInForm: FC = () => {
 
     const isSubmitting: boolean = navigation.state === "submitting";
 
-    const onValidSubmit: SubmitHandler<SignInFormValues> = data => {
+    const onValidSubmit: SubmitHandler<SignInFormValues> = data =>
         submit({ ...data, [SIGN_IN_ACTION_KEY]: SIGN_IN_WITH_CREDENTIALS }, { method: "post" });
-    };
-    useEffect((): void => {
-        if (actionData?.credentialsError) {
-            setError(SIGN_IN_FORM_FIELDS.identifier.name, { message: actionData?.credentialsError });
-            setError(SIGN_IN_FORM_FIELDS.password.name, { message: actionData?.credentialsError });
-        }
-    }, [actionData]);
 
     return (
         <Box

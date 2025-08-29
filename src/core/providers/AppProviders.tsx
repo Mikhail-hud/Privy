@@ -7,7 +7,7 @@ import { AppThemeProvider } from "@app/core/providers";
 export const AppProviders: FC<PropsWithChildren> = ({ children }) => {
     return (
         <AppThemeProvider>
-            <SnackbarProvider maxSnack={3} autoHideDuration={3000}>
+            <SnackbarProvider maxSnack={3} autoHideDuration={5000}>
                 <Provider store={store}>{children}</Provider>
             </SnackbarProvider>
         </AppThemeProvider>

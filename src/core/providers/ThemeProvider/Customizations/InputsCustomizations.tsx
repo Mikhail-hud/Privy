@@ -19,6 +19,14 @@ export const inputsCustomizations: Components<Theme> = {
                     boxShadow: `0 0 0 100px ${(theme.vars || theme).palette.background.paper} inset`,
                 },
             }),
+            underline: ({ theme }) => ({
+                "&:before": {
+                    borderBottom: `1px solid ${theme.palette.divider}`,
+                },
+                "&:hover:not(.Mui-disabled):before": {
+                    borderBottom: `1px solid ${theme.palette.primary.main}`,
+                },
+            }),
         },
     },
 };

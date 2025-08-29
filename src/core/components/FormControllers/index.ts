@@ -6,4 +6,5 @@ export * from "./FullName";
 export * from "./Biography";
 export * from "./Gender";
 export * from "./Identifier";
+export * from "./Switch";
 export * from "./Password";

@@ -1,6 +1,6 @@
 import { FC } from "react";
 import { Typography } from "@mui/material";
-import { useGetProfileQuery } from "@app/core/services/unthreadsApi/profile";
+import { useGetProfileQuery } from "@app/core/services";
 
 export const Dialogs: FC = () => {
     const { data } = useGetProfileQuery();

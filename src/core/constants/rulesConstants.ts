@@ -1,4 +1,4 @@
-import { EMAIL_PATTERN, USER_NAME_PATTERN } from "@app/core/utils/authUtils";
+import { EMAIL_PATTERN, USER_NAME_PATTERN } from "@app/core/constants/patterns";
 
 export const MIN_AGE = 13;
 export const MAX_AGE = 150;

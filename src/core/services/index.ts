@@ -1,1 +1,1 @@
-export * from "./unthreadsApi";
+export * from "./privyApi";

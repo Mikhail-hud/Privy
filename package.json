@@ -1,11 +1,11 @@
 {
-  "name": "unthreads",
+  "name": "Privy Space",
   "version": "1.0.0",
   "description": "Incognito social media",
   "main": "index.js",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Mikhail-hud/unthreads.git"
+    "url": "https://github.com/Mikhail-hud/privy.git"
   },
   "keywords": [
     "social",
@@ -17,9 +17,9 @@
   "author": "MHud",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/Mikhail-hud/unthreads/issues"
+    "url": "https://github.com/Mikhail-hud/privy/issues"
   },
-  "homepage": "https://github.com/Mikhail-hud/unthreads#readme",
+  "homepage": "https://github.com/Mikhail-hud/privy#readme",
   "scripts": {
     "start": "vite",
     "build": "vite build",
@@ -75,6 +75,7 @@
     "@mui/material": "^7.2.0",
     "@reduxjs/toolkit": "^2.8.1",
     "@types/react-redux": "^7.1.34",
+    "@types/react-slick": "^0.23.13",
     "axios": "1.8.2",
     "classnames": "^2.3.1",
     "moment": "^2.29.2",
@@ -87,6 +88,7 @@
     "react-infinite-scroll-component": "^6.1.0",
     "react-redux": "^9.2.0",
     "react-router-dom": "^6.25.0",
+    "react-slick": "^0.31.0",
     "react-virtuoso": "^2.16.1",
     "socket.io-client": "^4.5.1"
   }

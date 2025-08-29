@@ -1,4 +1,4 @@
-import { SESSIONS_TAG, TAG_TYPES, unthreadsApi, USER_NAME_TAG, USER_TAG } from "@app/core/services";
+import { SESSIONS_TAG, TAG_TYPES, privyApi, USER_NAME_TAG, USER_TAG } from "@app/core/services";
 
 export interface SignInPayload {
     identifier: string;
@@ -80,7 +80,7 @@ export interface newPasswordPayload {
     passwordRepeat: string;
 }
 
-export const authApi = unthreadsApi.injectEndpoints({
+export const authApi = privyApi.injectEndpoints({
     endpoints: builder => ({
         me: builder.query<User, void>({
             query: () => "auth/me",

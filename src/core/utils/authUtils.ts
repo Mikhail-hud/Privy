@@ -1,5 +1,4 @@
-export const EMAIL_PATTERN = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-export const USER_NAME_PATTERN = /^[a-zA-Z0-9_.-]{3,30}$/;
+import { EMAIL_PATTERN, USER_NAME_PATTERN } from "@app/core/constants/patterns.ts";
 
 export const isValidEmail = (value: string): boolean => {
     return EMAIL_PATTERN.test(value);

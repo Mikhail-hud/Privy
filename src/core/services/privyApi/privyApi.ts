@@ -1,18 +1,19 @@
-import { UNTHREADS_API_ROOT } from "@app/config";
+import { PRIVY_API_ROOT } from "@app/config";
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
 export const PROFILE_TAG = "ProfileTag";
+export const PROFILE_PHOTOS_TAG = "ProfilePhotosTag";
 export const SESSIONS_TAG = "SessionsTag";
 export const USER_NAME_TAG = "UserNameTag";
 export const USER_TAG = "UserTag";
 
-export const TAG_TYPES = [PROFILE_TAG, SESSIONS_TAG, USER_TAG, USER_NAME_TAG];
+export const TAG_TYPES = [PROFILE_TAG, SESSIONS_TAG, USER_TAG, USER_NAME_TAG, PROFILE_PHOTOS_TAG] as const;
 
-export const unthreadsApi = createApi({
+export const privyApi = createApi({
     reducerPath: "console",
     tagTypes: TAG_TYPES,
     baseQuery: fetchBaseQuery({
-        baseUrl: `${UNTHREADS_API_ROOT}/v1/`,
+        baseUrl: `${PRIVY_API_ROOT}/v1/`,
         credentials: "include",
     }),
     endpoints: () => ({}),

@@ -37,7 +37,7 @@ export const AccountMenu: FC = () => {
                     aria-expanded={open ? "true" : undefined}
                 >
                     <Avatar src={data?.profilePhoto?.url} sx={{ width: 32, height: 32 }}>
-                        {data?.username?.charAt(0).toUpperCase() || "U"}
+                        {data?.userName?.charAt(0).toUpperCase() || "U"}
                     </Avatar>
                 </IconButton>
             </Box>
