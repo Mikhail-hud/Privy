@@ -9,8 +9,8 @@ import CardContent from "@mui/material/CardContent";
 // import CardActions from "@mui/material/CardActions";
 import { useGetProfileQuery } from "@app/core/services";
 // import FavoriteIcon from "@mui/icons-material/Favorite";
+import { ProfileAvatar } from "@app/core/components";
 import { ProfileTabs } from "@app/features/profile/ProfileCard/ProfileTabs";
-import { ProfileAvatar } from "@app/features/profile/ProfileCard/ProfileAvatar";
 import { EditProfileAction } from "@app/features/profile/ProfileCard/EditProfileAction";
 
 export const ProfileCard: FC = () => {
@@ -18,7 +18,7 @@ export const ProfileCard: FC = () => {
     return (
         <Card variant="outlined" sx={{ maxWidth: 800, margin: "auto", mt: 1, mb: 1 }}>
             <CardHeader
-                avatar={<ProfileAvatar />}
+                avatar={<ProfileAvatar profile={data} isOwner />}
                 subheader={data?.userName}
                 action={<EditProfileAction />}
                 title={data?.fullName ? data.fullName : undefined}

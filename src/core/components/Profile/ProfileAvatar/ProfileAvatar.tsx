@@ -1,9 +1,3 @@
-import {
-    PhotoUploadType,
-    useGetProfileQuery,
-    useUploadPhotoMutation,
-    useDeleteProfilePhotoMutation,
-} from "@app/core/services";
 import Menu from "@mui/material/Menu";
 import Badge from "@mui/material/Badge";
 import Avatar from "@mui/material/Avatar";
@@ -20,9 +14,14 @@ import NoPhotographyIcon from "@mui/icons-material/NoPhotography";
 import { GENERIC_ERROR_MESSAGE } from "@app/core/constants/general";
 import { FILE_PATTERN, FILE_SIZE } from "@app/core/constants/patterns";
 import { ChangeEvent, FC, MouseEvent, RefObject, useState } from "react";
+import { Profile, PhotoUploadType, useUploadPhotoMutation, useDeleteProfilePhotoMutation } from "@app/core/services";
 
-export const ProfileAvatar: FC = () => {
-    const { data } = useGetProfileQuery();
+interface ProfileAvatarProps {
+    profile: Profile | undefined;
+    isOwner?: boolean;
+}
+
+export const ProfileAvatar: FC<ProfileAvatarProps> = ({ profile, isOwner = false }) => {
     const [deletePhoto] = useDeleteProfilePhotoMutation();
     const [uploadPhoto, { isLoading: isUploading }] = useUploadPhotoMutation();
 
@@ -116,11 +115,11 @@ export const ProfileAvatar: FC = () => {
                 ) : (
                     <Avatar
                         alt="profile image"
-                        src={data?.profilePhoto?.url}
+                        src={profile?.profilePhoto?.url}
                         onClick={() => setBackdropOpen(true)}
                         sx={{ width: 100, height: 100, cursor: "pointer" }}
                     >
-                        {data?.userName?.charAt(0).toUpperCase() || "U"}
+                        {profile?.userName?.charAt(0).toUpperCase() || "U"}
                     </Avatar>
                 )}
             </Badge>
@@ -137,33 +136,33 @@ export const ProfileAvatar: FC = () => {
                     </ListItemIcon>
                     Upload new Incognito photo
                 </MenuItem>
-                {data?.profilePhoto && (
+                {profile?.profilePhoto && (
                     <MenuItem
                         sx={{ color: "error.main" }}
                         disabled={isDeletingProfilePhoto}
-                        onClick={() => handleDeletePhoto(data?.profilePhoto?.id, PhotoUploadType.PROFILE)}
+                        onClick={() => handleDeletePhoto(profile?.profilePhoto?.id, PhotoUploadType.PROFILE)}
                     >
                         <ListItemIcon>
                             {isDeletingProfilePhoto ? (
                                 <Skeleton variant="circular" animation="pulse" width={24} height={24} />
                             ) : (
-                                <Avatar src={data?.profilePhoto?.url} sx={{ width: 24, height: 24 }} />
+                                <Avatar src={profile?.profilePhoto?.url} sx={{ width: 24, height: 24 }} />
                             )}
                         </ListItemIcon>
                         Delete current Profile photo
                     </MenuItem>
                 )}
-                {data?.incognitoPhoto && (
+                {profile?.incognitoPhoto && (
                     <MenuItem
                         sx={{ color: "error.main" }}
                         disabled={isDeletingIncognitoPhoto}
-                        onClick={() => handleDeletePhoto(data?.incognitoPhoto?.id, PhotoUploadType.INCOGNITO)}
+                        onClick={() => handleDeletePhoto(profile?.incognitoPhoto?.id, PhotoUploadType.INCOGNITO)}
                     >
                         <ListItemIcon>
                             {isDeletingIncognitoPhoto ? (
                                 <Skeleton variant="circular" animation="pulse" width={24} height={24} />
                             ) : (
-                                <Avatar src={data?.incognitoPhoto?.url} sx={{ width: 24, height: 24 }} />
+                                <Avatar src={profile?.incognitoPhoto?.url} sx={{ width: 24, height: 24 }} />
                             )}
                         </ListItemIcon>
                         Delete current Incognito photo
@@ -182,10 +181,10 @@ export const ProfileAvatar: FC = () => {
                 onClick={() => setBackdropOpen(false)}
                 sx={{ zIndex: theme => theme.zIndex.drawer + 1, background: "black" }}
             >
-                {data?.profilePhoto?.url ? (
+                {profile?.profilePhoto?.url ? (
                     <img
                         alt="profile_image"
-                        src={data?.profilePhoto?.url}
+                        src={profile?.profilePhoto?.url}
                         style={{ maxWidth: "80vw", maxHeight: "80vh", borderRadius: "15px" }}
                     />
                 ) : (
@@ -193,7 +192,7 @@ export const ProfileAvatar: FC = () => {
                         alt="profile_image"
                         sx={{ width: "100%", height: "100%", maxWidth: "250px", maxHeight: "250px" }}
                     >
-                        {data?.userName?.charAt(0).toUpperCase() || "U"}
+                        {profile?.userName?.charAt(0).toUpperCase() || "U"}
                     </Avatar>
                 )}
             </Backdrop>
