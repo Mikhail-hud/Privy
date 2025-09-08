@@ -1,11 +1,12 @@
 import {
     Photo,
     Profile,
-    useSetIncognitoPhotoMutation,
+    useSetPrivatePhotoMutation,
+    useSetPublicPhotoMutation,
     useDeleteProfilePhotoMutation,
-    useSetProfilePhotoToActiveMutation,
+    useUnsetPublicPhotoMutation,
+    useUnsetPrivatePhotoMutation,
 } from "@app/core/services";
-import Slider from "react-slick";
 import { FC, MouseEvent } from "react";
 import Menu from "@mui/material/Menu";
 import Box from "@mui/material/Box";
@@ -13,12 +14,11 @@ import { enqueueSnackbar } from "notistack";
 import Backdrop from "@mui/material/Backdrop";
 import MenuItem from "@mui/material/MenuItem";
 import ImageList from "@mui/material/ImageList";
-import { brand, useTheme } from "@app/core/providers";
+import { useTheme } from "@app/core/providers";
 import StarIcon from "@mui/icons-material/Star";
 import { alpha } from "@mui/material/styles";
 import EditIcon from "@mui/icons-material/Edit";
 import { QueryError } from "@app/core/interfaces";
-import IconButton from "@mui/material/IconButton";
 import DeleteIcon from "@mui/icons-material/Delete";
 import CloseIcon from "@mui/icons-material/Close";
 import { Theme, useMediaQuery } from "@mui/material";
@@ -26,25 +26,18 @@ import ListItemIcon from "@mui/material/ListItemIcon";
 import DownloadIcon from "@mui/icons-material/Download";
 import ImageListItem from "@mui/material/ImageListItem";
 import ImageListItemBar from "@mui/material/ImageListItemBar";
+import CircularProgress from "@mui/material/CircularProgress";
 import NoPhotographyIcon from "@mui/icons-material/NoPhotography";
+import { ActionIconButton, PhotoSwiper } from "@app/core/components";
 import { GENERIC_ERROR_MESSAGE } from "@app/core/constants/general";
-
-const settings = {
-    dots: true,
-    fade: true,
-    infinite: true,
-    speed: 500,
-    slidesToShow: 1,
-    slidesToScroll: 1,
-    waitForAnimate: false,
-};
 
 interface UserPhotoGalleryProps {
     profile: Profile | undefined;
     photos: Photo[];
+    isOwner?: boolean;
 }
 
-export const UserPhotoGallery: FC<UserPhotoGalleryProps> = ({ photos = [], profile }) => {
+export const UserPhotoGallery: FC<UserPhotoGalleryProps> = ({ photos = [], profile, isOwner = false }) => {
     const theme: Theme = useTheme();
     const isMobile: boolean = useMediaQuery(theme.breakpoints.down("sm"));
     const isTablet: boolean = useMediaQuery(theme.breakpoints.between("sm", "md"));
@@ -59,30 +52,31 @@ export const UserPhotoGallery: FC<UserPhotoGalleryProps> = ({ photos = [], profi
         return 3;
     }, [isMobile, isTablet]);
 
-    const [deleteProfilePhoto] = useDeleteProfilePhotoMutation();
-    const [setPhotoToActive] = useSetProfilePhotoToActiveMutation();
+    const [deleteProfilePhoto, { isLoading: isDeleting }] = useDeleteProfilePhotoMutation();
 
-    const [setPhotoAsIncognito] = useSetIncognitoPhotoMutation();
+    const [setPhotoAsPublic, { isLoading: isSettingAsPublic }] = useSetPublicPhotoMutation();
+    const [setPhotoAsPrivate, { isLoading: isSettingAsPrivate }] = useSetPrivatePhotoMutation();
+
+    const [unsetPrivatePhoto, { isLoading: isUnSettingAsPrivate }] = useUnsetPrivatePhotoMutation();
+    const [unsetPublicPhoto, { isLoading: isUnSettingAsPublic }] = useUnsetPublicPhotoMutation();
 
     const [selectedImageIndex, setSelectedImageIndex] = useState<number | null>(null);
+    const [activePhotoId, setActivePhotoId] = useState<string | null>(null);
+    const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
+    const isPublicPhoto = profile?.publicPhoto?.id === activePhotoId;
+    const isPrivatePhoto = profile?.privatePhoto?.id === activePhotoId;
 
-    const [menuState, setMenuState] = useState<{ anchorEl: HTMLElement | null; itemId: string | null }>({
-        anchorEl: null,
-        itemId: null,
-    });
+    const handleMenuOpen = (event: MouseEvent<HTMLElement>, itemId: string): void => {
+        setActivePhotoId(itemId);
+        setAnchorEl(event.currentTarget);
+    };
 
-    const handleMenuOpen = (event: MouseEvent<HTMLElement>, itemId: string): void =>
-        setMenuState({
-            anchorEl: event.currentTarget,
-            itemId,
-        });
-
-    const handleMenuClose = (): void => setMenuState({ anchorEl: null, itemId: null });
+    const handleMenuClose = (): void => setAnchorEl(null);
 
     const handleDeletePhoto = async (): Promise<void> => {
-        if (!menuState.itemId) return;
+        if (!activePhotoId || isDeleting) return;
         try {
-            await deleteProfilePhoto(menuState.itemId).unwrap();
+            await deleteProfilePhoto(activePhotoId).unwrap();
             handleMenuClose();
         } catch (error) {
             const errorMessage: string = (error as QueryError)?.data?.message?.toString() || GENERIC_ERROR_MESSAGE;
@@ -90,33 +84,47 @@ export const UserPhotoGallery: FC<UserPhotoGalleryProps> = ({ photos = [], profi
         }
     };
 
-    const handleSetPhotoToActive = async (): Promise<void> => {
-        if (!menuState.itemId) return;
+    const handleSetPhotoAsPublic = async (): Promise<void> => {
+        if (!activePhotoId || isSettingAsPublic) return;
         try {
-            await setPhotoToActive(menuState.itemId).unwrap();
-            handleMenuClose();
+            await setPhotoAsPublic(activePhotoId).unwrap();
         } catch (error) {
             const errorMessage: string = (error as QueryError)?.data?.message?.toString() || GENERIC_ERROR_MESSAGE;
             enqueueSnackbar(errorMessage, { variant: "error" });
         }
     };
-    const handleSetPhotoAsIncognito = async (): Promise<void> => {
-        if (!menuState.itemId) return;
+    const handleSetPhotoAsPrivate = async (): Promise<void> => {
+        if (!activePhotoId || isSettingAsPrivate) return;
         try {
-            await setPhotoAsIncognito(menuState.itemId).unwrap();
-            handleMenuClose();
+            await setPhotoAsPrivate(activePhotoId).unwrap();
+        } catch (error) {
+            const errorMessage: string = (error as QueryError)?.data?.message?.toString() || GENERIC_ERROR_MESSAGE;
+            enqueueSnackbar(errorMessage, { variant: "error" });
+        }
+    };
+
+    const handleUnsetPublicPhoto = async (): Promise<void> => {
+        if (!activePhotoId || isUnSettingAsPublic) return;
+        try {
+            await unsetPublicPhoto().unwrap();
+        } catch (error) {
+            const errorMessage: string = (error as QueryError)?.data?.message?.toString() || GENERIC_ERROR_MESSAGE;
+            enqueueSnackbar(errorMessage, { variant: "error" });
+        }
+    };
+    const handleUnsetPrivatePhoto = async (): Promise<void> => {
+        if (!activePhotoId || isUnSettingAsPrivate) return;
+        try {
+            await unsetPrivatePhoto().unwrap();
         } catch (error) {
             const errorMessage: string = (error as QueryError)?.data?.message?.toString() || GENERIC_ERROR_MESSAGE;
             enqueueSnackbar(errorMessage, { variant: "error" });
         }
     };
     const handleDownloadPhoto = async (): Promise<void> => {
-        if (!menuState.itemId) return;
-        const imageToDownload = photos.find(img => img.id === menuState.itemId);
+        if (!activePhotoId) return;
+        const imageToDownload = photos.find(img => img.id === activePhotoId);
         if (!imageToDownload) return;
-
-        handleMenuClose();
-
         try {
             const response = await fetch(imageToDownload.url);
             const blob = await response.blob();
@@ -133,81 +141,114 @@ export const UserPhotoGallery: FC<UserPhotoGalleryProps> = ({ photos = [], profi
         }
     };
 
-    const handleImageClick = (index: number): void => {
+    const handleImageClick = (index: number, id: string): void => {
         document.body.style.overflow = "hidden";
+        setActivePhotoId(id);
         setSelectedImageIndex(index);
     };
 
     const handleCloseBackdrop = (): void => {
         document.body.style.overflow = "unset";
         setSelectedImageIndex(null);
+        setActivePhotoId(null);
     };
+
+    const onSlideChange = (currentSlideIndex: number): void => setActivePhotoId(photos[currentSlideIndex]?.id || null);
 
     return (
         <>
-            <ImageList cols={cols}>
+            <ImageList cols={cols} gap={8} variant="masonry">
                 {photos.map((item, index) => (
                     <ImageListItem key={item.id}>
                         <img
+                            srcSet={`${item.url}?w=248&fit=crop&auto=format&dpr=2 2x`}
+                            src={`${item.url}?w=248&fit=crop&auto=format`}
+                            alt={item.url}
                             loading="lazy"
-                            alt={item.key}
-                            src={item.url}
                             style={{ cursor: "pointer" }}
-                            onClick={() => handleImageClick(index)}
+                            onClick={() => handleImageClick(index, item.id)}
                         />
-                        я
                         <ImageListItemBar
                             position="top"
-                            sx={{ background: theme => alpha(theme.palette.common.black, 0.1) }}
+                            sx={{ background: "transparent" }}
                             actionIcon={
-                                <Box
-                                    sx={{
-                                        alignItems: "center",
-                                        display: "flex",
-                                        width: "100%",
-                                        gap: 1,
-                                        mr: 1,
-                                    }}
-                                >
-                                    {profile?.profilePhoto?.id === item.id && <StarIcon sx={{ color: brand[200] }} />}
-                                    {profile?.incognitoPhoto?.id === item.id && (
-                                        <NoPhotographyIcon sx={{ color: brand[200] }} />
-                                    )}
-                                    <IconButton
-                                        sx={theme => ({
-                                            color: theme.palette.common.white,
-                                            backgroundColor: alpha(theme.palette.common.black, 0.3),
-                                            "&:hover": {
-                                                backgroundColor: alpha(theme.palette.common.black, 0.5),
-                                            },
-                                        })}
-                                        onClick={e => handleMenuOpen(e, item.id)}
+                                isOwner && (
+                                    <Box
+                                        sx={{
+                                            alignItems: "center",
+                                            display: "flex",
+                                            width: "100%",
+                                            gap: 1,
+                                            mr: 1,
+                                        }}
                                     >
-                                        <EditIcon />
-                                    </IconButton>
-                                </Box>
+                                        <ActionIconButton
+                                            icon={<EditIcon />}
+                                            sx={theme => ({
+                                                color: theme.palette.common.white,
+                                                backgroundColor: alpha(theme.palette.common.black, 0.2),
+                                                "&:hover": {
+                                                    backgroundColor: alpha(theme.palette.common.black, 0.4),
+                                                },
+                                            })}
+                                            onClick={e => handleMenuOpen(e, item.id)}
+                                        />
+                                    </Box>
+                                )
                             }
                             actionPosition="right"
                         />
                     </ImageListItem>
                 ))}
             </ImageList>
-            <Menu anchorEl={menuState.anchorEl} open={Boolean(menuState.anchorEl)} onClose={handleMenuClose}>
-                <MenuItem onClick={handleSetPhotoToActive} disabled={profile?.profilePhoto?.id === menuState.itemId}>
-                    <ListItemIcon>
-                        <StarIcon fontSize="small" />
-                    </ListItemIcon>
-                    Set as Profile
-                </MenuItem>
-                <MenuItem
-                    onClick={handleSetPhotoAsIncognito}
-                    disabled={profile?.incognitoPhoto?.id === menuState.itemId}
-                >
-                    <ListItemIcon>
-                        <NoPhotographyIcon fontSize="small" />
-                    </ListItemIcon>
-                    Set as Incognito
-                </MenuItem>
+            <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleMenuClose}>
+                {isPublicPhoto ? (
+                    <MenuItem onClick={handleUnsetPublicPhoto}>
+                        <ListItemIcon>
+                            {isUnSettingAsPublic ? (
+                                <CircularProgress size={16} color="inherit" />
+                            ) : (
+                                <StarIcon fontSize="small" />
+                            )}
+                        </ListItemIcon>
+                        Unset Public Profile Photo
+                    </MenuItem>
+                ) : (
+                    <MenuItem onClick={handleSetPhotoAsPublic}>
+                        <ListItemIcon>
+                            {isUnSettingAsPublic ? (
+                                <CircularProgress size={16} color="inherit" />
+                            ) : (
+                                <StarIcon fontSize="small" />
+                            )}
+                        </ListItemIcon>
+                        Set as Public Profile Photo
+                    </MenuItem>
+                )}
+
+                {isPrivatePhoto ? (
+                    <MenuItem onClick={handleUnsetPrivatePhoto}>
+                        <ListItemIcon>
+                            {isUnSettingAsPrivate ? (
+                                <CircularProgress size={16} color="inherit" />
+                            ) : (
+                                <NoPhotographyIcon fontSize="small" />
+                            )}
+                        </ListItemIcon>
+                        Unset Private Profile Photo
+                    </MenuItem>
+                ) : (
+                    <MenuItem onClick={handleSetPhotoAsPrivate}>
+                        <ListItemIcon>
+                            {isSettingAsPrivate ? (
+                                <CircularProgress size={16} color="inherit" />
+                            ) : (
+                                <NoPhotographyIcon fontSize="small" />
+                            )}
+                        </ListItemIcon>
+                        Set as Private Profile Photo
+                    </MenuItem>
+                )}
                 <MenuItem onClick={handleDownloadPhoto}>
                     <ListItemIcon>
                         <DownloadIcon fontSize="small" />
@@ -216,7 +257,7 @@ export const UserPhotoGallery: FC<UserPhotoGalleryProps> = ({ photos = [], profi
                 </MenuItem>
                 <MenuItem onClick={handleDeletePhoto} sx={{ color: "error.main" }}>
                     <ListItemIcon>
-                        <DeleteIcon fontSize="small" sx={{ color: "error.main" }} />
+                        {isDeleting ? <CircularProgress size={16} color="inherit" /> : <DeleteIcon fontSize="small" />}
                     </ListItemIcon>
                     Delete Photo
                 </MenuItem>
@@ -225,71 +266,69 @@ export const UserPhotoGallery: FC<UserPhotoGalleryProps> = ({ photos = [], profi
                 sx={{ zIndex: theme => theme.zIndex.drawer + 1, background: "black" }}
                 open={selectedImageIndex !== null}
             >
-                <IconButton
-                    onClick={handleCloseBackdrop}
-                    sx={{ position: "absolute", top: 16, left: 16, color: theme => theme.palette.common.white }}
+                <Box
+                    sx={{
+                        p: 2,
+                        gap: 2,
+                        width: "100%",
+                        height: "100%",
+                        display: "flex",
+                        flexDirection: "column",
+                    }}
                 >
-                    <CloseIcon />
-                </IconButton>
-                {selectedImageIndex !== null && (
-                    <Box
-                        sx={theme => ({
-                            width: "100vw",
-                            ".slick-dots li button:before": {
-                                color: theme.palette.common.white,
-                                fontSize: "10px",
-                            },
-                            ".slick-dots li.slick-active button:before": {
-                                color: theme.palette.common.white,
-                            },
-
-                            ".slick-prev, .slick-next": {
-                                zIndex: 1,
-                                width: 48,
-                                height: 48,
-                                borderRadius: "50%",
-                                backgroundColor: alpha(theme.palette.common.black, 0.3),
-                                "&:hover": {
-                                    backgroundColor: alpha(theme.palette.common.black, 0.5),
-                                },
-                            },
-                            ".slick-prev": {
-                                left: "15px",
-                            },
-                            ".slick-next": {
-                                right: "25px",
-                            },
-                            ".slick-prev:before, .slick-next:before": {
-                                fontSize: "24px",
-                                color: theme.palette.common.white,
-                            },
-                        })}
-                    >
-                        <Slider {...settings} initialSlide={selectedImageIndex}>
-                            {photos.map(item => (
-                                <Box
-                                    key={item.id}
-                                    sx={{
-                                        height: "90vh !important",
-                                        display: "flex !important",
-                                        justifyContent: "center",
-                                        alignItems: "center",
-                                    }}
-                                >
-                                    <img
-                                        src={item.url}
-                                        alt={item.key}
-                                        style={{
-                                            maxWidth: "90vw",
-                                            maxHeight: "90vh",
-                                            objectFit: "scale-down",
-                                        }}
-                                    />
-                                </Box>
-                            ))}
-                        </Slider>
+                    <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                        <ActionIconButton
+                            icon={<CloseIcon />}
+                            onClick={handleCloseBackdrop}
+                            sx={{ alignSelf: "flex-start" }}
+                        />
+                        {(isPublicPhoto || isPrivatePhoto) && (
+                            <Box
+                                sx={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 2, mr: 2 }}
+                            >
+                                {isPublicPhoto && <StarIcon sx={{ color: theme.palette.primary.main }} />}
+                                {isPrivatePhoto && <NoPhotographyIcon sx={{ color: theme.palette.primary.main }} />}
+                            </Box>
+                        )}
                     </Box>
-                )}
+                    {selectedImageIndex !== null && (
+                        <PhotoSwiper
+                            photos={photos}
+                            initialSlide={selectedImageIndex}
+                            onSlideChange={swiper => onSlideChange(swiper.realIndex)}
+                        />
+                    )}
+                    {isOwner && (
+                        <Box
+                            sx={{
+                                gap: 2,
+                                width: "100%",
+                                display: "flex",
+                                justifyContent: "center",
+                            }}
+                        >
+                            <ActionIconButton
+                                icon={<StarIcon />}
+                                loading={isSettingAsPublic || isUnSettingAsPublic}
+                                label={isPublicPhoto ? "Unset Public" : "Set Public"}
+                                onClick={isPublicPhoto ? handleUnsetPublicPhoto : handleSetPhotoAsPublic}
+                            />
+                            <ActionIconButton
+                                icon={<NoPhotographyIcon />}
+                                loading={isSettingAsPrivate || isUnSettingAsPrivate}
+                                label={isPrivatePhoto ? "Unset Private" : "Set Private"}
+                                onClick={isPrivatePhoto ? handleUnsetPrivatePhoto : handleSetPhotoAsPrivate}
+                            />
+                            <ActionIconButton
+                                loading={isDeleting}
+                                label="Delete"
+                                icon={<DeleteIcon />}
+                                sx={{ color: "error.main" }}
+                                onClick={handleDeletePhoto}
+                            />
+                        </Box>
+                    )}
+                </Box>
             </Backdrop>
         </>
     );

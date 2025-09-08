@@ -1,20 +1,19 @@
-import Menu from "@mui/material/Menu";
+import {
+    Profile,
+    PhotoUploadType,
+    useUploadPhotoMutation,
+    useUnsetPublicPhotoMutation,
+    useUnsetPrivatePhotoMutation,
+    useDeleteProfilePhotoMutation,
+} from "@app/core/services";
 import Badge from "@mui/material/Badge";
-import Avatar from "@mui/material/Avatar";
 import { enqueueSnackbar } from "notistack";
-import Backdrop from "@mui/material/Backdrop";
-import MenuItem from "@mui/material/MenuItem";
-import Skeleton from "@mui/material/Skeleton";
+import { Avatar } from "@app/core/components";
 import { QueryError } from "@app/core/interfaces";
-import StarIcon from "@mui/icons-material/Star";
-import IconButton from "@mui/material/IconButton";
-import ListItemIcon from "@mui/material/ListItemIcon";
-import AddAPhotoIcon from "@mui/icons-material/AddAPhoto";
-import NoPhotographyIcon from "@mui/icons-material/NoPhotography";
+import { ChangeEvent, FC, RefObject, useState } from "react";
 import { GENERIC_ERROR_MESSAGE } from "@app/core/constants/general";
 import { FILE_PATTERN, FILE_SIZE } from "@app/core/constants/patterns";
-import { ChangeEvent, FC, MouseEvent, RefObject, useState } from "react";
-import { Profile, PhotoUploadType, useUploadPhotoMutation, useDeleteProfilePhotoMutation } from "@app/core/services";
+import { AvatarBackdrop } from "@app/core/components/Profile/ProfileAvatar/AvatarBackdrop";
 
 interface ProfileAvatarProps {
     profile: Profile | undefined;
@@ -23,47 +22,47 @@ interface ProfileAvatarProps {
 
 export const ProfileAvatar: FC<ProfileAvatarProps> = ({ profile, isOwner = false }) => {
     const [deletePhoto] = useDeleteProfilePhotoMutation();
-    const [uploadPhoto, { isLoading: isUploading }] = useUploadPhotoMutation();
+    const [uploadPhoto] = useUploadPhotoMutation();
 
-    const [isDeletingProfilePhoto, setIsDeletingProfilePhoto] = useState<boolean>(false);
-    const [isDeletingIncognitoPhoto, setIsDeletingIncognitoPhoto] = useState<boolean>(false);
+    const [isDeletingPublicPhoto, setIsDeletingPublicPhoto] = useState<boolean>(false);
+    const [isDeletingPrivatePhoto, setIsDeletingPrivatePhoto] = useState<boolean>(false);
 
-    const [backdropOpen, setBackdropOpen] = useState<boolean>(false);
-    const [uploadType, setUploadType] = useState<PhotoUploadType>(PhotoUploadType.PROFILE);
-    const [anchorEl, setAnchorEl] = useState<null | HTMLButtonElement>(null);
+    const [publicBackdropOpen, sePublicBackdropOpen] = useState<boolean>(false);
+    const [privateBackdropOpen, setPrivateBackdropOpen] = useState<boolean>(false);
+
+    const [isUploadingPublicPhoto, setIsUploadingPublicPhoto] = useState<boolean>(false);
+    const [isUploadingPrivatePhoto, setIsUploadingPrivatePhoto] = useState<boolean>(false);
+
+    const [unsetPrivatePhoto, { isLoading: isUnSettingPrivatePhoto }] = useUnsetPrivatePhotoMutation();
+    const [unsetPublicPhoto, { isLoading: isUnSettingPublicPhoto }] = useUnsetPublicPhotoMutation();
+
+    const [uploadType, setUploadType] = useState<PhotoUploadType>(PhotoUploadType.PUBLIC);
 
     const fileInputRef: RefObject<HTMLInputElement | null> = useRef<HTMLInputElement>(null);
-
-    const isMenuOpen: boolean = Boolean(anchorEl);
-
-    const handleMenuOpen = (event: MouseEvent<HTMLButtonElement>): void => setAnchorEl(event.currentTarget);
-
-    const handleMenuClose = (): void => setAnchorEl(null);
 
     const handleUploadClick = (type: PhotoUploadType): void => {
         setUploadType(type);
         fileInputRef.current?.click();
-        handleMenuClose();
     };
 
     const handleDeletePhoto = async (id: string | undefined | null, type: PhotoUploadType): Promise<void> => {
         if (!id) {
             return;
         }
-        type === PhotoUploadType.PROFILE ? setIsDeletingProfilePhoto(true) : setIsDeletingIncognitoPhoto(true);
+        type === PhotoUploadType.PUBLIC ? setIsDeletingPublicPhoto(true) : setIsDeletingPrivatePhoto(true);
         try {
             await deletePhoto(id).unwrap();
-            handleMenuClose();
         } catch (error) {
             const errorMessage: string = (error as QueryError)?.data?.message?.toString() || GENERIC_ERROR_MESSAGE;
             enqueueSnackbar(errorMessage, { variant: "error" });
         } finally {
-            type === PhotoUploadType.PROFILE ? setIsDeletingProfilePhoto(false) : setIsDeletingIncognitoPhoto(false);
+            type === PhotoUploadType.PUBLIC ? setIsDeletingPublicPhoto(false) : setIsDeletingPrivatePhoto(false);
         }
     };
 
-    const handleAvatarChange = async (event: ChangeEvent<HTMLInputElement>) => {
+    const handleAvatarChange = async (event: ChangeEvent<HTMLInputElement>): Promise<void> => {
         if (event.target.files?.length) {
+            uploadType === PhotoUploadType.PUBLIC ? setIsUploadingPublicPhoto(true) : setIsUploadingPrivatePhoto(true);
             const file: File = event.target.files[0];
 
             if (!FILE_PATTERN.test(file.type)) {
@@ -82,7 +81,27 @@ export const ProfileAvatar: FC<ProfileAvatarProps> = ({ profile, isOwner = false
                 enqueueSnackbar(errorMessage, { variant: "error" });
             } finally {
                 if (event.target) event.target.value = "";
+                uploadType === PhotoUploadType.PUBLIC
+                    ? setIsUploadingPublicPhoto(false)
+                    : setIsUploadingPrivatePhoto(false);
             }
+        }
+    };
+
+    const handlUnsetPublicPhoto = async (): Promise<void> => {
+        try {
+            await unsetPublicPhoto().unwrap();
+        } catch (error) {
+            const errorMessage: string = (error as QueryError)?.data?.message?.toString() || GENERIC_ERROR_MESSAGE;
+            enqueueSnackbar(errorMessage, { variant: "error" });
+        }
+    };
+    const handleUnsetPrivatePhoto = async (): Promise<void> => {
+        try {
+            await unsetPrivatePhoto().unwrap();
+        } catch (error) {
+            const errorMessage: string = (error as QueryError)?.data?.message?.toString() || GENERIC_ERROR_MESSAGE;
+            enqueueSnackbar(errorMessage, { variant: "error" });
         }
     };
 
@@ -92,83 +111,32 @@ export const ProfileAvatar: FC<ProfileAvatarProps> = ({ profile, isOwner = false
                 overlap="circular"
                 anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
                 badgeContent={
-                    <IconButton
-                        onClick={handleMenuOpen}
-                        color="primary"
-                        size="small"
+                    <Avatar
+                        profile={profile}
+                        alt="private_photo"
+                        loading={isUploadingPrivatePhoto}
+                        src={profile?.privatePhoto?.url}
+                        skeleton={{ width: 50, height: 50 }}
+                        onClick={() => setPrivateBackdropOpen(true)}
                         sx={theme => ({
-                            width: 30,
-                            height: 30,
-                            border: "1px solid",
-                            bgcolor: "background.paper",
-                            "&:hover": {
-                                backgroundColor: theme.palette.mode === "light" ? "grey.100" : "grey.800",
-                            },
+                            width: 50,
+                            height: 50,
+                            cursor: "pointer",
+                            border: `2px solid ${theme.palette.background.paper}`,
                         })}
-                    >
-                        <AddAPhotoIcon fontSize="inherit" />
-                    </IconButton>
+                    />
                 }
             >
-                {isUploading ? (
-                    <Skeleton variant="circular" animation="pulse" width={100} height={100} />
-                ) : (
-                    <Avatar
-                        alt="profile image"
-                        src={profile?.profilePhoto?.url}
-                        onClick={() => setBackdropOpen(true)}
-                        sx={{ width: 100, height: 100, cursor: "pointer" }}
-                    >
-                        {profile?.userName?.charAt(0).toUpperCase() || "U"}
-                    </Avatar>
-                )}
+                <Avatar
+                    profile={profile}
+                    alt="public_photo"
+                    loading={isUploadingPublicPhoto}
+                    src={profile?.publicPhoto?.url}
+                    skeleton={{ width: 120, height: 120 }}
+                    onClick={() => sePublicBackdropOpen(true)}
+                    sx={{ width: 120, height: 120, cursor: "pointer" }}
+                />
             </Badge>
-            <Menu anchorEl={anchorEl} open={isMenuOpen} onClose={handleMenuClose}>
-                <MenuItem onClick={() => handleUploadClick(PhotoUploadType.PROFILE)}>
-                    <ListItemIcon>
-                        <StarIcon fontSize="small" />
-                    </ListItemIcon>
-                    Upload new Profile photo
-                </MenuItem>
-                <MenuItem onClick={() => handleUploadClick(PhotoUploadType.INCOGNITO)}>
-                    <ListItemIcon>
-                        <NoPhotographyIcon fontSize="small" />
-                    </ListItemIcon>
-                    Upload new Incognito photo
-                </MenuItem>
-                {profile?.profilePhoto && (
-                    <MenuItem
-                        sx={{ color: "error.main" }}
-                        disabled={isDeletingProfilePhoto}
-                        onClick={() => handleDeletePhoto(profile?.profilePhoto?.id, PhotoUploadType.PROFILE)}
-                    >
-                        <ListItemIcon>
-                            {isDeletingProfilePhoto ? (
-                                <Skeleton variant="circular" animation="pulse" width={24} height={24} />
-                            ) : (
-                                <Avatar src={profile?.profilePhoto?.url} sx={{ width: 24, height: 24 }} />
-                            )}
-                        </ListItemIcon>
-                        Delete current Profile photo
-                    </MenuItem>
-                )}
-                {profile?.incognitoPhoto && (
-                    <MenuItem
-                        sx={{ color: "error.main" }}
-                        disabled={isDeletingIncognitoPhoto}
-                        onClick={() => handleDeletePhoto(profile?.incognitoPhoto?.id, PhotoUploadType.INCOGNITO)}
-                    >
-                        <ListItemIcon>
-                            {isDeletingIncognitoPhoto ? (
-                                <Skeleton variant="circular" animation="pulse" width={24} height={24} />
-                            ) : (
-                                <Avatar src={profile?.incognitoPhoto?.url} sx={{ width: 24, height: 24 }} />
-                            )}
-                        </ListItemIcon>
-                        Delete current Incognito photo
-                    </MenuItem>
-                )}
-            </Menu>
             <input
                 type="file"
                 ref={fileInputRef}
@@ -176,26 +144,37 @@ export const ProfileAvatar: FC<ProfileAvatarProps> = ({ profile, isOwner = false
                 onChange={handleAvatarChange}
                 accept="image/png, image/jpeg, image/gif"
             />
-            <Backdrop
-                open={backdropOpen}
-                onClick={() => setBackdropOpen(false)}
-                sx={{ zIndex: theme => theme.zIndex.drawer + 1, background: "black" }}
-            >
-                {profile?.profilePhoto?.url ? (
-                    <img
-                        alt="profile_image"
-                        src={profile?.profilePhoto?.url}
-                        style={{ maxWidth: "80vw", maxHeight: "80vh", borderRadius: "15px" }}
-                    />
-                ) : (
-                    <Avatar
-                        alt="profile_image"
-                        sx={{ width: "100%", height: "100%", maxWidth: "250px", maxHeight: "250px" }}
-                    >
-                        {profile?.userName?.charAt(0).toUpperCase() || "U"}
-                    </Avatar>
-                )}
-            </Backdrop>
+
+            <AvatarBackdrop
+                isOwner={isOwner}
+                profile={profile}
+                open={publicBackdropOpen}
+                onUploadClick={handleUploadClick}
+                onDeletePhoto={handleDeletePhoto}
+                onUnsetPhoto={handlUnsetPublicPhoto}
+                photoType={PhotoUploadType.PUBLIC}
+                isUploading={isUploadingPublicPhoto}
+                onUnsetPhotoShown={!!profile?.publicPhoto?.id}
+                onClose={() => sePublicBackdropOpen(false)}
+                isDeletingProfilePhoto={isDeletingPublicPhoto}
+                isDeletingIncognitoPhoto={isDeletingPrivatePhoto}
+                isUnSetting={isUnSettingPublicPhoto || isUnSettingPrivatePhoto}
+            />
+            <AvatarBackdrop
+                isOwner={isOwner}
+                profile={profile}
+                open={privateBackdropOpen}
+                onDeletePhoto={handleDeletePhoto}
+                onUploadClick={handleUploadClick}
+                onUnsetPhoto={handleUnsetPrivatePhoto}
+                isUploading={isUploadingPrivatePhoto}
+                photoType={PhotoUploadType.PRIVATE}
+                onUnsetPhotoShown={!!profile?.privatePhoto?.id}
+                isDeletingProfilePhoto={isDeletingPublicPhoto}
+                isDeletingIncognitoPhoto={isDeletingPrivatePhoto}
+                onClose={() => setPrivateBackdropOpen(false)}
+                isUnSetting={isUnSettingPublicPhoto || isUnSettingPrivatePhoto}
+            />
         </>
     );
 };

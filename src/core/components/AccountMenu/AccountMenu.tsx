@@ -1,11 +1,16 @@
+import Box from "@mui/material/Box";
+import Menu from "@mui/material/Menu";
 import { FC, MouseEvent } from "react";
+import Divider from "@mui/material/Divider";
+import { Avatar } from "@app/core/components";
 import Logout from "@mui/icons-material/Logout";
+import MenuItem from "@mui/material/MenuItem";
+import IconButton from "@mui/material/IconButton";
 import Settings from "@mui/icons-material/Settings";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import DashboardIcon from "@mui/icons-material/Dashboard";
 import { useGetProfileQuery, UserRole } from "@app/core/services";
 import { NavigateFunction, useNavigate, useSubmit } from "react-router-dom";
-import { Avatar, Box, Divider, IconButton, Menu, MenuItem } from "@mui/material";
 import { DASHBOARD_PAGE_PATH, SETTINGS_PAGE_PATH, SIGN_OUT_ACTION_ONLY_PATH } from "@app/core/constants/pathConstants";
 
 export const AccountMenu: FC = () => {
@@ -36,9 +41,13 @@ export const AccountMenu: FC = () => {
                     aria-controls={open ? "account-menu" : undefined}
                     aria-expanded={open ? "true" : undefined}
                 >
-                    <Avatar src={data?.profilePhoto?.url} sx={{ width: 32, height: 32 }}>
-                        {data?.userName?.charAt(0).toUpperCase() || "U"}
-                    </Avatar>
+                    <Avatar
+                        profile={data}
+                        alt="public_photo"
+                        src={data?.publicPhoto?.url}
+                        sx={{ width: 32, height: 32 }}
+                        skeleton={{ width: 32, height: 32 }}
+                    />
                 </IconButton>
             </Box>
             <Menu open={open} id="account-menu" anchorEl={anchorEl} onClose={handleClose} onClick={handleClose}>

@@ -1,8 +1,8 @@
 import { PROFILE_PHOTOS_TAG, PROFILE_TAG, privyApi, User, UserGender, UserRole } from "@app/core/services";
 
 export enum PhotoUploadType {
-    PROFILE = "PROFILE",
-    INCOGNITO = "INCOGNITO",
+    PRIVATE = "PRIVATE",
+    PUBLIC = "PUBLIC",
     SHARED = "SHARED",
 }
 
@@ -31,8 +31,8 @@ export interface Profile extends User {
     createdAt: string;
     updatedAt: string;
     isProfileIncognito: boolean;
-    profilePhoto: Photo | null;
-    incognitoPhoto: Photo | null;
+    publicPhoto: Photo | null;
+    privatePhoto: Photo | null;
 }
 
 export type ProfileUpdatePayload = Partial<
@@ -70,24 +70,38 @@ export const profileApi = privyApi.injectEndpoints({
             },
             invalidatesTags: (_, err) => (err ? [] : [PROFILE_TAG, PROFILE_PHOTOS_TAG]),
         }),
-        setProfilePhotoToActive: builder.mutation<Photo, string>({
+        setPublicPhoto: builder.mutation<Photo, string>({
             query: (photoId: string): { url: string; method: string } => ({
-                url: `profile/photos/${photoId}/active`,
+                url: `profile/photos/${photoId}/public`,
                 method: "PUT",
             }),
-            invalidatesTags: (_, err) => (err ? [] : [PROFILE_TAG, PROFILE_PHOTOS_TAG]),
+            invalidatesTags: (_, err) => (err ? [] : [PROFILE_TAG]),
         }),
 
-        setIncognitoPhoto: builder.mutation<Photo, string>({
+        setPrivatePhoto: builder.mutation<Photo, string>({
             query: (photoId: string): { url: string; method: string } => ({
-                url: `profile/photos/${photoId}/set-incognito`,
+                url: `profile/photos/${photoId}/private`,
                 method: "PUT",
             }),
-            invalidatesTags: (_, err) => (err ? [] : [PROFILE_TAG, PROFILE_PHOTOS_TAG]),
+            invalidatesTags: (_, err) => (err ? [] : [PROFILE_TAG]),
         }),
         deleteProfilePhoto: builder.mutation<void, string>({
             query: (photoId: string): { url: string; method: string } => ({
                 url: `profile/photos/${photoId}`,
+                method: "DELETE",
+            }),
+            invalidatesTags: () => [PROFILE_TAG, PROFILE_PHOTOS_TAG],
+        }),
+        unsetPublicPhoto: builder.mutation<void, void>({
+            query: (): { url: string; method: string } => ({
+                url: `profile/photos/public`,
+                method: "DELETE",
+            }),
+            invalidatesTags: () => [PROFILE_TAG, PROFILE_PHOTOS_TAG],
+        }),
+        unsetPrivatePhoto: builder.mutation<void, void>({
+            query: (): { url: string; method: string } => ({
+                url: `profile/photos/private`,
                 method: "DELETE",
             }),
             invalidatesTags: () => [PROFILE_TAG, PROFILE_PHOTOS_TAG],
@@ -102,6 +116,8 @@ export const {
     useDeleteProfilePhotoMutation,
     useUpdateProfileMutation,
     useGetProfilePhotosQuery,
-    useSetProfilePhotoToActiveMutation,
-    useSetIncognitoPhotoMutation,
+    useSetPrivatePhotoMutation,
+    useSetPublicPhotoMutation,
+    useUnsetPrivatePhotoMutation,
+    useUnsetPublicPhotoMutation,
 } = profileApi;

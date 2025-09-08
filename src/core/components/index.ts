@@ -1,5 +1,6 @@
 export * from "./Layout";
 export * from "./TopBar";
+export * from "./Ui";
 export * from "./Profile";
 export * from "./AccountMenu";
 export * from "./RequireAdmin";
