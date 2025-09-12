@@ -15,7 +15,6 @@ import Backdrop from "@mui/material/Backdrop";
 import MenuItem from "@mui/material/MenuItem";
 import ImageList from "@mui/material/ImageList";
 import { useTheme } from "@app/core/providers";
-import StarIcon from "@mui/icons-material/Star";
 import { alpha } from "@mui/material/styles";
 import EditIcon from "@mui/icons-material/Edit";
 import { QueryError } from "@app/core/interfaces";
@@ -27,7 +26,7 @@ import DownloadIcon from "@mui/icons-material/Download";
 import ImageListItem from "@mui/material/ImageListItem";
 import ImageListItemBar from "@mui/material/ImageListItemBar";
 import CircularProgress from "@mui/material/CircularProgress";
-import NoPhotographyIcon from "@mui/icons-material/NoPhotography";
+import { PublicIcon, PrivateIcon } from "@app/core/assets/icons";
 import { ActionIconButton, PhotoSwiper } from "@app/core/components";
 import { GENERIC_ERROR_MESSAGE } from "@app/core/constants/general";
 
@@ -208,7 +207,7 @@ export const UserPhotoGallery: FC<UserPhotoGalleryProps> = ({ photos = [], profi
                             {isUnSettingAsPublic ? (
                                 <CircularProgress size={16} color="inherit" />
                             ) : (
-                                <StarIcon fontSize="small" />
+                                <PublicIcon fontSize="small" />
                             )}
                         </ListItemIcon>
                         Unset Public Profile Photo
@@ -219,7 +218,7 @@ export const UserPhotoGallery: FC<UserPhotoGalleryProps> = ({ photos = [], profi
                             {isUnSettingAsPublic ? (
                                 <CircularProgress size={16} color="inherit" />
                             ) : (
-                                <StarIcon fontSize="small" />
+                                <PublicIcon fontSize="small" />
                             )}
                         </ListItemIcon>
                         Set as Public Profile Photo
@@ -232,7 +231,7 @@ export const UserPhotoGallery: FC<UserPhotoGalleryProps> = ({ photos = [], profi
                             {isUnSettingAsPrivate ? (
                                 <CircularProgress size={16} color="inherit" />
                             ) : (
-                                <NoPhotographyIcon fontSize="small" />
+                                <PrivateIcon fontSize="small" />
                             )}
                         </ListItemIcon>
                         Unset Private Profile Photo
@@ -243,7 +242,7 @@ export const UserPhotoGallery: FC<UserPhotoGalleryProps> = ({ photos = [], profi
                             {isSettingAsPrivate ? (
                                 <CircularProgress size={16} color="inherit" />
                             ) : (
-                                <NoPhotographyIcon fontSize="small" />
+                                <PrivateIcon fontSize="small" />
                             )}
                         </ListItemIcon>
                         Set as Private Profile Photo
@@ -286,8 +285,8 @@ export const UserPhotoGallery: FC<UserPhotoGalleryProps> = ({ photos = [], profi
                             <Box
                                 sx={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 2, mr: 2 }}
                             >
-                                {isPublicPhoto && <StarIcon sx={{ color: theme.palette.primary.main }} />}
-                                {isPrivatePhoto && <NoPhotographyIcon sx={{ color: theme.palette.primary.main }} />}
+                                {isPublicPhoto && <PublicIcon sx={{ color: "primary.main" }} />}
+                                {isPrivatePhoto && <PrivateIcon sx={{ color: "primary.main" }} />}
                             </Box>
                         )}
                     </Box>
@@ -308,13 +307,13 @@ export const UserPhotoGallery: FC<UserPhotoGalleryProps> = ({ photos = [], profi
                             }}
                         >
                             <ActionIconButton
-                                icon={<StarIcon />}
+                                icon={<PublicIcon />}
                                 loading={isSettingAsPublic || isUnSettingAsPublic}
                                 label={isPublicPhoto ? "Unset Public" : "Set Public"}
                                 onClick={isPublicPhoto ? handleUnsetPublicPhoto : handleSetPhotoAsPublic}
                             />
                             <ActionIconButton
-                                icon={<NoPhotographyIcon />}
+                                icon={<PrivateIcon />}
                                 loading={isSettingAsPrivate || isUnSettingAsPrivate}
                                 label={isPrivatePhoto ? "Unset Private" : "Set Private"}
                                 onClick={isPrivatePhoto ? handleUnsetPrivatePhoto : handleSetPhotoAsPrivate}

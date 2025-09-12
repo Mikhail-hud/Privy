@@ -1,7 +1,7 @@
 import { EMAIL_PATTERN, USER_NAME_PATTERN } from "@app/core/constants/patterns";
 
+export const ISO_8601_YYYY_MM_DD_FORMAT = "YYYY-MM-DD";
 export const MIN_AGE = 13;
-export const MAX_AGE = 150;
 export const MAX_PASSWORD_LENGTH = 128;
 export const MIN_PASSWORD_LENGTH = 6;
 export const USER_NAME_MIN_LENGTH = 3;
@@ -23,17 +23,8 @@ export const VALIDATE_RELES = {
         },
     },
 
-    AGE: {
-        required: "Age is required",
-        min: {
-            value: MIN_AGE,
-            message: `You must be at least ${MIN_AGE} years old.`,
-        },
-        max: {
-            value: MAX_AGE,
-            message: `Age cannot exceed ${MAX_AGE} years.`,
-        },
-        valueAsNumber: true,
+    BIRTHDATE: {
+        required: "Birthdate is required",
     },
     PASSWORD: {
         required: "Password is required",

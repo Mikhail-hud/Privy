@@ -6,11 +6,11 @@ import { SubmitHandler, useForm } from "react-hook-form";
 import { transformServerErrors } from "@app/core/utils/general";
 import { VALIDATE_RELES } from "@app/core/constants/rulesConstants";
 import { Navigation, SubmitFunction, useActionData, useNavigation, useSubmit } from "react-router-dom";
-import { Age, UserName, Email, Password, RememberMe, FullName, Biography, Gender } from "@app/core/components";
+import { BirthDate, UserName, Email, Password, RememberMe, FullName, Biography, Gender } from "@app/core/components";
 
 export const SIGN_UP_FORM_FIELDS = {
     gender: { name: "gender", label: "Gender" },
-    age: { name: "age", label: "Age" },
+    birthDate: { name: "birthDate", label: "Birthdate" },
     fullName: { name: "fullName", label: "Full Name" },
     userName: { name: "userName", label: "User Name" },
     password: { name: "password", label: "Password" },
@@ -22,7 +22,7 @@ export const SIGN_UP_FORM_FIELDS = {
 
 export interface SignUpFormValues {
     [SIGN_UP_FORM_FIELDS.gender.name]: UserGender;
-    [SIGN_UP_FORM_FIELDS.age.name]: number | string;
+    [SIGN_UP_FORM_FIELDS.birthDate.name]: string | null;
     [SIGN_UP_FORM_FIELDS.biography.name]: string;
     [SIGN_UP_FORM_FIELDS.fullName.name]: string;
     [SIGN_UP_FORM_FIELDS.userName.name]: string;
@@ -34,7 +34,7 @@ export interface SignUpFormValues {
 
 const DEFAULT_SIGN_UP_FORM_VALUES: SignUpFormValues = {
     [SIGN_UP_FORM_FIELDS.gender.name]: UserGender.OTHER,
-    [SIGN_UP_FORM_FIELDS.age.name]: "",
+    [SIGN_UP_FORM_FIELDS.birthDate.name]: null,
     [SIGN_UP_FORM_FIELDS.fullName.name]: "",
     [SIGN_UP_FORM_FIELDS.userName.name]: "",
     [SIGN_UP_FORM_FIELDS.email.name]: "",
@@ -76,11 +76,10 @@ export const SignUpForm: FC = () => {
                 name={SIGN_UP_FORM_FIELDS.userName.name}
                 label={SIGN_UP_FORM_FIELDS.userName.label}
             />
-            <Age<SignUpFormValues>
+            <BirthDate<SignUpFormValues>
                 control={control}
-                rules={VALIDATE_RELES.AGE}
-                name={SIGN_UP_FORM_FIELDS.age.name}
-                label={SIGN_UP_FORM_FIELDS.age.label}
+                name={SIGN_UP_FORM_FIELDS.birthDate.name}
+                label={SIGN_UP_FORM_FIELDS.birthDate.label}
             />
             <Email<SignUpFormValues>
                 control={control}

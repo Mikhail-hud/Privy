@@ -25,7 +25,7 @@ export interface Profile extends User {
     email: string;
     fullName: string;
     biography: string;
-    age: number | string;
+    birthDate: string;
     gender: UserGender;
     role: UserRole;
     createdAt: string;
@@ -36,7 +36,7 @@ export interface Profile extends User {
 }
 
 export type ProfileUpdatePayload = Partial<
-    Pick<Profile, "fullName" | "biography" | "age" | "gender" | "isProfileIncognito">
+    Pick<Profile, "fullName" | "biography" | "birthDate" | "gender" | "isProfileIncognito">
 >;
 
 export const profileApi = privyApi.injectEndpoints({

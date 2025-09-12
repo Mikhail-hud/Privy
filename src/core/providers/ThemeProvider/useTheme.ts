@@ -4,6 +4,7 @@ import { inputsCustomizations } from "@app/core/providers/ThemeProvider/Customiz
 
 export const useTheme = (): Theme => {
     return createTheme({
+        cssVariables: true,
         colorSchemes,
         typography,
         components: {

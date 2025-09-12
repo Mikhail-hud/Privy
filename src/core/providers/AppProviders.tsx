@@ -3,13 +3,17 @@ import { store } from "@app/core/store";
 import { SnackbarProvider } from "notistack";
 import { FC, PropsWithChildren } from "react";
 import { AppThemeProvider } from "@app/core/providers";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 
 export const AppProviders: FC<PropsWithChildren> = ({ children }) => {
     return (
-        <AppThemeProvider>
-            <SnackbarProvider maxSnack={3} autoHideDuration={5000}>
-                <Provider store={store}>{children}</Provider>
-            </SnackbarProvider>
-        </AppThemeProvider>
+        <LocalizationProvider dateAdapter={AdapterDayjs}>
+            <AppThemeProvider>
+                <SnackbarProvider maxSnack={3} autoHideDuration={5000}>
+                    <Provider store={store}>{children}</Provider>
+                </SnackbarProvider>
+            </AppThemeProvider>
+        </LocalizationProvider>
     );
 };

@@ -7,7 +7,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import AddAPhotoIcon from "@mui/icons-material/AddAPhoto";
 import { ActionIconButton, Avatar } from "@app/core/components";
 import { PhotoUploadType, Profile } from "@app/core/services";
-import NoPhotographyIcon from "@mui/icons-material/NoPhotography";
+import { PrivateIcon, PublicIcon } from "@app/core/assets/icons";
 
 interface AvatarBackdropContentProps {
     isOwner?: boolean;
@@ -91,7 +91,7 @@ export const AvatarBackdrop: React.FC<AvatarBackdropContentProps> = ({
                             <ActionIconButton
                                 onClick={onUnsetPhoto}
                                 loading={isUnSetting}
-                                icon={<NoPhotographyIcon />}
+                                icon={isPublicPhoto ? <PublicIcon /> : <PrivateIcon />}
                                 label={isPublicPhoto ? "Unset Public" : "Unset Private"}
                             />
                         )}

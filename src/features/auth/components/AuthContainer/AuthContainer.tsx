@@ -1,7 +1,7 @@
-import Card from "@mui/material/Card";
-import { styled } from "@mui/material";
-import Container from "@mui/material/Container";
 import { FC, PropsWithChildren } from "react";
+import { Box, Card, Stack, styled, Container } from "@mui/material";
+import { Mark } from "@app/features/auth/components/AuthContainer/Mark";
+import { DescriptionContent } from "@app/features/auth/components/AuthContainer/DescriptionContent";
 
 const MuiCard = styled(Card)(({ theme }) => ({
     display: "flex",
@@ -10,6 +10,7 @@ const MuiCard = styled(Card)(({ theme }) => ({
     width: "100%",
     padding: theme.spacing(4),
     gap: theme.spacing(2),
+    background: "transparent",
     margin: "auto",
     [theme.breakpoints.up("sm")]: {
         maxWidth: "500px",
@@ -21,16 +22,34 @@ export const AuthContainer: FC<PropsWithChildren> = ({ children }) => {
         <Container
             maxWidth={false}
             sx={{
-                height: "100vh",
+                py: 2,
                 display: "flex",
-                alignItems: "center",
-                backgroundSize: "contain",
-                backgroundRepeat: "no-repeat",
-                backgroundPosition: "right bottom",
-                backgroundImage: "url('/src/core/assets/img/common/bg.png')",
+                minHeight: "100vh",
+                justifyContent: "center",
+                alignItems: { xs: "flex-start", md: "center" },
             }}
         >
-            <MuiCard variant="outlined">{children}</MuiCard>
+            <Stack
+                spacing={2}
+                direction={{ xs: "column-reverse", md: "row" }}
+                sx={{ width: "100%", maxWidth: "1600px", alignItems: "center" }}
+            >
+                <Box
+                    sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        flexDirection: "column",
+                        width: { xs: "100%", md: "50%" },
+                    }}
+                >
+                    <Mark />
+                    <DescriptionContent />
+                </Box>
+                <Box sx={{ width: { xs: "100%", md: "50%" } }}>
+                    <MuiCard variant="outlined">{children}</MuiCard>
+                </Box>
+            </Stack>
         </Container>
     );
 };

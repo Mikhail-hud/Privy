@@ -10,15 +10,15 @@ import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { transformServerErrors } from "@app/core/utils/general";
-import { VALIDATE_RELES } from "@app/core/constants/rulesConstants";
 import { GENERIC_ERROR_MESSAGE } from "@app/core/constants/general";
-import { Age, Biography, FullName, Gender, Switch } from "@app/core/components";
-import { useGetProfileQuery, UserGender, useUpdateProfileMutation } from "@app/core/services";
+import { VALIDATE_RELES } from "@app/core/constants/rulesConstants";
+import { BirthDate, Biography, FullName, Gender, Switch } from "@app/core/components";
+import { ProfileUpdatePayload, useGetProfileQuery, UserGender, useUpdateProfileMutation } from "@app/core/services";
 
 export const PROFILE_FORM_FIELDS = {
     gender: { name: "gender", label: "Gender" },
     incognito: { name: "isProfileIncognito", label: "Incognito profile" },
-    age: { name: "age", label: "Age" },
+    birthDate: { name: "birthDate", label: "Birthdate" },
     fullName: { name: "fullName", label: "Full Name" },
     email: { name: "email", label: "Email" },
     biography: { name: "biography", label: "Biography" },
@@ -27,7 +27,7 @@ export const PROFILE_FORM_FIELDS = {
 export interface ProfileFormValues {
     [PROFILE_FORM_FIELDS.gender.name]: UserGender;
     [PROFILE_FORM_FIELDS.incognito.name]: boolean;
-    [PROFILE_FORM_FIELDS.age.name]: number | string;
+    [PROFILE_FORM_FIELDS.birthDate.name]: string | null;
     [PROFILE_FORM_FIELDS.biography.name]: string;
     [PROFILE_FORM_FIELDS.fullName.name]: string;
 }
@@ -35,7 +35,7 @@ export interface ProfileFormValues {
 const DEFAULT_SIGN_UP_FORM_VALUES: ProfileFormValues = {
     [PROFILE_FORM_FIELDS.gender.name]: UserGender.OTHER,
     [PROFILE_FORM_FIELDS.incognito.name]: true,
-    [PROFILE_FORM_FIELDS.age.name]: "",
+    [PROFILE_FORM_FIELDS.birthDate.name]: null,
     [PROFILE_FORM_FIELDS.fullName.name]: "",
     [PROFILE_FORM_FIELDS.biography.name]: "",
 };
@@ -46,7 +46,7 @@ export const EditProfileAction: FC = () => {
     const [open, setOpen] = useState<boolean>(false);
 
     const values: ProfileFormValues = {
-        age: data?.age ?? "",
+        birthDate: data?.birthDate ?? null,
         fullName: data?.fullName ?? "",
         biography: data?.biography ?? "",
         isProfileIncognito: !!data?.isProfileIncognito,
@@ -70,7 +70,7 @@ export const EditProfileAction: FC = () => {
 
     const onValidSubmit: SubmitHandler<ProfileFormValues> = async data => {
         try {
-            await updateProfile(data).unwrap();
+            await updateProfile(data as ProfileUpdatePayload).unwrap();
             handleClose();
         } catch (error) {
             enqueueSnackbar((error as QueryError)?.data?.message?.toString() || GENERIC_ERROR_MESSAGE, {
@@ -109,11 +109,10 @@ export const EditProfileAction: FC = () => {
                         name={PROFILE_FORM_FIELDS.biography.name}
                         label={PROFILE_FORM_FIELDS.biography.label}
                     />
-                    <Age<ProfileFormValues>
+                    <BirthDate<ProfileFormValues>
                         control={control}
-                        rules={VALIDATE_RELES.AGE}
-                        name={PROFILE_FORM_FIELDS.age.name}
-                        label={PROFILE_FORM_FIELDS.age.label}
+                        name={PROFILE_FORM_FIELDS.birthDate.name}
+                        label={PROFILE_FORM_FIELDS.birthDate.label}
                     />
                     <Gender<ProfileFormValues>
                         control={control}
