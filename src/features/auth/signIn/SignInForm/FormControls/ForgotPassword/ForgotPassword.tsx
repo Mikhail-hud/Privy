@@ -65,7 +65,9 @@ export const ForgotPassword: FC<ForgotPasswordProps> = ({ open, handleClose }) =
                 transition: { onEntered: handleDialogEntered },
             }}
         >
-            <DialogTitle variant="h3">Reset password</DialogTitle>
+            <DialogTitle variant="h3" color="primary">
+                Reset password
+            </DialogTitle>
             <DialogContent sx={{ display: "flex", flexDirection: "column", gap: 2, width: "100%" }}>
                 <DialogContentText>
                     Enter your account&apos;s email address, and we&apos;ll send you a link to reset your password.

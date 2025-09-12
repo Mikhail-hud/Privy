@@ -26,7 +26,7 @@ export const AuthContainer: FC<PropsWithChildren> = ({ children }) => {
                 display: "flex",
                 minHeight: "100vh",
                 justifyContent: "center",
-                alignItems: { xs: "flex-start", md: "center" },
+                alignItems: "center",
             }}
         >
             <Stack

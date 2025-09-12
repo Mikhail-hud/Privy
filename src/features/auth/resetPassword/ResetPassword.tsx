@@ -7,7 +7,7 @@ import { ResetPasswordForm } from "@app/features/auth/resetPassword/ResetPasswor
 
 export const ResetPassword: FC = () => (
     <AuthContainer>
-        <Typography component="h1" variant="h3">
+        <Typography component="h1" variant="h3" color="primary">
             Password Recovery
         </Typography>
         <ResetPasswordForm />

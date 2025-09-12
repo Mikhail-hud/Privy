@@ -8,7 +8,7 @@ import { SIGN_IN_PAGE_PATH } from "@app/core/constants/pathConstants";
 
 export const SignUp: FC = () => (
     <AuthContainer>
-        <Typography component="h1" variant="h3">
+        <Typography component="h1" variant="h3" color="primary">
             Sign Up
         </Typography>
         <SignUpForm />

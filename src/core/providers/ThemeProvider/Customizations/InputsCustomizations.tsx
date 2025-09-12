@@ -6,7 +6,9 @@ export const inputsCustomizations: Components<Theme> = {
             input: ({ theme }) => ({
                 "&:-webkit-autofill": {
                     WebkitTextFillColor: (theme.vars || theme).palette.text.primary,
-                    boxShadow: `0 0 0 100px ${(theme.vars || theme).palette.background.paper} inset`,
+                    boxShadow: "none",
+                    WebkitBoxShadow: "none",
+                    transition: "background-color 9999s ease-in-out 0s",
                 },
             }),
         },
@@ -16,15 +18,20 @@ export const inputsCustomizations: Components<Theme> = {
             input: ({ theme }) => ({
                 "&:-webkit-autofill": {
                     WebkitTextFillColor: (theme.vars || theme).palette.text.primary,
-                    boxShadow: `0 0 0 100px ${(theme.vars || theme).palette.background.paper} inset`,
+                    boxShadow: "none",
+                    WebkitBoxShadow: "none",
+                    transition: "background-color 9999s ease-in-out 0s",
                 },
             }),
             underline: ({ theme }) => ({
                 "&:before": {
-                    borderBottom: `1px solid ${theme.palette.divider}`,
+                    borderBottom: `1px solid ${(theme.vars || theme).palette.divider}`,
                 },
                 "&:hover:not(.Mui-disabled):before": {
-                    borderBottom: `1px solid ${theme.palette.primary.main}`,
+                    borderBottom: `1px solid ${(theme.vars || theme).palette.primary.main}`,
+                },
+                "&.Mui-focused:after": {
+                    borderBottom: `2px solid ${(theme.vars || theme).palette.primary.main}`,
                 },
             }),
         },
