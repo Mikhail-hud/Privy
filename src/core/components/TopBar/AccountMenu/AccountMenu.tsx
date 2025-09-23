@@ -1,7 +1,9 @@
 import Box from "@mui/material/Box";
 import Menu from "@mui/material/Menu";
 import { FC, MouseEvent } from "react";
+import { useAuth } from "@app/core/hooks";
 import Divider from "@mui/material/Divider";
+import { UserRole } from "@app/core/services";
 import { Avatar } from "@app/core/components";
 import Logout from "@mui/icons-material/Logout";
 import MenuItem from "@mui/material/MenuItem";
@@ -9,13 +11,12 @@ import IconButton from "@mui/material/IconButton";
 import Settings from "@mui/icons-material/Settings";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import DashboardIcon from "@mui/icons-material/Dashboard";
-import { useGetProfileQuery, UserRole } from "@app/core/services";
-import { NavigateFunction, useNavigate, useSubmit } from "react-router-dom";
-import { DASHBOARD_PAGE_PATH, SETTINGS_PAGE_PATH, SIGN_OUT_ACTION_ONLY_PATH } from "@app/core/constants/pathConstants";
+import { NavigateFunction, useNavigate } from "react-router-dom";
+import { DASHBOARD_PAGE_PATH, SETTINGS_PAGE_PATH } from "@app/core/constants/pathConstants";
 
 export const AccountMenu: FC = () => {
-    const submit = useSubmit();
-    const { data } = useGetProfileQuery();
+    const { profile, signOut } = useAuth();
+
     const navigate: NavigateFunction = useNavigate();
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
@@ -27,9 +28,7 @@ export const AccountMenu: FC = () => {
 
     const handleMenuItemClick = (key: string): void => navigate(key);
 
-    const handleSignOut = (): void => {
-        submit(null, { method: "post", action: SIGN_OUT_ACTION_ONLY_PATH });
-    };
+    const handleSignOut = (): void => signOut();
 
     return (
         <>
@@ -42,9 +41,9 @@ export const AccountMenu: FC = () => {
                     aria-expanded={open ? "true" : undefined}
                 >
                     <Avatar
-                        profile={data}
+                        profile={profile}
                         alt="public_photo"
-                        src={data?.publicPhoto?.url}
+                        src={profile.publicPhoto?.url}
                         sx={{ width: 32, height: 32 }}
                         skeleton={{ width: 32, height: 32 }}
                     />
@@ -57,7 +56,7 @@ export const AccountMenu: FC = () => {
                     </ListItemIcon>
                     Settings
                 </MenuItem>
-                {data?.role === UserRole.ADMIN && (
+                {profile.role === UserRole.ADMIN && (
                     <MenuItem onClick={() => handleMenuItemClick(DASHBOARD_PAGE_PATH)}>
                         <ListItemIcon>
                             <DashboardIcon fontSize="small" />

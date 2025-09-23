@@ -4,7 +4,7 @@ import { enqueueSnackbar } from "notistack";
 import { QueryError } from "@app/core/interfaces";
 import { GENERIC_ERROR_MESSAGE } from "@app/core/constants/general";
 import { PROFILE_PAGE_PATH } from "@app/core/constants/pathConstants";
-import { authApi, SignInPayload, TwoFactorSignInPayload, UserWithTwoFactor } from "@app/core/services";
+import { authApi, profileApi, SignInPayload, TwoFactorSignInPayload, UserWithTwoFactor } from "@app/core/services";
 
 export const SIGN_IN_ACTION_KEY = "intent";
 export const SIGN_IN_WITH_TWO_FACTOR = "signInWithTwoFactor";
@@ -39,6 +39,8 @@ export const signInAction = async ({ request }: { request: Request }): Promise<R
             if (user.twoFactorRequired) {
                 return { user };
             }
+            // If two-factor authentication is not required, fetch the profile and redirect
+            await store.dispatch(profileApi.endpoints.getProfile.initiate()).unwrap();
             return redirect(PROFILE_PAGE_PATH);
         } catch (error) {
             const errorMessage = (error as QueryError)?.data?.message?.toString() || GENERIC_ERROR_MESSAGE;
@@ -52,6 +54,7 @@ export const signInAction = async ({ request }: { request: Request }): Promise<R
         const promise = store.dispatch(authApi.endpoints.twoFactorSignIn.initiate({ twoFactorCode }));
         try {
             await promise.unwrap();
+            await store.dispatch(profileApi.endpoints.getProfile.initiate()).unwrap();
             return redirect(PROFILE_PAGE_PATH);
         } catch (error) {
             const errorMessage = (error as QueryError)?.data?.message?.toString() || GENERIC_ERROR_MESSAGE;

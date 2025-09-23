@@ -33,6 +33,7 @@ import {
     signOutAction,
     appLayoutLoader,
     signUpAction,
+    publicRoutesLoader,
 } from "@app/features";
 import { ProfilePhotos } from "@app/features/profile/ProfileCard/ProfileTabs";
 
@@ -41,15 +42,18 @@ const router = createBrowserRouter([
         path: SIGN_IN_PAGE_PATH,
         action: signInAction,
         element: <SignIn />,
+        loader: publicRoutesLoader,
     },
     {
         path: SIGN_UP_PAGE_PATH,
         action: signUpAction,
         element: <SignUp />,
+        loader: publicRoutesLoader,
     },
     {
         path: RESET_PASSWORD_PATH,
         element: <ResetPassword />,
+        loader: publicRoutesLoader,
     },
     {
         // Action only route, no element

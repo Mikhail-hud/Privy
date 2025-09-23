@@ -1,9 +1,9 @@
+import { useAuth } from "@app/core/hooks";
 import { UserPhotoGallery } from "@app/core/components";
-import { useGetProfilePhotosQuery, useGetProfileQuery } from "@app/core/services";
+import { useGetProfilePhotosQuery } from "@app/core/services";
 
 export const ProfilePhotos = () => {
-    const { data: profile } = useGetProfileQuery();
-    const { data: photos = [] } = useGetProfilePhotosQuery();
-
-    return <UserPhotoGallery photos={photos} profile={profile} isOwner />;
+    const { profile } = useAuth();
+    const { data = [] } = useGetProfilePhotosQuery();
+    return <UserPhotoGallery photos={data} profile={profile} isOwner />;
 };

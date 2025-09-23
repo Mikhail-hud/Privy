@@ -7,23 +7,25 @@ import Typography from "@mui/material/Typography";
 import CardHeader from "@mui/material/CardHeader";
 import CardContent from "@mui/material/CardContent";
 // import CardActions from "@mui/material/CardActions";
-import { useGetProfileQuery } from "@app/core/services";
 // import FavoriteIcon from "@mui/icons-material/Favorite";
 import { ProfileAvatar } from "@app/core/components";
 import { ProfileTabs } from "@app/features/profile/ProfileCard/ProfileTabs";
 import { EditProfileAction } from "@app/features/profile/ProfileCard/EditProfileAction";
+import { UserContext } from "@app/features";
+import { useAuth } from "@app/core/hooks";
 
 export const ProfileCard: FC = () => {
-    const { data } = useGetProfileQuery();
+    const { profile } = useAuth();
+    const context = useOutletContext<UserContext>();
     return (
-        <Card variant="outlined" sx={{ maxWidth: 800, margin: "auto", mt: 1, mb: 1 }}>
+        <Card variant="outlined" sx={{ maxWidth: 800, margin: "auto", height: "100%" }}>
             <CardHeader
-                avatar={<ProfileAvatar profile={data} isOwner />}
-                subheader={data?.userName}
+                avatar={<ProfileAvatar profile={profile} isOwner />}
+                subheader={profile.userName}
                 action={<EditProfileAction />}
-                title={data?.fullName ? data.fullName : undefined}
+                title={profile.fullName}
             />
-            {data?.biography && (
+            {profile.biography && (
                 <>
                     <Divider textAlign="left">
                         <Typography variant="subtitle1" color="textSecondary">
@@ -32,7 +34,7 @@ export const ProfileCard: FC = () => {
                     </Divider>
                     <CardContent>
                         <Typography variant="body1" color="textSecondary" sx={{ whiteSpace: "pre-wrap" }}>
-                            {data?.biography}
+                            {profile.biography}
                         </Typography>
                     </CardContent>
                 </>
@@ -44,7 +46,7 @@ export const ProfileCard: FC = () => {
             {/*</CardActions>*/}
             <CardContent sx={{ pt: 0 }}>
                 <ProfileTabs />
-                <Outlet />
+                <Outlet context={context} />
             </CardContent>
         </Card>
     );

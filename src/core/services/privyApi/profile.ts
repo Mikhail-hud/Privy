@@ -1,4 +1,4 @@
-import { PROFILE_PHOTOS_TAG, PROFILE_TAG, privyApi, User, UserGender, UserRole } from "@app/core/services";
+import { PROFILE_PHOTOS_TAG, PROFILE_TAG, privyApi, User, UserGender } from "@app/core/services";
 
 export enum PhotoUploadType {
     PRIVATE = "PRIVATE",
@@ -20,14 +20,11 @@ export interface Photo {
 }
 
 export interface Profile extends User {
-    id: number;
-    userName: string;
     email: string;
     fullName: string;
     biography: string;
     birthDate: string;
     gender: UserGender;
-    role: UserRole;
     createdAt: string;
     updatedAt: string;
     isProfileIncognito: boolean;
@@ -97,14 +94,14 @@ export const profileApi = privyApi.injectEndpoints({
                 url: `profile/photos/public`,
                 method: "DELETE",
             }),
-            invalidatesTags: () => [PROFILE_TAG, PROFILE_PHOTOS_TAG],
+            invalidatesTags: () => [PROFILE_TAG],
         }),
         unsetPrivatePhoto: builder.mutation<void, void>({
             query: (): { url: string; method: string } => ({
                 url: `profile/photos/private`,
                 method: "DELETE",
             }),
-            invalidatesTags: () => [PROFILE_TAG, PROFILE_PHOTOS_TAG],
+            invalidatesTags: () => [PROFILE_TAG],
         }),
     }),
     overrideExisting: false,

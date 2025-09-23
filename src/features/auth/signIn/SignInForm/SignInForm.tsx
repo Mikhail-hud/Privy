@@ -1,14 +1,15 @@
 import Box from "@mui/material/Box";
 import Link from "@mui/material/Link";
 import Button from "@mui/material/Button";
+import { useAuth } from "@app/core/hooks";
+import { AuthActionData } from "@app/features";
 import { FC, useState, MouseEvent } from "react";
 import { VALIDATE_RELES } from "@app/core/constants/rulesConstants";
 import { FieldErrors, SubmitHandler, useForm } from "react-hook-form";
 import { Identifier, Password, RememberMe } from "@app/core/components";
 import { isValidEmail, isValidUsername } from "@app/core/utils/authUtils";
-import { AuthActionData, SIGN_IN_ACTION_KEY, SIGN_IN_WITH_CREDENTIALS } from "@app/features";
+import { Navigation, useActionData, useNavigation } from "react-router-dom";
 import { ForgotPassword, TwoFactor } from "@app/features/auth/signIn/SignInForm/FormControls";
-import { Navigation, SubmitFunction, useActionData, useNavigation, useSubmit } from "react-router-dom";
 
 export const SIGN_IN_FORM_FIELDS = {
     identifier: {
@@ -41,7 +42,7 @@ const transformErrors = (credentialsError?: string): FieldErrors<SignInFormValue
 };
 
 export const SignInForm: FC = () => {
-    const submit: SubmitFunction = useSubmit();
+    const { signIn } = useAuth();
     const navigation: Navigation = useNavigation();
     const actionData = useActionData() as AuthActionData;
 
@@ -61,8 +62,7 @@ export const SignInForm: FC = () => {
 
     const isSubmitting: boolean = navigation.state === "submitting";
 
-    const onValidSubmit: SubmitHandler<SignInFormValues> = data =>
-        submit({ ...data, [SIGN_IN_ACTION_KEY]: SIGN_IN_WITH_CREDENTIALS }, { method: "post" });
+    const onValidSubmit: SubmitHandler<SignInFormValues> = data => signIn(data);
 
     return (
         <Box

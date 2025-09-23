@@ -1,2 +1,2 @@
 export * from "./appLayoutLoader";
-export * from "./guestOnlyLoader";
+export * from "./publicRoutesLoader";

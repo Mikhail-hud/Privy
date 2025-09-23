@@ -1,11 +1,12 @@
 import { FC } from "react";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
+import { useAuth } from "@app/core/hooks";
 import { UserGender } from "@app/core/services";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { transformServerErrors } from "@app/core/utils/general";
 import { VALIDATE_RELES } from "@app/core/constants/rulesConstants";
-import { Navigation, SubmitFunction, useActionData, useNavigation, useSubmit } from "react-router-dom";
+import { Navigation, useActionData, useNavigation } from "react-router-dom";
 import { BirthDate, UserName, Email, Password, RememberMe, FullName, Biography, Gender } from "@app/core/components";
 
 export const SIGN_UP_FORM_FIELDS = {
@@ -45,7 +46,7 @@ const DEFAULT_SIGN_UP_FORM_VALUES: SignUpFormValues = {
 };
 
 export const SignUpForm: FC = () => {
-    const submit: SubmitFunction = useSubmit();
+    const { signUp } = useAuth();
     const navigation: Navigation = useNavigation();
     const actionData = useActionData() as { error: string; errors: Record<string, string> };
 
@@ -58,9 +59,7 @@ export const SignUpForm: FC = () => {
 
     const isSubmitting: boolean = navigation.state === "submitting";
 
-    const onValidSubmit: SubmitHandler<SignUpFormValues> = data => {
-        submit({ ...data }, { method: "post" });
-    };
+    const onValidSubmit: SubmitHandler<SignUpFormValues> = data => signUp(data);
 
     return (
         <Box

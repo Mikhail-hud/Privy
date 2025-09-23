@@ -1,3 +1,4 @@
+import Paper from "@mui/material/Paper";
 import ForumIcon from "@mui/icons-material/Forum";
 import PersonIcon from "@mui/icons-material/Person";
 import { Link as RouterLink } from "react-router-dom";
@@ -34,17 +35,19 @@ export const LabelBottomNavigation = () => {
     const location = useLocation();
     const activePath = NAV_ITEMS.find(item => location.pathname.startsWith(item.path))?.path;
     return (
-        <BottomNavigation showLabels value={activePath} sx={{ position: "fixed", bottom: 0, left: 0, right: 0 }}>
-            {NAV_ITEMS.map(item => (
-                <BottomNavigationAction
-                    to={item.path}
-                    key={item.path}
-                    label={item.label}
-                    value={item.path}
-                    component={RouterLink}
-                    icon={location.pathname.startsWith(item.path) ? item.activeIcon : item.icon}
-                />
-            ))}
-        </BottomNavigation>
+        <Paper sx={{ position: "sticky", bottom: 0 }} elevation={0}>
+            <BottomNavigation showLabels value={activePath}>
+                {NAV_ITEMS.map(item => (
+                    <BottomNavigationAction
+                        to={item.path}
+                        key={item.path}
+                        label={item.label}
+                        value={item.path}
+                        component={RouterLink}
+                        icon={location.pathname.startsWith(item.path) ? item.activeIcon : item.icon}
+                    />
+                ))}
+            </BottomNavigation>
+        </Paper>
     );
 };

@@ -56,7 +56,7 @@ export enum UserGender {
 
 export interface User {
     id: number;
-    username: string;
+    userName: string;
     role: UserRole;
 }
 
