@@ -13,7 +13,7 @@ import { QueryError } from "@app/core/interfaces";
 import { ChangeEvent, FC, RefObject, useState } from "react";
 import { GENERIC_ERROR_MESSAGE } from "@app/core/constants/general";
 import { FILE_PATTERN, FILE_SIZE } from "@app/core/constants/patterns";
-import { AvatarBackdrop } from "@app/core/components/Profile/ProfileAvatar/AvatarBackdrop";
+import { AvatarBackdrop } from "@app/core/components/Features/Profile/ProfileAvatar/AvatarBackdrop";
 
 interface ProfileAvatarProps {
     profile: Profile | undefined;
@@ -142,6 +142,7 @@ export const ProfileAvatar: FC<ProfileAvatarProps> = ({ profile, isOwner = false
                 ref={fileInputRef}
                 style={{ display: "none" }}
                 onChange={handleAvatarChange}
+                // TODO: fix accept types
                 accept="image/png, image/jpeg, image/gif"
             />
 

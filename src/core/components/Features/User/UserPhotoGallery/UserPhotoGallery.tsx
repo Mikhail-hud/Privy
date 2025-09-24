@@ -1,8 +1,8 @@
 import { FC, MouseEvent } from "react";
 import { Photo, Profile } from "@app/core/services";
 import { ProfileMenuPhotoActions } from "@app/core/components";
-import { PhotoGrid } from "@app/core/components/UserPhotoGallery/PhotoGrid";
-import { PhotoViewer } from "@app/core/components/UserPhotoGallery/PhotoViewer";
+import { PhotoGrid } from "@app/core/components/Features/User/UserPhotoGallery/PhotoGrid";
+import { PhotoViewer } from "@app/core/components/Features/User/UserPhotoGallery/PhotoViewer";
 
 interface UserPhotoGalleryProps {
     profile: Profile | undefined;

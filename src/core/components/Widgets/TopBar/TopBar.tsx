@@ -4,7 +4,7 @@ import Paper from "@mui/material/Paper";
 import Toolbar from "@mui/material/Toolbar";
 import IconButton from "@mui/material/IconButton";
 import NotificationsIcon from "@mui/icons-material/Notifications";
-import { AccountMenu } from "@app/core/components/TopBar/AccountMenu";
+import { AccountMenu } from "@app/core/components/Widgets/TopBar/AccountMenu";
 
 export const TopBar = () => (
     <Paper elevation={0} component="header" sx={{ top: 0, position: "sticky", zIndex: theme => theme.zIndex.appBar }}>
