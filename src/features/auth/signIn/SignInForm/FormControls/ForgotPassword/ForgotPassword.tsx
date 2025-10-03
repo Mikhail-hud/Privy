@@ -11,7 +11,7 @@ import DialogActions from "@mui/material/DialogActions";
 import { useResetPasswordMutation } from "@app/core/services";
 import DialogContentText from "@mui/material/DialogContentText";
 import { GENERIC_ERROR_MESSAGE } from "@app/core/constants/general";
-import { VALIDATE_RELES } from "@app/core/constants/rulesConstants.ts";
+import { VALIDATE_RELES } from "@app/core/constants/rulesConstants";
 
 export const FORGOT_PASSWOR_FIELDS = {
     email: { name: "email", label: "Email" },

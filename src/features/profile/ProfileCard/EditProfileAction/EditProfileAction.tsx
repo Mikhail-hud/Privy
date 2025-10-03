@@ -13,7 +13,7 @@ import { SubmitHandler, useForm } from "react-hook-form";
 import { transformServerErrors } from "@app/core/utils/general";
 import { GENERIC_ERROR_MESSAGE } from "@app/core/constants/general";
 import { VALIDATE_RELES } from "@app/core/constants/rulesConstants";
-import { BirthDate, Biography, FullName, Gender, Switch } from "@app/core/components";
+import { BirthDate, Biography, FullName, Gender, Switch, Interests } from "@app/core/components";
 import { ProfileUpdatePayload, UserGender, useUpdateProfileMutation } from "@app/core/services";
 
 export const PROFILE_FORM_FIELDS = {
@@ -87,7 +87,6 @@ export const EditProfileAction: FC = () => {
             </IconButton>
             <Dialog
                 open={open}
-                fullWidth
                 maxWidth="md"
                 onClose={handleClose}
                 slotProps={{
@@ -110,6 +109,7 @@ export const EditProfileAction: FC = () => {
                         name={PROFILE_FORM_FIELDS.biography.name}
                         label={PROFILE_FORM_FIELDS.biography.label}
                     />
+                    <Interests profile={profile} />
                     <BirthDate<ProfileFormValues>
                         control={control}
                         name={PROFILE_FORM_FIELDS.birthDate.name}

@@ -41,7 +41,7 @@ export const AvatarBackdrop: React.FC<AvatarBackdropContentProps> = ({
     isOwner = false,
 }) => {
     const isPublicPhoto = photoType === PhotoUploadType.PUBLIC;
-    const currentPhotoUrl = isPublicPhoto ? profile?.publicPhoto?.url : profile?.privatePhoto?.url;
+    const currentPhotoUrl = isPublicPhoto ? profile?.publicPhoto?.signedUrl : profile?.privatePhoto?.signedUrl;
     const currentPhotoId = isPublicPhoto ? profile?.publicPhoto?.id : profile?.privatePhoto?.id;
     const isDeleting = isPublicPhoto ? isDeletingProfilePhoto : isDeletingIncognitoPhoto;
 

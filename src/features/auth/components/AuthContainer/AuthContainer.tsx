@@ -1,5 +1,9 @@
+import Box from "@mui/material/Box";
+import Card from "@mui/material/Card";
+import Stack from "@mui/material/Stack";
+import { styled } from "@mui/material";
 import { FC, PropsWithChildren } from "react";
-import { Box, Card, Stack, styled, Container } from "@mui/material";
+import Container from "@mui/material/Container";
 import { Mark } from "@app/features/auth/components/AuthContainer/Mark";
 import { DescriptionContent } from "@app/features/auth/components/AuthContainer/DescriptionContent";
 

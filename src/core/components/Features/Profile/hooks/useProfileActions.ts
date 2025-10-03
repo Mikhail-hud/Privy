@@ -9,6 +9,7 @@ import {
 import { enqueueSnackbar } from "notistack";
 import { QueryError } from "@app/core/interfaces";
 import { GENERIC_ERROR_MESSAGE } from "@app/core/constants/general";
+import { PRIVY_API_ROOT } from "@app/config";
 
 type ActionHandler<T, U> = {
     handler: (queryArg: U, onSuccessCallback?: () => void) => Promise<T | void>;
@@ -29,7 +30,7 @@ export interface UseProfilActions {
     unsetPublic: ActionHandlerWithoutArg;
     unsetPrivate: ActionHandlerWithoutArg;
     delete: ActionHandler<void, string>;
-    downloadPhoto: (photo: Photo) => Promise<void>;
+    downloadPhoto: (photo: Photo) => void;
 }
 
 export const useProfileActions = (): UseProfilActions => {
@@ -66,21 +67,8 @@ export const useProfileActions = (): UseProfilActions => {
         isLoading,
     });
 
-    const downloadPhoto = async (photo: Photo): Promise<void> => {
-        try {
-            const response = await fetch(photo.url);
-            const blob = await response.blob();
-            const url = window.URL.createObjectURL(blob);
-            const link = document.createElement("a");
-            link.href = url;
-            link.setAttribute("download", photo.key || "download.jpg");
-            document.body.appendChild(link);
-            link.click();
-            link.parentNode?.removeChild(link);
-            window.URL.revokeObjectURL(url);
-        } catch (error) {
-            enqueueSnackbar("Failed to download photo", { variant: "error" });
-        }
+    const downloadPhoto = (photo: Photo): void => {
+        window.open(`${PRIVY_API_ROOT}/v1/profile/photos/${photo.id}/download`, "_self");
     };
 
     return {

@@ -68,6 +68,9 @@ export const ProfileAvatar: FC<ProfileAvatarProps> = ({ profile, isOwner = false
             if (!FILE_PATTERN.test(file.type)) {
                 enqueueSnackbar("Invalid file type. Allowed types: JPEG, PNG, GIF, WEBP, SVG.", { variant: "error" });
                 if (event.target) event.target.value = "";
+                uploadType === PhotoUploadType.PUBLIC
+                    ? setIsUploadingPublicPhoto(false)
+                    : setIsUploadingPrivatePhoto(false);
                 return;
             }
             try {
@@ -115,7 +118,7 @@ export const ProfileAvatar: FC<ProfileAvatarProps> = ({ profile, isOwner = false
                         profile={profile}
                         alt="private_photo"
                         loading={isUploadingPrivatePhoto}
-                        src={profile?.privatePhoto?.url}
+                        src={profile?.privatePhoto?.signedUrl}
                         skeleton={{ width: 50, height: 50 }}
                         onClick={() => setPrivateBackdropOpen(true)}
                         sx={theme => ({
@@ -131,20 +134,13 @@ export const ProfileAvatar: FC<ProfileAvatarProps> = ({ profile, isOwner = false
                     profile={profile}
                     alt="public_photo"
                     loading={isUploadingPublicPhoto}
-                    src={profile?.publicPhoto?.url}
+                    src={profile?.publicPhoto?.signedUrl}
                     skeleton={{ width: 120, height: 120 }}
                     onClick={() => sePublicBackdropOpen(true)}
                     sx={{ width: 120, height: 120, cursor: "pointer" }}
                 />
             </Badge>
-            <input
-                type="file"
-                ref={fileInputRef}
-                style={{ display: "none" }}
-                onChange={handleAvatarChange}
-                // TODO: fix accept types
-                accept="image/png, image/jpeg, image/gif"
-            />
+            <input type="file" ref={fileInputRef} style={{ display: "none" }} onChange={handleAvatarChange} />
 
             <AvatarBackdrop
                 isOwner={isOwner}

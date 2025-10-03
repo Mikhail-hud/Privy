@@ -1,4 +1,5 @@
 import { PROFILE_PHOTOS_TAG, PROFILE_TAG, privyApi, User, UserGender } from "@app/core/services";
+import { Tag } from "@app/core/services/privyApi/tags.ts";
 
 export enum PhotoUploadType {
     PRIVATE = "PRIVATE",
@@ -14,13 +15,18 @@ export interface UploadPhotoPayload {
 export interface Photo {
     id: string;
     key: string;
-    url: string;
     userId: number;
     createdAt: string;
+    mimeType: string;
+    caption: string | null;
+    fileSize: number;
+    originalFilename: string;
+    signedUrl: string;
 }
 
 export interface Profile extends User {
     email: string;
+    interests: Tag[];
     fullName: string;
     biography: string;
     birthDate: string;
@@ -46,6 +52,14 @@ export const profileApi = privyApi.injectEndpoints({
             query: (body: ProfileUpdatePayload): { url: string; method: string; body: ProfileUpdatePayload } => ({
                 url: "profile",
                 method: "PATCH",
+                body,
+            }),
+            invalidatesTags: (_, err) => (err ? [] : [PROFILE_TAG]),
+        }),
+        updateProfileInterests: builder.mutation<Profile, { interests: number[] }>({
+            query: (body: { interests: number[] }): { url: string; method: string; body: { interests: number[] } } => ({
+                url: "profile/interests",
+                method: "PUT",
                 body,
             }),
             invalidatesTags: (_, err) => (err ? [] : [PROFILE_TAG]),
@@ -117,4 +131,5 @@ export const {
     useSetPublicPhotoMutation,
     useUnsetPrivatePhotoMutation,
     useUnsetPublicPhotoMutation,
+    useUpdateProfileInterestsMutation,
 } = profileApi;

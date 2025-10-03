@@ -52,7 +52,7 @@ export const ProfileMenuPhotoActions: FC<ProfileMenuPhotoActionsProps> = ({
 
     const handleDownloadPhoto = async (): Promise<void> => {
         if (!photo) return;
-        await downloadPhoto(photo);
+        downloadPhoto(photo);
     };
 
     return (

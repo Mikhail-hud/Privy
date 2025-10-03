@@ -49,7 +49,7 @@ export const PhotoSwiper: FC<PhotoSwiperProps> = ({ photos = [], ...rest }) => {
                     }}
                 >
                     <img
-                        src={photo.url}
+                        src={photo.signedUrl}
                         alt={`photo_${photo.id}`}
                         draggable="false"
                         style={{

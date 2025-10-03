@@ -17,7 +17,6 @@ interface PhotoGridProps {
 }
 
 export const PhotoGrid: FC<PhotoGridProps> = memo(({ photos, isOwner, onImageClick, onMenuOpen }) => {
-    console.log("PhotoGrid render");
     const theme: Theme = useTheme();
     const isMobile: boolean = useMediaQuery(theme.breakpoints.down("sm"));
     const isTablet: boolean = useMediaQuery(theme.breakpoints.between("sm", "md"));
@@ -34,11 +33,10 @@ export const PhotoGrid: FC<PhotoGridProps> = memo(({ photos, isOwner, onImageCli
                 <ImageListItem key={item.id}>
                     <img
                         loading="lazy"
-                        alt={item.url}
+                        alt={item.signedUrl}
+                        src={item.signedUrl}
                         style={{ cursor: "pointer" }}
                         onClick={onImageClick(index, item)}
-                        src={`${item.url}?w=248&fit=crop&auto=format`}
-                        srcSet={`${item.url}?w=248&fit=crop&auto=format&dpr=2 2x`}
                     />
                     {isOwner && (
                         <ImageListItemBar
@@ -48,7 +46,6 @@ export const PhotoGrid: FC<PhotoGridProps> = memo(({ photos, isOwner, onImageCli
                                 <ActionIconButton
                                     icon={<EditIcon />}
                                     sx={theme => ({
-                                        color: "primary.main",
                                         backgroundColor: alpha(theme.palette.common.black, 0.2),
                                         "&:hover": {
                                             backgroundColor: alpha(theme.palette.common.black, 0.4),

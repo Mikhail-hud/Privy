@@ -43,7 +43,7 @@ export const AccountMenu: FC = () => {
                     <Avatar
                         profile={profile}
                         alt="public_photo"
-                        src={profile.publicPhoto?.url}
+                        src={profile.publicPhoto?.signedUrl}
                         sx={{ width: 32, height: 32 }}
                         skeleton={{ width: 32, height: 32 }}
                     />
