@@ -31,22 +31,20 @@ interface UseAuth {
 }
 
 /**
- * Provides auth-related helper actions and (optionally) the current user profile.
+ * Provides authentication helper actions and, if available, the current user profile.
  * The profile query is skipped when the current pathname matches a public route.
  *
- * TypeScript fix: Replaced `PUBLIC_ROUTES.includes(location.pathname)` (caused TS2345 due to
- * literal route union vs generic string) with `.some(route => route === location.pathname)` to
- * avoid passing a plain string as the search argument to a literal-typed array.
- *
- * @returns UseAuth helper object.
+ * @returns {UseAuth} An object containing the current user profile (if loaded), loading states, and imperative auth actions.
  *
  * @example
  * const { profile, signIn, signOut, isLoading } = useAuth();
  */
+
 export const useAuth = (): UseAuth => {
     const submit: SubmitFunction = useSubmit();
+    const location = useLocation();
 
-    // Safe literal route union comparison without widening array element types
+    /** Determine if the current route is public (no profile load needed) */
     const isPublicPage: boolean = PUBLIC_ROUTES.some(route => route === location.pathname);
 
     const { data, isLoading, isFetching } = useGetProfileQuery(undefined, { skip: isPublicPage });
@@ -72,7 +70,6 @@ export const useAuth = (): UseAuth => {
         isLoading,
         isFetching,
         signInWithTwoFactor,
-        // Profile is preloaded after sign-in; see protected layout loader.
         profile: data as User,
     };
 };
