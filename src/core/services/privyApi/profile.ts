@@ -1,5 +1,4 @@
-import { PROFILE_PHOTOS_TAG, PROFILE_TAG, privyApi, User, UserGender } from "@app/core/services";
-import { Tag } from "@app/core/services/privyApi/tags.ts";
+import { PROFILE_PHOTOS_TAG, PROFILE_TAG, privyApi, User } from "@app/core/services";
 
 export enum PhotoUploadType {
     PRIVATE = "PRIVATE",
@@ -24,31 +23,17 @@ export interface Photo {
     signedUrl: string;
 }
 
-export interface Profile extends User {
-    email: string;
-    interests: Tag[];
-    fullName: string;
-    biography: string;
-    birthDate: string;
-    gender: UserGender;
-    createdAt: string;
-    updatedAt: string;
-    isProfileIncognito: boolean;
-    publicPhoto: Photo | null;
-    privatePhoto: Photo | null;
-}
-
 export type ProfileUpdatePayload = Partial<
-    Pick<Profile, "fullName" | "biography" | "birthDate" | "gender" | "isProfileIncognito">
+    Pick<User, "fullName" | "biography" | "birthDate" | "gender" | "isProfileIncognito">
 >;
 
 export const profileApi = privyApi.injectEndpoints({
     endpoints: builder => ({
-        getProfile: builder.query<Profile, void>({
+        getProfile: builder.query<User, void>({
             query: (): string => "profile",
             providesTags: () => [PROFILE_TAG],
         }),
-        updateProfile: builder.mutation<Profile, ProfileUpdatePayload>({
+        updateProfile: builder.mutation<User, ProfileUpdatePayload>({
             query: (body: ProfileUpdatePayload): { url: string; method: string; body: ProfileUpdatePayload } => ({
                 url: "profile",
                 method: "PATCH",
@@ -56,7 +41,7 @@ export const profileApi = privyApi.injectEndpoints({
             }),
             invalidatesTags: (_, err) => (err ? [] : [PROFILE_TAG]),
         }),
-        updateProfileInterests: builder.mutation<Profile, { interests: number[] }>({
+        updateProfileInterests: builder.mutation<User, { interests: number[] }>({
             query: (body: { interests: number[] }): { url: string; method: string; body: { interests: number[] } } => ({
                 url: "profile/interests",
                 method: "PUT",

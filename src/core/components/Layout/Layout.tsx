@@ -5,12 +5,12 @@ import { Outlet, useLoaderData } from "react-router-dom";
 import { LabelBottomNavigation, TopBar } from "@app/core/components";
 
 export const AppLayout: FC = () => {
-    const { user, profile } = useLoaderData() as UserContext;
+    const { user } = useLoaderData() as UserContext;
     return (
         <Box sx={{ display: "flex", flexDirection: "column", height: "100vh", gap: 1 }}>
             <TopBar />
             <Box component="main" sx={{ flexGrow: 1 }}>
-                <Outlet context={{ user, profile }} />
+                <Outlet context={{ user }} />
             </Box>
             <LabelBottomNavigation />
         </Box>

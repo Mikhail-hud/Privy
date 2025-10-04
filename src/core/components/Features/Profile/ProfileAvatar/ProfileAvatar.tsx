@@ -1,5 +1,5 @@
 import {
-    Profile,
+    User,
     PhotoUploadType,
     useUploadPhotoMutation,
     useUnsetPublicPhotoMutation,
@@ -16,7 +16,7 @@ import { FILE_PATTERN, FILE_SIZE } from "@app/core/constants/patterns";
 import { AvatarBackdrop } from "@app/core/components/Features/Profile/ProfileAvatar/AvatarBackdrop";
 
 interface ProfileAvatarProps {
-    profile: Profile | undefined;
+    profile: User | undefined;
     isOwner?: boolean;
 }
 

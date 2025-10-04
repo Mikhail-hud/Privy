@@ -19,7 +19,7 @@ import { transformServerErrors } from "@app/core/utils/general.ts";
 import { GENERIC_ERROR_MESSAGE } from "@app/core/constants/general";
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
 import Autocomplete, { AutocompleteInputChangeReason } from "@mui/material/Autocomplete";
-import { useGetTagsQuery, useUpdateProfileInterestsMutation, Profile, Tag } from "@app/core/services";
+import { useGetTagsQuery, useUpdateProfileInterestsMutation, User, Tag } from "@app/core/services";
 
 const InputBox = styled(Box)(({ theme }) => ({
     borderBottom: `1px solid ${(theme.vars || theme).palette.divider}`,
@@ -49,7 +49,7 @@ const INTERESTS_FORM_FIELDS_VALUES: InterestsValues = {
 };
 
 interface InterestsProps {
-    profile: Profile | undefined;
+    profile: User | undefined;
 }
 
 export const Interests: FC<InterestsProps> = ({ profile }) => {

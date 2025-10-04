@@ -19,7 +19,7 @@ export const publicRoutesLoader = async (): Promise<Promise<Response> | null> =>
     // Select the result of the "me" endpoint from the auth API
     const result = authApi.endpoints.me.select()(state);
 
-    // If the user is authenticated (result is successful), redirect to the profile page
+    // If the user is authenticated (a result is successful), redirect to the profile page
     if (result.isSuccess) {
         return redirect(PROFILE_PAGE_PATH);
     }

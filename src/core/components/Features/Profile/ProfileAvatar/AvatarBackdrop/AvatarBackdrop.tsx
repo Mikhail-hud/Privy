@@ -6,7 +6,7 @@ import Typography from "@mui/material/Typography";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddAPhotoIcon from "@mui/icons-material/AddAPhoto";
 import { ActionIconButton, Avatar } from "@app/core/components";
-import { PhotoUploadType, Profile } from "@app/core/services";
+import { PhotoUploadType, User } from "@app/core/services";
 import { PrivateIcon, PublicIcon } from "@app/core/assets/icons";
 
 interface AvatarBackdropContentProps {
@@ -16,7 +16,7 @@ interface AvatarBackdropContentProps {
     isUploading?: boolean;
     onUnsetPhoto: () => void;
     photoType: PhotoUploadType;
-    profile: Profile | undefined;
+    profile: User | undefined;
     isUnSetting: boolean;
     onUnsetPhotoShown: boolean;
     isDeletingProfilePhoto: boolean;

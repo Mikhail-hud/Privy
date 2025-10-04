@@ -1,4 +1,34 @@
-import { SESSIONS_TAG, TAG_TYPES, privyApi, USER_NAME_TAG, USER_TAG } from "@app/core/services";
+/**
+ * Authentication and user session management API using RTK Query.
+ *
+ * Defines types, cache sync logic, and endpoints for authentication actions.
+ *
+ * Types:
+ * - `User`, `Session`, `SignInPayload`, `SignUpPayload`, `TwoFactorSignInPayload`, etc.
+ *   Represent user, session, and authentication payloads.
+ *
+ * Helper:
+ * - `syncUserInCache(userData)`: Updates user data in both `authApi` and `profileApi` caches.
+ *
+ * Endpoints:
+ * - `me`: Fetches current user profile.
+ * - `signIn`: Authenticates user (supports two-factor).
+ * - `signUp`: Registers a new user.
+ * - `twoFactorSignIn`: Signs in with two-factor authentication.
+ * - `signOut`: Logs out the user.
+ * - `checkUserNameAvailability`: Checks username availability.
+ * - `getSessions`: Lists user sessions.
+ * - `revokeSession`: Revokes a specific session.
+ * - `revokeAllSessions`: Revokes all sessions except current.
+ * - `changePassword`: Changes user password.
+ * - `resetPassword`: Initiates password reset.
+ * - `setNewPassword`: Sets a new password after reset.
+ *
+ * Exports React hooks for each endpoint for use in components.
+ */
+
+import { AppDispatch } from "@app/core/store";
+import { SESSIONS_TAG, TAG_TYPES, privyApi, USER_NAME_TAG, USER_TAG, profileApi, Tag, Photo } from "@app/core/services";
 
 export interface SignInPayload {
     identifier: string;
@@ -58,10 +88,21 @@ export interface User {
     id: number;
     userName: string;
     role: UserRole;
+    email: string;
+    interests: Tag[];
+    fullName: string;
+    biography: string;
+    birthDate: string;
+    gender: UserGender;
+    createdAt: string;
+    updatedAt: string;
+    isProfileIncognito: boolean;
+    publicPhoto: Photo | null;
+    privatePhoto: Photo | null;
 }
 
-export interface UserWithTwoFactor extends User {
-    twoFactorRequired?: boolean;
+export interface TwoFactorStatus {
+    twoFactorRequired: boolean;
 }
 
 export interface ChangePasswordPayload {
@@ -80,13 +121,24 @@ export interface newPasswordPayload {
     passwordRepeat: string;
 }
 
+const syncUserInCache =
+    (userData: User) =>
+    (dispatch: AppDispatch): void => {
+        dispatch(authApi.util.upsertQueryData("me", undefined, userData));
+        dispatch(profileApi.util.upsertQueryData("getProfile", undefined, userData));
+    };
+
 export const authApi = privyApi.injectEndpoints({
     endpoints: builder => ({
         me: builder.query<User, void>({
             query: () => "auth/me",
             providesTags: () => [USER_TAG],
+            async onQueryStarted(_a: never, { dispatch, queryFulfilled }): Promise<void> {
+                const { data } = await queryFulfilled;
+                dispatch(profileApi.util.upsertQueryData("getProfile", undefined, data));
+            },
         }),
-        signIn: builder.mutation<UserWithTwoFactor, SignInPayload>({
+        signIn: builder.mutation<TwoFactorStatus | User, SignInPayload>({
             query: body => ({
                 url: "auth/sign-in",
                 method: "POST",
@@ -96,8 +148,8 @@ export const authApi = privyApi.injectEndpoints({
             async onQueryStarted(_a: never, { dispatch, queryFulfilled }): Promise<void> {
                 const { data } = await queryFulfilled;
                 // If two-factor authentication is required, we do not update the user data
-                if (data?.twoFactorRequired) return;
-                dispatch(authApi.util.upsertQueryData("me", undefined, data));
+                if ("twoFactorRequired" in data) return;
+                dispatch(syncUserInCache(data));
             },
         }),
         signUp: builder.mutation<User, SignUpPayload>({
@@ -109,7 +161,7 @@ export const authApi = privyApi.injectEndpoints({
             invalidatesTags: (_, err) => (err ? [] : TAG_TYPES),
             async onQueryStarted(_a: never, { dispatch, queryFulfilled }): Promise<void> {
                 const { data } = await queryFulfilled;
-                dispatch(authApi.util.upsertQueryData("me", undefined, data));
+                dispatch(syncUserInCache(data));
             },
         }),
         twoFactorSignIn: builder.mutation<User, TwoFactorSignInPayload>({
@@ -121,7 +173,7 @@ export const authApi = privyApi.injectEndpoints({
             invalidatesTags: (_, err) => (err ? [] : TAG_TYPES),
             async onQueryStarted(_a: never, { dispatch, queryFulfilled }): Promise<void> {
                 const { data } = await queryFulfilled;
-                dispatch(authApi.util.upsertQueryData("me", undefined, data));
+                dispatch(syncUserInCache(data));
             },
         }),
         signOut: builder.mutation<unknown, void>({
@@ -190,6 +242,7 @@ export const authApi = privyApi.injectEndpoints({
 
 export const {
     useGetSessionsQuery,
+    useMeQuery,
     useLazyCheckUserNameAvailabilityQuery,
     useRevokeSessionMutation,
     useRevokeAllSessionsMutation,

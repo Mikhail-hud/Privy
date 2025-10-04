@@ -4,7 +4,6 @@ import { useAuth } from "@app/core/hooks";
 import { AuthActionData } from "@app/features";
 import DialogTitle from "@mui/material/DialogTitle";
 import DialogActions from "@mui/material/DialogActions";
-import { UserWithTwoFactor } from "@app/core/services";
 import DialogContent from "@mui/material/DialogContent";
 import { MuiOtpInput } from "mui-one-time-password-input";
 import { FC, FormEvent, useEffect, useState } from "react";
@@ -18,7 +17,7 @@ export const TwoFactor: FC = () => {
     const navigation: Navigation = useNavigation();
     const actionData = useActionData() as AuthActionData;
     const [open, setOpen] = useState<boolean>(false);
-    const [user, setUser] = useState<UserWithTwoFactor | null>(null);
+    const [isTwoFactorRequired, seIsTwoFactorRequired] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
     const [twoFactorCode, setTwoFactorCode] = useState<string>("");
 
@@ -30,7 +29,7 @@ export const TwoFactor: FC = () => {
     const isSubmitting: boolean = navigation.state === "submitting";
 
     const handleClose = (): void => {
-        setUser(null);
+        seIsTwoFactorRequired(false);
         setOpen(false);
         setTwoFactorCode("");
         setError(null);
@@ -44,14 +43,14 @@ export const TwoFactor: FC = () => {
             setError(`Please enter a valid ${MUI_OTP_INPUT_LENGTH}-digit code.`);
             return;
         }
-        if (user?.twoFactorRequired && twoFactorCode) {
+        if (isTwoFactorRequired && twoFactorCode) {
             signInWithTwoFactor({ twoFactorCode });
         }
     };
 
     useEffect((): void => {
-        if (actionData?.user?.twoFactorRequired) {
-            setUser(actionData.user);
+        if (actionData?.twoFactorRequired) {
+            seIsTwoFactorRequired(actionData?.twoFactorRequired);
             setOpen(true);
             setError(null);
         }

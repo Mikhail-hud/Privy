@@ -1,12 +1,12 @@
 import React from "react";
-import { Profile } from "@app/core/services";
+import { User } from "@app/core/services";
 import MUIAvatar from "@mui/material/Avatar";
 import Skeleton from "@mui/material/Skeleton";
 import { AvatarProps } from "@mui/material/Avatar";
 import { SkeletonProps } from "@mui/material/Skeleton";
 
 interface Props extends AvatarProps {
-    profile: Profile | undefined;
+    profile: User | undefined;
     loading?: boolean;
     skeleton?: SkeletonProps;
 }
