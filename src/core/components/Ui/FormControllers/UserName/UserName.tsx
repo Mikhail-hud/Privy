@@ -2,9 +2,9 @@ import { debounce } from "@mui/material/utils";
 import { QueryError } from "@app/core/interfaces";
 import CircularProgress from "@mui/material/CircularProgress";
 import TextField, { TextFieldProps } from "@mui/material/TextField";
-import { GENERIC_ERROR_MESSAGE } from "@app/core/constants/general";
 import CheckCircleOutline from "@mui/icons-material/CheckCircleOutline";
 import { useLazyCheckUserNameAvailabilityQuery } from "@app/core/services";
+import { DEBOUNCE_DELAY, GENERIC_ERROR_MESSAGE } from "@app/core/constants/general";
 import {
     Path,
     Control,
@@ -15,8 +15,6 @@ import {
     ControllerRenderProps,
 } from "react-hook-form";
 import { ReactElement } from "react";
-
-const DEBOUNCE_DELAY = 500;
 
 type UserNameProps<T extends FieldValues> = Omit<TextFieldProps, "name"> & {
     name: Path<T>;

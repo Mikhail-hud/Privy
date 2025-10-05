@@ -1,8 +1,10 @@
 /**
- * @file React hook centralizing authentication helpers: loading the current user profile (unless on a public route),
+ * @file src/core/hooks/useAuth.ts
+ * React hook centralizing authentication helpers: loading the current user profile (unless on a public route),
  * and exposing imperative actions for sign in (credentials + 2FA), sign up, and sign out.
  */
 
+import { SKIP_TOKEN } from "@app/core/constants/general";
 import { SubmitFunction, useSubmit } from "react-router-dom";
 import { SignInFormValues } from "@app/features/auth/signIn/SignInForm";
 import { SignUpFormValues } from "@app/features/auth/signUp/SignUpForm";
@@ -47,29 +49,41 @@ export const useAuth = (): UseAuth => {
     /** Determine if the current route is public (no profile load needed) */
     const isPublicPage: boolean = PUBLIC_ROUTES.some(route => route === location.pathname);
 
-    const { data, isLoading, isFetching } = useGetProfileQuery(undefined, { skip: isPublicPage });
+    const { data, isLoading, isFetching } = useGetProfileQuery(SKIP_TOKEN, { skip: isPublicPage });
 
     /** Dispatches a sign-out action POST to invalidate the session server-side. */
-    const signOut = (): void => submit(null, { method: "post", action: SIGN_OUT_ACTION_ONLY_PATH });
+    const signOut = useCallback(
+        (): void => submit(null, { method: "post", action: SIGN_OUT_ACTION_ONLY_PATH }),
+        [submit]
+    );
 
     /** Initiates credentials-based sign-in (first step; may require 2FA). */
-    const signIn = (data: SignInFormValues): void =>
-        submit({ ...data, [SIGN_IN_ACTION_KEY]: SIGN_IN_WITH_CREDENTIALS }, { method: "post" });
+    const signIn = useCallback(
+        (data: SignInFormValues): void =>
+            submit({ ...data, [SIGN_IN_ACTION_KEY]: SIGN_IN_WITH_CREDENTIALS }, { method: "post" }),
+        [submit]
+    );
 
     /** Completes second factor sign-in when required. */
-    const signInWithTwoFactor = (data: TwoFactorSignInPayload): void =>
-        submit({ ...data, [SIGN_IN_ACTION_KEY]: SIGN_IN_WITH_TWO_FACTOR }, { method: "post" });
+    const signInWithTwoFactor = useCallback(
+        (data: TwoFactorSignInPayload): void =>
+            submit({ ...data, [SIGN_IN_ACTION_KEY]: SIGN_IN_WITH_TWO_FACTOR }, { method: "post" }),
+        [submit]
+    );
 
     /** Submits registration data to the sign-up action. */
-    const signUp = (data: SignUpFormValues): void => submit({ ...data }, { method: "post" });
+    const signUp = useCallback((data: SignUpFormValues): void => submit({ ...data }, { method: "post" }), [submit]);
 
-    return {
-        signOut,
-        signUp,
-        signIn,
-        isLoading,
-        isFetching,
-        signInWithTwoFactor,
-        profile: data as User,
-    };
+    return useMemo(
+        () => ({
+            signOut,
+            signUp,
+            signIn,
+            isLoading,
+            isFetching,
+            signInWithTwoFactor,
+            profile: data as User,
+        }),
+        [signOut, signUp, signIn, isLoading, isFetching, signInWithTwoFactor, data]
+    );
 };

@@ -5,3 +5,4 @@ export * from "./dialogs";
 export * from "./settings";
 export * from "./favorites";
 export * from "./dashboard";
+export * from "./errorElement";

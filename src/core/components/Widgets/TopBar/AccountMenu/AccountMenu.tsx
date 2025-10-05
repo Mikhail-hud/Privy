@@ -1,23 +1,24 @@
 import Box from "@mui/material/Box";
 import Menu from "@mui/material/Menu";
 import { FC, MouseEvent } from "react";
-import { useAuth } from "@app/core/hooks";
 import Divider from "@mui/material/Divider";
-import { UserRole } from "@app/core/services";
 import { Avatar } from "@app/core/components";
 import Logout from "@mui/icons-material/Logout";
 import MenuItem from "@mui/material/MenuItem";
 import IconButton from "@mui/material/IconButton";
+import { User, UserRole } from "@app/core/services";
 import Settings from "@mui/icons-material/Settings";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import DashboardIcon from "@mui/icons-material/Dashboard";
-import { NavigateFunction, useNavigate } from "react-router-dom";
 import { DASHBOARD_PAGE_PATH, SETTINGS_PAGE_PATH } from "@app/core/constants/pathConstants";
 
-export const AccountMenu: FC = () => {
-    const { profile, signOut } = useAuth();
+interface AccountMenuProps {
+    signOut: () => void;
+    profile: User;
+    onAccountMenuItemClick: (key: string) => () => void;
+}
 
-    const navigate: NavigateFunction = useNavigate();
+export const AccountMenu: FC<AccountMenuProps> = memo(({ signOut, profile, onAccountMenuItemClick }) => {
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
     const open: boolean = Boolean(anchorEl);
@@ -25,8 +26,6 @@ export const AccountMenu: FC = () => {
     const handleClick = (event: MouseEvent<HTMLElement>): void => setAnchorEl(event.currentTarget);
 
     const handleClose = (): void => setAnchorEl(null);
-
-    const handleMenuItemClick = (key: string): void => navigate(key);
 
     const handleSignOut = (): void => signOut();
 
@@ -50,14 +49,14 @@ export const AccountMenu: FC = () => {
                 </IconButton>
             </Box>
             <Menu open={open} id="account-menu" anchorEl={anchorEl} onClose={handleClose} onClick={handleClose}>
-                <MenuItem onClick={() => handleMenuItemClick(SETTINGS_PAGE_PATH)}>
+                <MenuItem onClick={onAccountMenuItemClick(SETTINGS_PAGE_PATH)}>
                     <ListItemIcon>
                         <Settings fontSize="small" />
                     </ListItemIcon>
                     Settings
                 </MenuItem>
                 {profile.role === UserRole.ADMIN && (
-                    <MenuItem onClick={() => handleMenuItemClick(DASHBOARD_PAGE_PATH)}>
+                    <MenuItem onClick={onAccountMenuItemClick(DASHBOARD_PAGE_PATH)}>
                         <ListItemIcon>
                             <DashboardIcon fontSize="small" />
                         </ListItemIcon>
@@ -74,4 +73,4 @@ export const AccountMenu: FC = () => {
             </Menu>
         </>
     );
-};
+});

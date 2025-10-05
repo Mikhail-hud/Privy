@@ -1,7 +1,8 @@
 /**
- * @file Ensures an authenticated user is available before rendering protected layout routes.
+ * Ensures an authenticated user is available before rendering protected layout routes.
  * Wrap this loader in route definitions that require a signed-in user. Returns either a
  * `UserContext` (on success) or a redirect `Response` to the sign-in page (on failure).
+ * @file src/features/auth/loaders/appLayoutLoader.tsx
  */
 
 import { store } from "@app/core/store";

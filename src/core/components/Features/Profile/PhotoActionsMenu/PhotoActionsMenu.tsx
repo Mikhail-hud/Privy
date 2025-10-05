@@ -1,7 +1,7 @@
 import { FC } from "react";
 import Menu from "@mui/material/Menu";
-import { Photo } from "@app/core/services";
 import MenuItem from "@mui/material/MenuItem";
+import { Photo, User } from "@app/core/services";
 import DeleteIcon from "@mui/icons-material/Delete";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import DownloadIcon from "@mui/icons-material/Download";
@@ -9,21 +9,16 @@ import { useProfileActions } from "@app/core/components";
 import CircularProgress from "@mui/material/CircularProgress";
 import { PublicIcon, PrivateIcon } from "@app/core/assets/icons";
 
-interface ProfileMenuPhotoActionsProps {
+interface PhotoActionsMenuProps {
+    profile: User;
     anchorEl: HTMLElement | null;
-    handleMenuClose: () => void;
-    isPublicPhoto: boolean;
-    isPrivatePhoto: boolean;
+    handleClose: () => void;
     photo: Photo | null;
 }
 
-export const ProfileMenuPhotoActions: FC<ProfileMenuPhotoActionsProps> = ({
-    isPrivatePhoto,
-    isPublicPhoto,
-    photo,
-    handleMenuClose,
-    anchorEl,
-}) => {
+export const PhotoActionsMenu: FC<PhotoActionsMenuProps> = memo(({ photo, handleClose, anchorEl, profile }) => {
+    const isPublicPhoto = profile?.publicPhoto?.id === photo?.id;
+    const isPrivatePhoto = profile?.privatePhoto?.id === photo?.id;
     const {
         delete: { isLoading: isDeleting, handler: deletePhoto },
         setPublic: { isLoading: isSettingAsPublic, handler: setPhotoAsPublic },
@@ -47,7 +42,7 @@ export const ProfileMenuPhotoActions: FC<ProfileMenuPhotoActionsProps> = ({
 
     const handleDeletePhoto = async (): Promise<void> => {
         if (!photo) return;
-        await deletePhoto(photo.id, handleMenuClose);
+        await deletePhoto(photo.id, handleClose);
     };
 
     const handleDownloadPhoto = async (): Promise<void> => {
@@ -56,7 +51,7 @@ export const ProfileMenuPhotoActions: FC<ProfileMenuPhotoActionsProps> = ({
     };
 
     return (
-        <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleMenuClose}>
+        <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleClose}>
             {isPublicPhoto ? (
                 <MenuItem onClick={handleUnsetPublicPhoto}>
                     <ListItemIcon>
@@ -80,7 +75,6 @@ export const ProfileMenuPhotoActions: FC<ProfileMenuPhotoActionsProps> = ({
                     Set as Public Profile Photo
                 </MenuItem>
             )}
-
             {isPrivatePhoto ? (
                 <MenuItem onClick={handleUnsetPrivatePhoto}>
                     <ListItemIcon>
@@ -118,4 +112,4 @@ export const ProfileMenuPhotoActions: FC<ProfileMenuPhotoActionsProps> = ({
             </MenuItem>
         </Menu>
     );
-};
+});

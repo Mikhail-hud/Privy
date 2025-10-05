@@ -4,11 +4,12 @@ import { styled } from "@mui/material";
 import Dialog from "@mui/material/Dialog";
 import Button from "@mui/material/Button";
 import { enqueueSnackbar } from "notistack";
+import { useDebounce } from "@app/core/hooks";
 import TextField from "@mui/material/TextField";
 import InputLabel from "@mui/material/InputLabel";
 import { QueryError } from "@app/core/interfaces";
-import { useState, FC, SyntheticEvent } from "react";
 import Typography from "@mui/material/Typography";
+import { useState, FC, SyntheticEvent } from "react";
 import FormControl from "@mui/material/FormControl";
 import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
@@ -16,8 +17,8 @@ import DialogActions from "@mui/material/DialogActions";
 import CircularProgress from "@mui/material/CircularProgress";
 import DialogContentText from "@mui/material/DialogContentText";
 import { transformServerErrors } from "@app/core/utils/general.ts";
-import { GENERIC_ERROR_MESSAGE } from "@app/core/constants/general";
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
+import { DEBOUNCE_DELAY, GENERIC_ERROR_MESSAGE } from "@app/core/constants/general";
 import Autocomplete, { AutocompleteInputChangeReason } from "@mui/material/Autocomplete";
 import { useGetTagsQuery, useUpdateProfileInterestsMutation, User, Tag } from "@app/core/services";
 
@@ -56,9 +57,11 @@ export const Interests: FC<InterestsProps> = ({ profile }) => {
     const [open, setOpen] = useState(false);
     const [inputValue, setInputValue] = useState<string>("");
 
+    const debouncedInputValue = useDebounce(inputValue, DEBOUNCE_DELAY);
+
     const { data: allTags = [], isLoading: isLoadingTags } = useGetTagsQuery(
-        { name: inputValue },
-        { skip: !open || !inputValue }
+        { name: debouncedInputValue },
+        { skip: !open || !debouncedInputValue }
     );
     const [updateInterests, { isLoading: isUpdating, error }] = useUpdateProfileInterestsMutation();
 

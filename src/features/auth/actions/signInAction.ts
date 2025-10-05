@@ -1,5 +1,6 @@
 /**
- * @file React Router action handling user sign-in (credentials and optional two-factor).
+ * @file src/features/auth/actions/signInAction.ts
+ * React Router action handling user sign-in (credentials and optional two-factor).
  * Determines intent from form data, dispatches the appropriate RTK Query mutation,
  * returns a redirect on success, or structured error data for UI consumption on failure.
  */

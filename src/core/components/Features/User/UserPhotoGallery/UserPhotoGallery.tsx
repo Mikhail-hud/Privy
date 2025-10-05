@@ -1,11 +1,11 @@
 import { FC, MouseEvent } from "react";
 import { Photo, User } from "@app/core/services";
-import { ProfileMenuPhotoActions } from "@app/core/components";
+import { PhotoActionsMenu } from "@app/core/components";
 import { PhotoGrid } from "@app/core/components/Features/User/UserPhotoGallery/PhotoGrid";
 import { PhotoViewer } from "@app/core/components/Features/User/UserPhotoGallery/PhotoViewer";
 
 interface UserPhotoGalleryProps {
-    profile: User | undefined;
+    profile: User;
     photos: Photo[];
     isOwner?: boolean;
 }
@@ -13,9 +13,8 @@ interface UserPhotoGalleryProps {
 export const UserPhotoGallery: FC<UserPhotoGalleryProps> = ({ photos, profile, isOwner = false }) => {
     const [selectedImageIndex, setSelectedImageIndex] = useState<number | null>(null);
     const [photo, setPhoto] = useState<Photo | null>(null);
+    const [activePhotoInViewer, setActivePhotoInViewer] = useState<Photo | null>(null);
     const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
-    const isPublicPhoto = profile?.publicPhoto?.id === photo?.id;
-    const isPrivatePhoto = profile?.privatePhoto?.id === photo?.id;
 
     const handleMenuOpen = useCallback(
         (photo: Photo) =>
@@ -30,46 +29,42 @@ export const UserPhotoGallery: FC<UserPhotoGalleryProps> = ({ photos, profile, i
         (index: number, photo: Photo) =>
             (_event: MouseEvent<HTMLImageElement>): void => {
                 document.body.style.overflow = "hidden";
-                setPhoto(photo);
+                setActivePhotoInViewer(photo);
                 setSelectedImageIndex(index);
             },
         []
     );
 
-    const handleMenuClose = (): void => {
+    const handleMenuClose = useCallback((): void => {
         setAnchorEl(null);
         setPhoto(null);
-    };
+    }, []);
 
-    const handleCloseBackdrop = (): void => {
+    const handleCloseBackdrop = useCallback((): void => {
         document.body.style.overflow = "unset";
         setSelectedImageIndex(null);
-        setPhoto(null);
-    };
+        setActivePhotoInViewer(null);
+    }, []);
 
-    const onSlideChange = (currentSlideIndex: number): void => setPhoto(photos[currentSlideIndex] || null);
+    const onSlideChange = useCallback(
+        (currentSlideIndex: number): void => setActivePhotoInViewer(photos[currentSlideIndex] || null),
+        [photos]
+    );
 
     return (
         <>
             <PhotoGrid photos={photos} isOwner={isOwner} onImageClick={handleImageClick} onMenuOpen={handleMenuOpen} />
             {isOwner && (
-                <ProfileMenuPhotoActions
-                    photo={photo}
-                    anchorEl={anchorEl}
-                    isPublicPhoto={isPublicPhoto}
-                    isPrivatePhoto={isPrivatePhoto}
-                    handleMenuClose={handleMenuClose}
-                />
+                <PhotoActionsMenu photo={photo} profile={profile} anchorEl={anchorEl} handleClose={handleMenuClose} />
             )}
             <PhotoViewer
-                photo={photo}
                 photos={photos}
+                profile={profile}
                 isOwner={isOwner}
-                isPublicPhoto={isPublicPhoto}
-                isPrivatePhoto={isPrivatePhoto}
-                initialSlide={selectedImageIndex}
-                onSlideChange={onSlideChange}
+                photo={activePhotoInViewer}
                 onClose={handleCloseBackdrop}
+                onSlideChange={onSlideChange}
+                initialSlide={selectedImageIndex}
                 open={selectedImageIndex !== null}
             />
         </>

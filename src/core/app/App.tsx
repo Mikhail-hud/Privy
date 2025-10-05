@@ -1,7 +1,8 @@
-import { FC } from "react";
+import { FC, Suspense } from "react";
 import {
     ROOT_ID,
     ROOT_PATH,
+    SIGN_UP_PAGE_PATH,
     SIGN_IN_PAGE_PATH,
     PROFILE_PAGE_PATH,
     DIALOGS_PAGE_PATH,
@@ -10,14 +11,13 @@ import {
     NOT_FOUND_PAGE_PATH,
     DASHBOARD_PAGE_PATH,
     RESET_PASSWORD_PATH,
-    SIGN_OUT_ACTION_ONLY_PATH,
-    SIGN_UP_PAGE_PATH,
-    PROFILE_FAVORITES_TAB_PATH,
     PROFILE_REPLIES_TAB_PATH,
     PROFILE_PHOTOS_TAB_PATH,
     PROFILE_REVEALS_TAB_PATH,
+    SIGN_OUT_ACTION_ONLY_PATH,
+    PROFILE_FAVORITES_TAB_PATH,
 } from "@app/core/constants/pathConstants";
-import { AppLayout, RequireAdmin, TabContainer } from "@app/core/components";
+import { AppLayout, Spiner, TabContainer } from "@app/core/components";
 import { createBrowserRouter, RouterProvider, Navigate, redirect } from "react-router-dom";
 import {
     SignIn,
@@ -25,9 +25,8 @@ import {
     Profile,
     Dialogs,
     SignUp,
-    Settings,
     Favorites,
-    Dashboard,
+    ErrorPage,
     ResetPassword,
     signInAction,
     signOutAction,
@@ -35,7 +34,12 @@ import {
     signUpAction,
     publicRoutesLoader,
 } from "@app/features";
-import { ProfilePhotos } from "@app/features/profile/ProfileCard/ProfileTabs";
+import { ProfilePhotos, profilePhotosLoader } from "@app/features/profile/ProfileCard/ProfileTabs";
+
+// Lazy-loaded components to optimize initial load time
+const RequireAdmin = lazy(() => import("@app/core/components/Hocs").then(module => ({ default: module.RequireAdmin })));
+const Dashboard = lazy(() => import("@app/features/dashboard").then(module => ({ default: module.Dashboard })));
+const Settings = lazy(() => import("@app/features/settings").then(module => ({ default: module.Settings })));
 
 const router = createBrowserRouter([
     {
@@ -56,7 +60,7 @@ const router = createBrowserRouter([
         loader: publicRoutesLoader,
     },
     {
-        // Action only route, no element
+        // Action-only route, no element
         path: SIGN_OUT_ACTION_ONLY_PATH,
         action: signOutAction,
         loader: () => redirect(PROFILE_PAGE_PATH),
@@ -66,20 +70,12 @@ const router = createBrowserRouter([
         path: ROOT_PATH,
         element: <AppLayout />,
         loader: appLayoutLoader,
+        // Fallback UI if the loader throws an error
+        errorElement: <ErrorPage />,
         children: [
             {
                 index: true,
                 element: <Navigate to={PROFILE_PAGE_PATH} replace />,
-            },
-
-            {
-                element: <RequireAdmin />,
-                children: [
-                    {
-                        path: DASHBOARD_PAGE_PATH,
-                        element: <Dashboard />,
-                    },
-                ],
             },
             {
                 path: PROFILE_PAGE_PATH,
@@ -102,6 +98,7 @@ const router = createBrowserRouter([
                     },
                     {
                         path: PROFILE_PHOTOS_TAB_PATH,
+                        loader: profilePhotosLoader,
                         element: <ProfilePhotos />,
                         handle: { tab: PROFILE_PHOTOS_TAB_PATH },
                     },
@@ -121,8 +118,25 @@ const router = createBrowserRouter([
                 element: <Favorites />,
             },
             {
+                element: <RequireAdmin />,
+                children: [
+                    {
+                        path: DASHBOARD_PAGE_PATH,
+                        element: (
+                            <Suspense fallback={<Spiner />}>
+                                <Dashboard />
+                            </Suspense>
+                        ),
+                    },
+                ],
+            },
+            {
                 path: SETTINGS_PAGE_PATH,
-                element: <Settings />,
+                element: (
+                    <Suspense fallback={<Spiner />}>
+                        <Settings />
+                    </Suspense>
+                ),
             },
         ],
     },

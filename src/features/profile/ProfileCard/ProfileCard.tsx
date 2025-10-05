@@ -11,18 +11,19 @@ import CardContent from "@mui/material/CardContent";
 import { ProfileAvatar } from "@app/core/components";
 import { ProfileTabs } from "@app/features/profile/ProfileCard/ProfileTabs";
 import { EditProfileAction } from "@app/features/profile/ProfileCard/EditProfileAction";
-import { UserContext } from "@app/features";
-import { useAuth } from "@app/core/hooks";
+import { User } from "@app/core/services";
 
-export const ProfileCard: FC = () => {
-    const { profile } = useAuth();
-    const context = useOutletContext<UserContext>();
+interface ProfileCardProps {
+    profile: User;
+}
+
+export const ProfileCard: FC<ProfileCardProps> = memo(({ profile }) => {
     return (
         <Card variant="outlined" sx={{ maxWidth: 800, margin: "auto", height: "100%" }}>
             <CardHeader
                 avatar={<ProfileAvatar profile={profile} isOwner />}
                 subheader={profile.userName}
-                action={<EditProfileAction />}
+                action={<EditProfileAction profile={profile} />}
                 title={profile.fullName}
             />
             {profile.biography && (
@@ -46,8 +47,8 @@ export const ProfileCard: FC = () => {
             {/*</CardActions>*/}
             <CardContent sx={{ pt: 0 }}>
                 <ProfileTabs />
-                <Outlet context={context} />
+                <Outlet />
             </CardContent>
         </Card>
     );
-};
+});

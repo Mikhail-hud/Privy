@@ -1,5 +1,6 @@
 /**
- * @file Action that signs the current user out. Dispatches the RTK Query `signOut` mutation,
+ * @file src/features/auth/actions/signOutAction.ts
+ * Action that signs the current user out. Dispatches the RTK Query `signOut` mutation,
  * redirects to the sign-in page on success, or shows an error snackbar and returns `null` on failure.
  */
 

@@ -19,7 +19,7 @@ export const PUBLIC_ROUTES = [RESET_PASSWORD_PATH, SIGN_IN_PAGE_PATH, SIGN_UP_PA
 // Root ID for the main layout
 export const ROOT_ID = "root";
 
-// Action only route, no element
+// Action-only route, no element
 export const SIGN_OUT_ACTION_ONLY_PATH = "/sign-out";
 
 // Params Keys

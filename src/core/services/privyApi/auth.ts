@@ -147,7 +147,7 @@ export const authApi = privyApi.injectEndpoints({
             invalidatesTags: (_, err) => (err ? [] : TAG_TYPES),
             async onQueryStarted(_a: never, { dispatch, queryFulfilled }): Promise<void> {
                 const { data } = await queryFulfilled;
-                // If two-factor authentication is required, we do not update the user data
+                // if two-factor is required, do not sync user in cache
                 if ("twoFactorRequired" in data) return;
                 dispatch(syncUserInCache(data));
             },

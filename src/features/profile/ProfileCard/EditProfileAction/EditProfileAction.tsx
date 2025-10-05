@@ -1,4 +1,3 @@
-import { useAuth } from "@app/core/hooks";
 import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";
 import { enqueueSnackbar } from "notistack";
@@ -14,7 +13,7 @@ import { transformServerErrors } from "@app/core/utils/general";
 import { GENERIC_ERROR_MESSAGE } from "@app/core/constants/general";
 import { VALIDATE_RELES } from "@app/core/constants/rulesConstants";
 import { BirthDate, Biography, FullName, Gender, Switch, Interests } from "@app/core/components";
-import { ProfileUpdatePayload, UserGender, useUpdateProfileMutation } from "@app/core/services";
+import { ProfileUpdatePayload, User, UserGender, useUpdateProfileMutation } from "@app/core/services";
 
 export const PROFILE_FORM_FIELDS = {
     gender: { name: "gender", label: "Gender" },
@@ -41,8 +40,11 @@ const DEFAULT_SIGN_UP_FORM_VALUES: ProfileFormValues = {
     [PROFILE_FORM_FIELDS.biography.name]: "",
 };
 
-export const EditProfileAction: FC = () => {
-    const { profile } = useAuth();
+interface EditProfileActionProps {
+    profile: User;
+}
+
+export const EditProfileAction: FC<EditProfileActionProps> = memo(({ profile }) => {
     const [updateProfile, { isLoading, error }] = useUpdateProfileMutation();
     const [open, setOpen] = useState<boolean>(false);
 
@@ -139,4 +141,4 @@ export const EditProfileAction: FC = () => {
             </Dialog>
         </>
     );
-};
+});

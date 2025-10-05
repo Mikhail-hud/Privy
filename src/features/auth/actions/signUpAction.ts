@@ -1,5 +1,6 @@
 /**
- * @file Action handler for user sign-up. Processes form data, dispatches the sign-up RTK Query mutation,
+ * @file src/features/auth/actions/signUpAction.ts
+ * Action handler for user sign-up. Processes form data, dispatches the sign-up RTK Query mutation,
  * redirects to the profile page on success, or returns a structured error object and displays a snackbar on failure.
  */
 

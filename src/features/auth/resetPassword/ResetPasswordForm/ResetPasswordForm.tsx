@@ -22,8 +22,8 @@ export interface ResetPasswordFormValues {
 }
 
 export const ResetPasswordForm: FC = () => {
-    const navigate: NavigateFunction = useNavigate();
     const [searchParams] = useSearchParams();
+    const navigate: NavigateFunction = useNavigate();
     const [setNewPassword, { isLoading }] = useSetNewPasswordMutation();
     const form = useForm<ResetPasswordFormValues>({
         mode: "onChange",
