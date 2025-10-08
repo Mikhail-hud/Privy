@@ -118,7 +118,7 @@ export const ManageLinksDialog: FC<ManageLinksDialogProps> = memo(({ open, onClo
                 {view === "list" ? "Manage Your Links" : editingLink ? "Edit Link" : "Create New Link"}
             </DialogTitle>
 
-            {view === "list" ? (
+            <Activity mode={view === "list" ? "visible" : "hidden"}>
                 <DialogContent>
                     <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
                         {links.map(link => (
@@ -147,8 +147,13 @@ export const ManageLinksDialog: FC<ManageLinksDialogProps> = memo(({ open, onClo
                         Add New Link
                     </Button>
                 </DialogContent>
-            ) : (
-                <Box component="form">
+                <DialogActions>
+                    <Button onClick={onClose}>Close</Button>
+                </DialogActions>
+            </Activity>
+
+            <Activity mode={view === "form" ? "visible" : "hidden"}>
+                <Box component="form" noValidate>
                     <DialogContent sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
                         <Controller
                             control={control}
@@ -157,7 +162,6 @@ export const ManageLinksDialog: FC<ManageLinksDialogProps> = memo(({ open, onClo
                             render={({ field, fieldState: { error } }) => (
                                 <TextField
                                     {...field}
-                                    autoFocus
                                     error={!!error}
                                     helperText={error?.message}
                                     label={LINKS_FORM_FIELDS.title.label}
@@ -192,12 +196,7 @@ export const ManageLinksDialog: FC<ManageLinksDialogProps> = memo(({ open, onClo
                         </Button>
                     </DialogActions>
                 </Box>
-            )}
-            {view === "list" && (
-                <DialogActions>
-                    <Button onClick={onClose}>Close</Button>
-                </DialogActions>
-            )}
+            </Activity>
         </Dialog>
     );
 });

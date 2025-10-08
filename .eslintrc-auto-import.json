@@ -1,5 +1,6 @@
 {
   "globals": {
+    "Activity": true,
     "Link": true,
     "NavLink": true,
     "Navigate": true,
@@ -16,11 +17,13 @@
     "memo": true,
     "startTransition": true,
     "test": true,
+    "useActionState": true,
     "useCallback": true,
     "useContext": true,
     "useDebugValue": true,
     "useDeferredValue": true,
     "useEffect": true,
+    "useEffectEvent": true,
     "useHref": true,
     "useId": true,
     "useImperativeHandle": true,
