@@ -6,6 +6,11 @@ export interface Tag {
     name: string;
 }
 
+interface UpdateTagPayload {
+    id: number;
+    name: string;
+}
+
 export const tagsApi = privyApi.injectEndpoints({
     endpoints: builder => ({
         getTags: builder.query<Tag[], { name: string }>({
@@ -28,7 +33,7 @@ export const tagsApi = privyApi.injectEndpoints({
             }),
             invalidatesTags: (_, err) => (err ? [] : [TAG_TAG]),
         }),
-        updateTag: builder.mutation<Tag, { id: number; name: string }>({
+        updateTag: builder.mutation<Tag, UpdateTagPayload>({
             query: ({ id, name }): { url: string; method: string; body: { name: string } } => ({
                 url: `tags/${id}`,
                 method: "PUT",

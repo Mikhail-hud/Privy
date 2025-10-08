@@ -12,8 +12,8 @@ import { SubmitHandler, useForm } from "react-hook-form";
 import { transformServerErrors } from "@app/core/utils/general";
 import { GENERIC_ERROR_MESSAGE } from "@app/core/constants/general";
 import { VALIDATE_RELES } from "@app/core/constants/rulesConstants";
-import { BirthDate, Biography, FullName, Gender, Switch, Interests } from "@app/core/components";
 import { ProfileUpdatePayload, User, UserGender, useUpdateProfileMutation } from "@app/core/services";
+import { BirthDate, Biography, FullName, Gender, Switch, Interests, UserLinks } from "@app/core/components";
 
 export const PROFILE_FORM_FIELDS = {
     gender: { name: "gender", label: "Gender" },
@@ -111,7 +111,8 @@ export const EditProfileAction: FC<EditProfileActionProps> = memo(({ profile }) 
                         name={PROFILE_FORM_FIELDS.biography.name}
                         label={PROFILE_FORM_FIELDS.biography.label}
                     />
-                    <Interests profile={profile} />
+                    <Interests interests={profile.interests} />
+                    <UserLinks links={profile.links} />
                     <BirthDate<ProfileFormValues>
                         control={control}
                         name={PROFILE_FORM_FIELDS.birthDate.name}

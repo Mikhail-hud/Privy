@@ -1,18 +1,14 @@
-import Box from "@mui/material/Box";
 import Chip from "@mui/material/Chip";
-import { styled } from "@mui/material";
 import Dialog from "@mui/material/Dialog";
 import Button from "@mui/material/Button";
 import { enqueueSnackbar } from "notistack";
 import { useDebounce } from "@app/core/hooks";
 import TextField from "@mui/material/TextField";
-import InputLabel from "@mui/material/InputLabel";
 import { QueryError } from "@app/core/interfaces";
-import Typography from "@mui/material/Typography";
 import { useState, FC, SyntheticEvent } from "react";
-import FormControl from "@mui/material/FormControl";
 import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
+import { FormFieldShell } from "@app/core/components";
 import DialogActions from "@mui/material/DialogActions";
 import CircularProgress from "@mui/material/CircularProgress";
 import DialogContentText from "@mui/material/DialogContentText";
@@ -20,22 +16,7 @@ import { transformServerErrors } from "@app/core/utils/general.ts";
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
 import { DEBOUNCE_DELAY, GENERIC_ERROR_MESSAGE } from "@app/core/constants/general";
 import Autocomplete, { AutocompleteInputChangeReason } from "@mui/material/Autocomplete";
-import { useGetTagsQuery, useUpdateProfileInterestsMutation, User, Tag } from "@app/core/services";
-
-const InputBox = styled(Box)(({ theme }) => ({
-    borderBottom: `1px solid ${(theme.vars || theme).palette.divider}`,
-    display: "flex",
-    alignItems: "center",
-    cursor: "pointer",
-    flexWrap: "wrap",
-    minHeight: 32,
-    gap: theme.spacing(0.5),
-    paddingTop: theme.spacing(1),
-    paddingBottom: theme.spacing(1),
-    "&:hover": {
-        borderColor: (theme.vars || theme).palette.primary.main,
-    },
-}));
+import { useGetTagsQuery, useUpdateProfileInterestsMutation, Tag } from "@app/core/services";
 
 export const INTERESTS_FORM_FIELDS = {
     interests: { name: "interests", label: "Interests" },
@@ -50,10 +31,10 @@ const INTERESTS_FORM_FIELDS_VALUES: InterestsValues = {
 };
 
 interface InterestsProps {
-    profile: User | undefined;
+    interests: Tag[];
 }
 
-export const Interests: FC<InterestsProps> = ({ profile }) => {
+export const Interests: FC<InterestsProps> = memo(({ interests }) => {
     const [open, setOpen] = useState(false);
     const [inputValue, setInputValue] = useState<string>("");
 
@@ -71,7 +52,7 @@ export const Interests: FC<InterestsProps> = ({ profile }) => {
     });
 
     const handleOpen = (): void => {
-        reset({ interests: profile?.interests || [] });
+        reset({ interests });
         setInputValue("");
         setOpen(true);
     };
@@ -101,19 +82,13 @@ export const Interests: FC<InterestsProps> = ({ profile }) => {
     );
 
     return (
-        <FormControl variant="standard" fullWidth>
-            <InputLabel shrink sx={{ position: "relative" }}>
-                {INTERESTS_FORM_FIELDS.interests.label}
-            </InputLabel>
-            <InputBox onClick={handleOpen}>
-                {profile?.interests?.length ? (
-                    profile.interests.map(interest => <Chip key={interest.id} label={interest.name} size="small" />)
-                ) : (
-                    <Typography variant="body1" color="text.secondary">
-                        Select interests so that we can select relevant content and people for you
-                    </Typography>
-                )}
-            </InputBox>
+        <FormFieldShell<Tag>
+            data={interests}
+            onClick={handleOpen}
+            label={INTERESTS_FORM_FIELDS.interests.label}
+            render={tag => <Chip key={tag.id} label={tag.name} size="small" />}
+            placeholder="Select interests so that we can select relevant content and people for you"
+        >
             <Dialog
                 open={open}
                 maxWidth={false}
@@ -167,6 +142,6 @@ export const Interests: FC<InterestsProps> = ({ profile }) => {
                     </Button>
                 </DialogActions>
             </Dialog>
-        </FormControl>
+        </FormFieldShell>
     );
-};
+});

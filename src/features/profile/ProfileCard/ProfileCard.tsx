@@ -22,9 +22,15 @@ export const ProfileCard: FC<ProfileCardProps> = memo(({ profile }) => {
         <Card variant="outlined" sx={{ maxWidth: 800, margin: "auto", height: "100%" }}>
             <CardHeader
                 avatar={<ProfileAvatar profile={profile} isOwner />}
-                subheader={profile.userName}
                 action={<EditProfileAction profile={profile} />}
                 title={profile.fullName}
+                subheader={
+                    <>
+                        <Typography variant="body2" color="textSecondary">
+                            {profile.userName}
+                        </Typography>
+                    </>
+                }
             />
             {profile.biography && (
                 <>

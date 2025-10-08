@@ -28,7 +28,17 @@
  */
 
 import { AppDispatch } from "@app/core/store";
-import { SESSIONS_TAG, TAG_TYPES, privyApi, USER_NAME_TAG, USER_TAG, profileApi, Tag, Photo } from "@app/core/services";
+import {
+    SESSIONS_TAG,
+    TAG_TYPES,
+    privyApi,
+    USER_NAME_TAG,
+    USER_TAG,
+    profileApi,
+    Tag,
+    Photo,
+    UserLink,
+} from "@app/core/services";
 
 export interface SignInPayload {
     identifier: string;
@@ -99,6 +109,7 @@ export interface User {
     isProfileIncognito: boolean;
     publicPhoto: Photo | null;
     privatePhoto: Photo | null;
+    links: UserLink[];
 }
 
 export interface TwoFactorStatus {
