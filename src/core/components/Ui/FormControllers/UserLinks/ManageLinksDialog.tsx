@@ -45,7 +45,6 @@ interface ManageLinksDialogProps {
 }
 
 export const ManageLinksDialog: FC<ManageLinksDialogProps> = memo(({ open, onClose, links }) => {
-    console.log("ManageLinksDialog render");
     const [view, setView] = useState<"list" | "form">("list");
     const [editingLink, setEditingLink] = useState<UserLink | null>(null);
 
