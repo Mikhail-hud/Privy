@@ -45,7 +45,7 @@ export const PhotoActionsMenu: FC<PhotoActionsMenuProps> = memo(({ photo, handle
         await deletePhoto(photo.id, handleClose);
     };
 
-    const handleDownloadPhoto = async (): Promise<void> => {
+    const handleDownloadPhoto = (): void => {
         if (!photo) return;
         downloadPhoto(photo);
     };

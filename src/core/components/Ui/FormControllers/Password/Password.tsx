@@ -1,9 +1,9 @@
-import TextField from "@mui/material/TextField";
 import IconButton from "@mui/material/IconButton";
 import Visibility from "@mui/icons-material/Visibility";
 import InputAdornment from "@mui/material/InputAdornment";
 import { MouseEvent, ReactElement, useState } from "react";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
+import TextField, { TextFieldProps } from "@mui/material/TextField";
 import {
     Path,
     Control,
@@ -13,7 +13,6 @@ import {
     ControllerFieldState,
     ControllerRenderProps,
 } from "react-hook-form";
-import { TextFieldProps } from "@mui/material/TextField";
 
 type PasswordProps<T extends FieldValues> = Omit<TextFieldProps, "name"> & {
     name: Path<T>;

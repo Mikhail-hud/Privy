@@ -3,7 +3,7 @@
 /// <reference types="vite/client" />
 
 interface ImportMetaEnv {
-    readonly VITE_UNTHREADS_API_ROOT: string;
+    readonly VITE_PRIVY_API_ROOT: string;
 }
 
 interface ImportMeta {

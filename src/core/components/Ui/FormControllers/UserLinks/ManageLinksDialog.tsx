@@ -1,12 +1,12 @@
 import Box from "@mui/material/Box";
 import Paper from "@mui/material/Paper";
+import { FC, Activity } from "react";
 import Dialog from "@mui/material/Dialog";
 import Button from "@mui/material/Button";
 import MuiLink from "@mui/material/Link";
 import Divider from "@mui/material/Divider";
 import { enqueueSnackbar } from "notistack";
 import AddIcon from "@mui/icons-material/Add";
-import { FC, useState, useEffect } from "react";
 import IconButton from "@mui/material/IconButton";
 import TextField from "@mui/material/TextField";
 import EditIcon from "@mui/icons-material/Edit";
@@ -81,7 +81,7 @@ export const ManageLinksDialog: FC<ManageLinksDialogProps> = memo(({ open, onClo
         setEditingLink(null);
     };
 
-    const handleDeleteLink = async (id: number) => {
+    const handleDeleteLink = async (id: number): Promise<void> => {
         try {
             await deleteLink({ id }).unwrap();
             enqueueSnackbar("Link deleted", { variant: "success" });

@@ -49,28 +49,42 @@ export const ProfileAvatar: FC<ProfileAvatarProps> = ({ profile, isOwner = false
         if (!id) {
             return;
         }
-        type === PhotoUploadType.PUBLIC ? setIsDeletingPublicPhoto(true) : setIsDeletingPrivatePhoto(true);
+        if (type === PhotoUploadType.PUBLIC) {
+            setIsDeletingPublicPhoto(true);
+        } else {
+            setIsDeletingPrivatePhoto(true);
+        }
         try {
             await deletePhoto(id).unwrap();
         } catch (error) {
             const errorMessage: string = (error as QueryError)?.data?.message?.toString() || GENERIC_ERROR_MESSAGE;
             enqueueSnackbar(errorMessage, { variant: "error" });
         } finally {
-            type === PhotoUploadType.PUBLIC ? setIsDeletingPublicPhoto(false) : setIsDeletingPrivatePhoto(false);
+            if (type === PhotoUploadType.PUBLIC) {
+                setIsDeletingPublicPhoto(false);
+            } else {
+                setIsDeletingPrivatePhoto(false);
+            }
         }
     };
 
     const handleAvatarChange = async (event: ChangeEvent<HTMLInputElement>): Promise<void> => {
         if (event.target.files?.length) {
-            uploadType === PhotoUploadType.PUBLIC ? setIsUploadingPublicPhoto(true) : setIsUploadingPrivatePhoto(true);
+            if (uploadType === PhotoUploadType.PUBLIC) {
+                setIsUploadingPublicPhoto(true);
+            } else {
+                setIsUploadingPrivatePhoto(true);
+            }
             const file: File = event.target.files[0];
 
             if (!FILE_PATTERN.test(file.type)) {
                 enqueueSnackbar("Invalid file type. Allowed types: JPEG, PNG, GIF, WEBP, SVG.", { variant: "error" });
                 if (event.target) event.target.value = "";
-                uploadType === PhotoUploadType.PUBLIC
-                    ? setIsUploadingPublicPhoto(false)
-                    : setIsUploadingPrivatePhoto(false);
+                if (uploadType === PhotoUploadType.PUBLIC) {
+                    setIsUploadingPublicPhoto(false);
+                } else {
+                    setIsUploadingPrivatePhoto(false);
+                }
                 return;
             }
             try {
@@ -84,9 +98,11 @@ export const ProfileAvatar: FC<ProfileAvatarProps> = ({ profile, isOwner = false
                 enqueueSnackbar(errorMessage, { variant: "error" });
             } finally {
                 if (event.target) event.target.value = "";
-                uploadType === PhotoUploadType.PUBLIC
-                    ? setIsUploadingPublicPhoto(false)
-                    : setIsUploadingPrivatePhoto(false);
+                if (uploadType === PhotoUploadType.PUBLIC) {
+                    setIsUploadingPublicPhoto(false);
+                } else {
+                    setIsUploadingPrivatePhoto(false);
+                }
             }
         }
     };

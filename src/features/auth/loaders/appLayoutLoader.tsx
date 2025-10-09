@@ -7,8 +7,11 @@
 
 import { store } from "@app/core/store";
 import { redirect } from "react-router-dom";
+import { enqueueSnackbar } from "notistack";
 import { authApi, User } from "@app/core/services";
+import { QueryError } from "@app/core/interfaces";
 import { SIGN_IN_PAGE_PATH } from "@app/core/constants/pathConstants";
+import { GENERIC_ERROR_MESSAGE } from "@app/core/constants/general.ts";
 
 /**
  * Authenticated user context made available to route elements.
@@ -53,6 +56,8 @@ export const appLayoutLoader = async (): Promise<UserContext | Response> => {
         const user: User = await promise.unwrap();
         return { user };
     } catch (error) {
+        const errorMessage = (error as QueryError)?.data?.message?.toString() || GENERIC_ERROR_MESSAGE;
+        enqueueSnackbar(errorMessage, { variant: "error" });
         return redirect(SIGN_IN_PAGE_PATH);
     } finally {
         promise.unsubscribe();

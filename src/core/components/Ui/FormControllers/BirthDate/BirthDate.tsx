@@ -28,6 +28,7 @@ const BirthDateFormControl = <T extends FieldValues>({ name, control, rules, ...
             control={control}
             name={name}
             rules={{
+                ...rules,
                 ...VALIDATE_RELES.BIRTHDATE,
                 validate: selectedDate => {
                     const age = dayjs().diff(selectedDate, "year");

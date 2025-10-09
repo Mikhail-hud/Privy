@@ -1,9 +1,8 @@
 import { FC, ReactNode } from "react";
 import { alpha } from "@mui/material/styles";
-import IconButton from "@mui/material/IconButton";
 import { SxProps, Theme } from "@mui/material";
 import Typography from "@mui/material/Typography";
-import { IconButtonProps } from "@mui/material/IconButton";
+import IconButton, { IconButtonProps } from "@mui/material/IconButton";
 
 interface ActionIconButtonProps extends IconButtonProps {
     icon: ReactNode;

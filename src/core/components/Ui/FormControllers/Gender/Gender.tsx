@@ -27,6 +27,7 @@ export const GenderFormControl = <T extends FieldValues>({ control, name, label,
     <Controller
         name={name}
         control={control}
+        rules={rules}
         render={({
             field,
             fieldState: { error },

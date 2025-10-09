@@ -36,9 +36,8 @@
   },
   "include": [
     "src/**/*",
-    "declarations.d.ts",
+    "*.d.ts",
     "src",
-    "auto-imports.d.ts",
     "vite.config.ts"
   ],
   "exclude": [

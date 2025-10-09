@@ -16,10 +16,6 @@ export default defineConfig(({ mode }) => {
                     {
                         vitest: ["describe", "it", "expect", "test", "vi", "beforeEach"],
                     },
-                    {
-                        from: "react",
-                        imports: ["Activity", "useEffectEvent", "useActionState"],
-                    },
                 ], // Automatically import hooks and utilities
                 dts: "./auto-imports.d.ts", // Generate TypeScript declaration file
                 eslintrc: {

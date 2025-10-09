@@ -27,7 +27,6 @@
  * Exports React hooks for each endpoint for use in components.
  */
 
-import { AppDispatch } from "@app/core/store";
 import {
     SESSIONS_TAG,
     TAG_TYPES,
@@ -132,13 +131,6 @@ export interface newPasswordPayload {
     passwordRepeat: string;
 }
 
-const syncUserInCache =
-    (userData: User) =>
-    (dispatch: AppDispatch): void => {
-        dispatch(authApi.util.upsertQueryData("me", undefined, userData));
-        dispatch(profileApi.util.upsertQueryData("getProfile", undefined, userData));
-    };
-
 export const authApi = privyApi.injectEndpoints({
     endpoints: builder => ({
         me: builder.query<User, void>({
@@ -146,6 +138,7 @@ export const authApi = privyApi.injectEndpoints({
             providesTags: () => [USER_TAG],
             async onQueryStarted(_a: never, { dispatch, queryFulfilled }): Promise<void> {
                 const { data } = await queryFulfilled;
+                /// Sync user in the profile cache as well
                 dispatch(profileApi.util.upsertQueryData("getProfile", undefined, data));
             },
         }),
@@ -160,7 +153,8 @@ export const authApi = privyApi.injectEndpoints({
                 const { data } = await queryFulfilled;
                 // if two-factor is required, do not sync user in cache
                 if ("twoFactorRequired" in data) return;
-                dispatch(syncUserInCache(data));
+                // Sync user in the cache
+                dispatch(authApi.util.upsertQueryData("me", undefined, data));
             },
         }),
         signUp: builder.mutation<User, SignUpPayload>({
@@ -172,7 +166,8 @@ export const authApi = privyApi.injectEndpoints({
             invalidatesTags: (_, err) => (err ? [] : TAG_TYPES),
             async onQueryStarted(_a: never, { dispatch, queryFulfilled }): Promise<void> {
                 const { data } = await queryFulfilled;
-                dispatch(syncUserInCache(data));
+                // Sync user in the cache
+                dispatch(authApi.util.upsertQueryData("me", undefined, data));
             },
         }),
         twoFactorSignIn: builder.mutation<User, TwoFactorSignInPayload>({
@@ -184,7 +179,8 @@ export const authApi = privyApi.injectEndpoints({
             invalidatesTags: (_, err) => (err ? [] : TAG_TYPES),
             async onQueryStarted(_a: never, { dispatch, queryFulfilled }): Promise<void> {
                 const { data } = await queryFulfilled;
-                dispatch(syncUserInCache(data));
+                // Sync user in the cache
+                dispatch(authApi.util.upsertQueryData("me", undefined, data));
             },
         }),
         signOut: builder.mutation<unknown, void>({

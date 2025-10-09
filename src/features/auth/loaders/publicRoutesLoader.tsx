@@ -10,9 +10,9 @@ import { PROFILE_PAGE_PATH } from "@app/core/constants/pathConstants";
  * for the result of the "me" endpoint from the auth API. If the user is authenticated,
  * they are redirected to the profile page. Otherwise, the route is accessible.
  *
- * @returns {Promise<Promise<Response> | null>} A redirect response to the profile page if the user is authenticated, or null if the user is not authenticated.
+ * @returns {Response> | null} A redirect response to the profile page if the user is authenticated, or null if the user is not authenticated.
  */
-export const publicRoutesLoader = async (): Promise<Promise<Response> | null> => {
+export const publicRoutesLoader = (): Response | null => {
     // Retrieve the current state of the Redux store
     const state = store.getState();
 

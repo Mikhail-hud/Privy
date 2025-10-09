@@ -39,9 +39,9 @@ export const ProfilePhotoActions: FC<ProfilePhotoActionsProps> = ({ isPublicPhot
         await deletePhoto(photo.id);
     };
 
-    const handleDownloadPhoto = async (): Promise<void> => {
+    const handleDownloadPhoto = (): void => {
         if (!photo) return;
-        await downloadPhoto(photo);
+        downloadPhoto(photo);
     };
 
     return (
