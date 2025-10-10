@@ -2,16 +2,14 @@ import { FC } from "react";
 import Card from "@mui/material/Card";
 import { Outlet } from "react-router-dom";
 import Divider from "@mui/material/Divider";
-// import IconButton from "@mui/material/IconButton";
+import { User } from "@app/core/services";
 import Typography from "@mui/material/Typography";
 import CardHeader from "@mui/material/CardHeader";
 import CardContent from "@mui/material/CardContent";
 // import CardActions from "@mui/material/CardActions";
-// import FavoriteIcon from "@mui/icons-material/Favorite";
-import { ProfileAvatar } from "@app/core/components";
+import { LinksList, ProfileAvatar } from "@app/core/components";
 import { ProfileTabs } from "@app/features/profile/ProfileCard/ProfileTabs";
 import { EditProfileAction } from "@app/features/profile/ProfileCard/EditProfileAction";
-import { User } from "@app/core/services";
 
 interface ProfileCardProps {
     profile: User;
@@ -21,17 +19,31 @@ export const ProfileCard: FC<ProfileCardProps> = memo(({ profile }) => {
     return (
         <Card variant="outlined" sx={{ maxWidth: 800, margin: "auto", height: "100%" }}>
             <CardHeader
+                sx={{
+                    "& .MuiCardHeader-content": {
+                        display: "flex",
+                        flexDirection: "column",
+                        alignSelf: "stretch",
+                        justifyContent: "space-between",
+                    },
+                }}
                 avatar={<ProfileAvatar profile={profile} isOwner />}
                 action={<EditProfileAction profile={profile} />}
-                title={profile.fullName}
-                subheader={
+                title={
                     <>
+                        <Typography variant="subtitle1" color="primary">
+                            {profile.fullName}
+                        </Typography>
                         <Typography variant="body2" color="textSecondary">
-                            {profile.userName}
+                            @{profile.userName}
                         </Typography>
                     </>
                 }
+                subheader={<LinksList links={profile.links} />}
             />
+            {/*<CardActions disableSpacing>*/}
+            {/*    <LinksList links={profile.links} />*/}
+            {/*</CardActions>*/}
             {profile.biography && (
                 <>
                     <Divider textAlign="left">
@@ -46,11 +58,6 @@ export const ProfileCard: FC<ProfileCardProps> = memo(({ profile }) => {
                     </CardContent>
                 </>
             )}
-            {/*<CardActions disableSpacing>*/}
-            {/*    <IconButton color="primary">*/}
-            {/*        <FavoriteIcon />*/}
-            {/*    </IconButton>*/}
-            {/*</CardActions>*/}
             <CardContent sx={{ pt: 0 }}>
                 <ProfileTabs />
                 <Outlet />

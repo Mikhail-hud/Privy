@@ -21,6 +21,7 @@ interface ProfileAvatarProps {
 }
 
 export const ProfileAvatar: FC<ProfileAvatarProps> = ({ profile, isOwner = false }) => {
+    // TODO: refactor to avoid re-renders
     const [deletePhoto] = useDeleteProfilePhotoMutation();
     const [uploadPhoto] = useUploadPhotoMutation();
 
@@ -40,12 +41,28 @@ export const ProfileAvatar: FC<ProfileAvatarProps> = ({ profile, isOwner = false
 
     const fileInputRef: RefObject<HTMLInputElement | null> = useRef<HTMLInputElement>(null);
 
-    const handleUploadClick = (type: PhotoUploadType): void => {
+    const handleUploadClick = (type: PhotoUploadType) => (): void => {
         setUploadType(type);
         fileInputRef.current?.click();
     };
 
-    const handleDeletePhoto = async (id: string | undefined | null, type: PhotoUploadType): Promise<void> => {
+    const onAvatarClick = (type: PhotoUploadType) => (): void => {
+        if (type === PhotoUploadType.PRIVATE) {
+            setPrivateBackdropOpen(true);
+            return;
+        }
+        sePublicBackdropOpen(true);
+    };
+
+    const onClose = (type: PhotoUploadType) => (): void => {
+        if (type === PhotoUploadType.PUBLIC) {
+            sePublicBackdropOpen(false);
+            return;
+        }
+        setPrivateBackdropOpen(false);
+    };
+
+    const handleDeletePhoto = (id: string | undefined | null, type: PhotoUploadType) => async (): Promise<void> => {
         if (!id) {
             return;
         }
@@ -78,8 +95,11 @@ export const ProfileAvatar: FC<ProfileAvatarProps> = ({ profile, isOwner = false
             const file: File = event.target.files[0];
 
             if (!FILE_PATTERN.test(file.type)) {
-                enqueueSnackbar("Invalid file type. Allowed types: JPEG, PNG, GIF, WEBP, SVG.", { variant: "error" });
+                enqueueSnackbar("Invalid file type. Allowed types: JPEG, PNG, GIF, WEBP, SVG.", {
+                    variant: "error",
+                });
                 if (event.target) event.target.value = "";
+
                 if (uploadType === PhotoUploadType.PUBLIC) {
                     setIsUploadingPublicPhoto(false);
                 } else {
@@ -115,6 +135,7 @@ export const ProfileAvatar: FC<ProfileAvatarProps> = ({ profile, isOwner = false
             enqueueSnackbar(errorMessage, { variant: "error" });
         }
     };
+
     const handleUnsetPrivatePhoto = async (): Promise<void> => {
         try {
             await unsetPrivatePhoto().unwrap();
@@ -134,9 +155,9 @@ export const ProfileAvatar: FC<ProfileAvatarProps> = ({ profile, isOwner = false
                         profile={profile}
                         alt="private_photo"
                         loading={isUploadingPrivatePhoto}
-                        src={profile?.privatePhoto?.signedUrl}
                         skeleton={{ width: 50, height: 50 }}
-                        onClick={() => setPrivateBackdropOpen(true)}
+                        src={profile?.privatePhoto?.signedUrl}
+                        onClick={onAvatarClick(PhotoUploadType.PRIVATE)}
                         sx={theme => ({
                             width: 50,
                             height: 50,
@@ -152,12 +173,11 @@ export const ProfileAvatar: FC<ProfileAvatarProps> = ({ profile, isOwner = false
                     loading={isUploadingPublicPhoto}
                     src={profile?.publicPhoto?.signedUrl}
                     skeleton={{ width: 120, height: 120 }}
-                    onClick={() => sePublicBackdropOpen(true)}
+                    onClick={onAvatarClick(PhotoUploadType.PUBLIC)}
                     sx={{ width: 120, height: 120, cursor: "pointer" }}
                 />
             </Badge>
             <input type="file" ref={fileInputRef} style={{ display: "none" }} onChange={handleAvatarChange} />
-
             <AvatarBackdrop
                 isOwner={isOwner}
                 profile={profile}
@@ -167,8 +187,8 @@ export const ProfileAvatar: FC<ProfileAvatarProps> = ({ profile, isOwner = false
                 onUnsetPhoto={handlUnsetPublicPhoto}
                 photoType={PhotoUploadType.PUBLIC}
                 isUploading={isUploadingPublicPhoto}
+                onClose={onClose(PhotoUploadType.PUBLIC)}
                 onUnsetPhotoShown={!!profile?.publicPhoto?.id}
-                onClose={() => sePublicBackdropOpen(false)}
                 isDeletingProfilePhoto={isDeletingPublicPhoto}
                 isDeletingIncognitoPhoto={isDeletingPrivatePhoto}
                 isUnSetting={isUnSettingPublicPhoto || isUnSettingPrivatePhoto}
@@ -182,10 +202,10 @@ export const ProfileAvatar: FC<ProfileAvatarProps> = ({ profile, isOwner = false
                 onUnsetPhoto={handleUnsetPrivatePhoto}
                 isUploading={isUploadingPrivatePhoto}
                 photoType={PhotoUploadType.PRIVATE}
+                onClose={onClose(PhotoUploadType.PRIVATE)}
                 onUnsetPhotoShown={!!profile?.privatePhoto?.id}
                 isDeletingProfilePhoto={isDeletingPublicPhoto}
                 isDeletingIncognitoPhoto={isDeletingPrivatePhoto}
-                onClose={() => setPrivateBackdropOpen(false)}
                 isUnSetting={isUnSettingPublicPhoto || isUnSettingPrivatePhoto}
             />
         </>

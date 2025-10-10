@@ -2,7 +2,7 @@ import { useState, FC } from "react";
 import Chip from "@mui/material/Chip";
 import { UserLink } from "@app/core/services";
 import { FormFieldShell } from "@app/core/components";
-import { ManageLinksDialog } from "./ManageLinksDialog";
+import { ManageLinksDialog } from "@app/core/components/Ui/FormControllers/UserLinks/ManageLinksDialog";
 
 interface UserLinksProps {
     links: UserLink[];

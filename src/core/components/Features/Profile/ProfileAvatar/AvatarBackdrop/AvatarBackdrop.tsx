@@ -5,8 +5,8 @@ import CloseIcon from "@mui/icons-material/Close";
 import Typography from "@mui/material/Typography";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddAPhotoIcon from "@mui/icons-material/AddAPhoto";
-import { ActionIconButton, Avatar } from "@app/core/components";
 import { PhotoUploadType, User } from "@app/core/services";
+import { ActionIconButton, Avatar } from "@app/core/components";
 import { PrivateIcon, PublicIcon } from "@app/core/assets/icons";
 
 interface AvatarBackdropContentProps {
@@ -21,8 +21,8 @@ interface AvatarBackdropContentProps {
     onUnsetPhotoShown: boolean;
     isDeletingProfilePhoto: boolean;
     isDeletingIncognitoPhoto: boolean;
-    onUploadClick: (type: PhotoUploadType) => void;
-    onDeletePhoto: (id: string | undefined | null, type: PhotoUploadType) => void;
+    onUploadClick: (type: PhotoUploadType) => () => void;
+    onDeletePhoto: (id: string | undefined | null, type: PhotoUploadType) => () => void;
 }
 
 export const AvatarBackdrop: React.FC<AvatarBackdropContentProps> = ({
@@ -40,6 +40,7 @@ export const AvatarBackdrop: React.FC<AvatarBackdropContentProps> = ({
     open,
     isOwner = false,
 }) => {
+    // TODO: Optimize re-renders
     const isPublicPhoto = photoType === PhotoUploadType.PUBLIC;
     const currentPhotoUrl = isPublicPhoto ? profile?.publicPhoto?.signedUrl : profile?.privatePhoto?.signedUrl;
     const currentPhotoId = isPublicPhoto ? profile?.publicPhoto?.id : profile?.privatePhoto?.id;
@@ -85,7 +86,7 @@ export const AvatarBackdrop: React.FC<AvatarBackdropContentProps> = ({
                             label="Upload"
                             loading={isUploading}
                             icon={<AddAPhotoIcon />}
-                            onClick={() => onUploadClick(photoType)}
+                            onClick={onUploadClick(photoType)}
                         />
                         {onUnsetPhotoShown && (
                             <ActionIconButton
@@ -101,7 +102,7 @@ export const AvatarBackdrop: React.FC<AvatarBackdropContentProps> = ({
                                 loading={isDeleting}
                                 icon={<DeleteIcon />}
                                 sx={{ color: "error.main" }}
-                                onClick={() => onDeletePhoto(currentPhotoId, photoType)}
+                                onClick={onDeletePhoto(currentPhotoId, photoType)}
                             />
                         )}
                     </Box>

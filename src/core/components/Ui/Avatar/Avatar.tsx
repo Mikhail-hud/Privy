@@ -9,9 +9,9 @@ interface Props extends AvatarProps {
     skeleton?: SkeletonProps;
 }
 
-export const Avatar: React.FC<Props> = ({ profile, loading, skeleton, ...rest }) => {
+export const Avatar: React.FC<Props> = memo(({ profile, loading, skeleton, ...rest }) => {
     if (loading) {
         return <Skeleton animation="pulse" variant="circular" sx={{ bgcolor: "grey.700" }} {...skeleton} />;
     }
     return <MUIAvatar {...rest}>{profile?.userName?.charAt(0).toUpperCase() || "U"}</MUIAvatar>;
-};
+});
