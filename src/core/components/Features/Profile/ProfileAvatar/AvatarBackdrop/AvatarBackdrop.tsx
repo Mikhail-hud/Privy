@@ -5,7 +5,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import Typography from "@mui/material/Typography";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddAPhotoIcon from "@mui/icons-material/AddAPhoto";
-import { PhotoUploadType, User } from "@app/core/services";
+import { PhotoUploadType, Profile } from "@app/core/services";
 import { ActionIconButton, Avatar } from "@app/core/components";
 import { PrivateIcon, PublicIcon } from "@app/core/assets/icons";
 
@@ -16,7 +16,7 @@ interface AvatarBackdropContentProps {
     isUploading?: boolean;
     onUnsetPhoto: () => void;
     photoType: PhotoUploadType;
-    profile: User | undefined;
+    profile: Profile;
     isUnSetting: boolean;
     onUnsetPhotoShown: boolean;
     isDeletingProfilePhoto: boolean;
@@ -64,9 +64,9 @@ export const AvatarBackdrop: React.FC<AvatarBackdropContentProps> = ({
                         />
                     ) : (
                         <Avatar
-                            profile={profile}
                             loading={isUploading}
                             src={currentPhotoUrl}
+                            userName={profile?.userName}
                             sx={{ width: 250, height: 250 }}
                             skeleton={{ width: 250, height: 250 }}
                             alt={isPublicPhoto ? "public_photo" : "private_photo"}

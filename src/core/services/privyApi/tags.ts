@@ -2,7 +2,6 @@ import { privyApi, TAG_TAG } from "@app/core/services";
 
 export interface Tag {
     id: number;
-    createdAt: string;
     name: string;
 }
 

@@ -6,7 +6,7 @@ import { Avatar } from "@app/core/components";
 import Logout from "@mui/icons-material/Logout";
 import MenuItem from "@mui/material/MenuItem";
 import IconButton from "@mui/material/IconButton";
-import { User, UserRole } from "@app/core/services";
+import { Profile, UserRole } from "@app/core/services";
 import Settings from "@mui/icons-material/Settings";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import DashboardIcon from "@mui/icons-material/Dashboard";
@@ -14,7 +14,7 @@ import { DASHBOARD_PAGE_PATH, SETTINGS_PAGE_PATH } from "@app/core/constants/pat
 
 interface AccountMenuProps {
     signOut: () => void;
-    profile: User;
+    profile: Profile;
     onAccountMenuItemClick: (key: string) => () => void;
 }
 
@@ -40,8 +40,8 @@ export const AccountMenu: FC<AccountMenuProps> = memo(({ signOut, profile, onAcc
                     aria-expanded={open ? "true" : undefined}
                 >
                     <Avatar
-                        profile={profile}
                         alt="public_photo"
+                        userName={profile?.userName}
                         src={profile.publicPhoto?.signedUrl}
                         sx={{ width: 32, height: 32 }}
                         skeleton={{ width: 32, height: 32 }}

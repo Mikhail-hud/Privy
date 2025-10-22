@@ -17,7 +17,7 @@ export const ActionIconButton: FC<ActionIconButtonProps> = ({ icon, label, sx = 
                 [
                     (theme: Theme) => ({
                         flexDirection: "column",
-                        color: theme.palette.common.white,
+                        color: (theme.vars || theme).palette.common.white,
                         backgroundColor: "transparent",
                         "&:hover": {
                             backgroundColor: "transparent",
@@ -26,7 +26,7 @@ export const ActionIconButton: FC<ActionIconButtonProps> = ({ icon, label, sx = 
                             color: alpha(theme.palette.common.white, 0.3),
                         },
                         ".MuiIconButton-loadingIndicator": {
-                            color: theme.palette.common.white,
+                            color: (theme.vars || theme).palette.common.white,
                         },
                     }),
                     sx,

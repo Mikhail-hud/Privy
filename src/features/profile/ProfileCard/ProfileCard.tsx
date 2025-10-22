@@ -1,28 +1,28 @@
 import { FC } from "react";
-import Card from "@mui/material/Card";
 import { Outlet } from "react-router-dom";
 import Divider from "@mui/material/Divider";
-import { User } from "@app/core/services";
+import { Profile } from "@app/core/services";
 import Typography from "@mui/material/Typography";
 import CardHeader from "@mui/material/CardHeader";
 import CardContent from "@mui/material/CardContent";
 // import CardActions from "@mui/material/CardActions";
-import { LinksList, ProfileAvatar } from "@app/core/components";
+import { ContentCardContainer, LinksList, ProfileAvatar, UserStats } from "@app/core/components";
 import { ProfileTabs } from "@app/features/profile/ProfileCard/ProfileTabs";
 import { EditProfileAction } from "@app/features/profile/ProfileCard/EditProfileAction";
-
 interface ProfileCardProps {
-    profile: User;
+    profile: Profile;
 }
 
 export const ProfileCard: FC<ProfileCardProps> = memo(({ profile }) => {
     return (
-        <Card variant="outlined" sx={{ maxWidth: 800, margin: "auto", height: "100%" }}>
+        <ContentCardContainer>
             <CardHeader
                 sx={{
                     "& .MuiCardHeader-content": {
                         display: "flex",
                         flexDirection: "column",
+                        gap: 0.5,
+                        // alignSelf: "self-start",
                         alignSelf: "stretch",
                         justifyContent: "space-between",
                     },
@@ -39,7 +39,12 @@ export const ProfileCard: FC<ProfileCardProps> = memo(({ profile }) => {
                         </Typography>
                     </>
                 }
-                subheader={<LinksList links={profile.links} />}
+                subheader={
+                    <>
+                        <UserStats followersCount={profile.followersCount} followingCount={profile.followingCount} />
+                        <LinksList links={profile.links} />
+                    </>
+                }
             />
             {/*<CardActions disableSpacing>*/}
             {/*    <LinksList links={profile.links} />*/}
@@ -62,6 +67,6 @@ export const ProfileCard: FC<ProfileCardProps> = memo(({ profile }) => {
                 <ProfileTabs />
                 <Outlet />
             </CardContent>
-        </Card>
+        </ContentCardContainer>
     );
 });

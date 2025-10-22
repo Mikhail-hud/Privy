@@ -49,6 +49,7 @@ interface ActionError {
 export const signUpAction = async ({ request }: { request: Request }): Promise<Response | ActionError> => {
     const formData: FormData = await request.formData();
     const credentials = Object.fromEntries(formData);
+    // TODO: validate credentials here or in the form before dispatching
     const promise = store.dispatch(authApi.endpoints.signUp.initiate(credentials as unknown as SignUpPayload));
     try {
         await promise.unwrap();

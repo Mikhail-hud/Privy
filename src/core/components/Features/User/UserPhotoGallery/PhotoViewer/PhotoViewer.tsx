@@ -1,6 +1,6 @@
 import { FC } from "react";
 import { Backdrop, Box } from "@mui/material";
-import { Photo, User } from "@app/core/services";
+import { Photo, Profile } from "@app/core/services";
 import CloseIcon from "@mui/icons-material/Close";
 import { PublicIcon, PrivateIcon } from "@app/core/assets/icons";
 import { PhotoSwiper, ActionIconButton, ProfilePhotoActions } from "@app/core/components";
@@ -10,7 +10,7 @@ interface PhotoViewerProps {
     onClose: () => void;
     photo: Photo | null;
     photos: Photo[];
-    profile: User;
+    profile: Profile;
     initialSlide: number | null;
     onSlideChange: (index: number) => void;
     isOwner: boolean;

@@ -1,5 +1,5 @@
 import {
-    User,
+    Profile,
     PhotoUploadType,
     useUploadPhotoMutation,
     useUnsetPublicPhotoMutation,
@@ -16,7 +16,7 @@ import { FILE_PATTERN, FILE_SIZE } from "@app/core/constants/patterns";
 import { AvatarBackdrop } from "@app/core/components/Features/Profile/ProfileAvatar/AvatarBackdrop";
 
 interface ProfileAvatarProps {
-    profile: User | undefined;
+    profile: Profile;
     isOwner?: boolean;
 }
 
@@ -152,8 +152,8 @@ export const ProfileAvatar: FC<ProfileAvatarProps> = ({ profile, isOwner = false
                 anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
                 badgeContent={
                     <Avatar
-                        profile={profile}
                         alt="private_photo"
+                        userName={profile?.userName}
                         loading={isUploadingPrivatePhoto}
                         skeleton={{ width: 50, height: 50 }}
                         src={profile?.privatePhoto?.signedUrl}
@@ -162,14 +162,14 @@ export const ProfileAvatar: FC<ProfileAvatarProps> = ({ profile, isOwner = false
                             width: 50,
                             height: 50,
                             cursor: "pointer",
-                            border: `2px solid ${theme.palette.background.paper}`,
+                            border: `2px solid ${(theme.vars || theme).palette.background.paper}`,
                         })}
                     />
                 }
             >
                 <Avatar
-                    profile={profile}
                     alt="public_photo"
+                    userName={profile?.userName}
                     loading={isUploadingPublicPhoto}
                     src={profile?.publicPhoto?.signedUrl}
                     skeleton={{ width: 120, height: 120 }}

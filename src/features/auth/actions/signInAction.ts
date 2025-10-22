@@ -11,7 +11,7 @@ import { enqueueSnackbar } from "notistack";
 import { QueryError } from "@app/core/interfaces";
 import { GENERIC_ERROR_MESSAGE } from "@app/core/constants/general";
 import { PROFILE_PAGE_PATH } from "@app/core/constants/pathConstants";
-import { authApi, SignInPayload, TwoFactorSignInPayload, TwoFactorStatus, User } from "@app/core/services";
+import { authApi, SignInPayload, TwoFactorSignInPayload, TwoFactorStatus, Profile } from "@app/core/services";
 
 /** Name of the form field indicating which sign-in action is intended. */
 export const SIGN_IN_ACTION_KEY = "intent";
@@ -83,10 +83,11 @@ export const signInAction = async ({ request }: { request: Request }): Promise<R
 
     if (intent === SIGN_IN_WITH_CREDENTIALS) {
         const credentials = Object.fromEntries(formData) as unknown as SignInFormDataPayload;
+        // TODO: validate credentials here or in the form before dispatching
         const { identifier, password, rememberMe } = credentials;
         const promise = store.dispatch(authApi.endpoints.signIn.initiate({ identifier, password, rememberMe }));
         try {
-            const userAuthStatus: TwoFactorStatus | User = await promise.unwrap();
+            const userAuthStatus: TwoFactorStatus | Profile = await promise.unwrap();
             if ("twoFactorRequired" in userAuthStatus) {
                 return userAuthStatus;
             }

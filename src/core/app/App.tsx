@@ -16,6 +16,7 @@ import {
     PROFILE_REVEALS_TAB_PATH,
     SIGN_OUT_ACTION_ONLY_PATH,
     PROFILE_FAVORITES_TAB_PATH,
+    LOOKUP_PAGE_PATH,
 } from "@app/core/constants/pathConstants";
 import { AppLayout, Spiner, TabContainer } from "@app/core/components";
 import { createBrowserRouter, RouterProvider, Navigate, redirect } from "react-router-dom";
@@ -25,8 +26,10 @@ import {
     Profile,
     Dialogs,
     SignUp,
+    Lookup,
     Favorites,
     ErrorPage,
+    lookupLoader,
     ResetPassword,
     signInAction,
     signOutAction,
@@ -108,6 +111,11 @@ const router = createBrowserRouter([
                         handle: { tab: PROFILE_REVEALS_TAB_PATH },
                     },
                 ],
+            },
+            {
+                loader: lookupLoader,
+                path: LOOKUP_PAGE_PATH,
+                element: <Lookup />,
             },
             {
                 path: DIALOGS_PAGE_PATH,

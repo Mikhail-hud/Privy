@@ -4,9 +4,6 @@ export interface UserLink {
     id: number;
     url: string;
     title: string;
-    userId: number;
-    createdAt: string;
-    updatedAt: string;
 }
 
 interface CreateLinkPayload {

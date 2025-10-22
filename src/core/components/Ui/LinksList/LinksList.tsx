@@ -14,7 +14,7 @@ export const LinksList: FC<LinksListProps> = memo(({ links }) => {
     }
 
     return (
-        <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
+        <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
             <Typography variant="body2" color="textSecondary">
                 Links:
             </Typography>

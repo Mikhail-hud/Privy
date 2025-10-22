@@ -3,14 +3,14 @@ import Box from "@mui/material/Box";
 import Badge from "@mui/material/Badge";
 import Paper from "@mui/material/Paper";
 import Toolbar from "@mui/material/Toolbar";
-import { User } from "@app/core/services";
+import { Profile } from "@app/core/services";
 import IconButton from "@mui/material/IconButton";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import { AccountMenu } from "@app/core/components/Widgets/TopBar/AccountMenu";
 
 interface TopBarProps {
     signOut: () => void;
-    profile: User;
+    profile: Profile;
     onAccountMenuItemClick: (key: string) => () => void;
 }
 

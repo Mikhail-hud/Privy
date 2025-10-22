@@ -4,5 +4,6 @@ export * from "./auth";
 export * from "./dialogs";
 export * from "./settings";
 export * from "./favorites";
+export * from "./lookup";
 export * from "./dashboard";
 export * from "./errorElement";

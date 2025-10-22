@@ -3,7 +3,7 @@ import Stack from "@mui/material/Stack";
 import LockIcon from "@mui/icons-material/Lock";
 import ForumIcon from "@mui/icons-material/Forum";
 import Typography from "@mui/material/Typography";
-import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
+import { PrivateIcon } from "@app/core/assets/icons";
 import PersonSearchIcon from "@mui/icons-material/PersonSearch";
 
 export const DescriptionContent: FC = () => {
@@ -17,7 +17,7 @@ export const DescriptionContent: FC = () => {
                 color="text.secondary"
                 sx={{ display: "flex", alignItems: "flex-start", gap: 1 }}
             >
-                <VisibilityOffIcon sx={{ mt: 0.5, flexShrink: 0 }} fontSize="small" color="action" />
+                <PrivateIcon sx={{ mt: 0.5, flexShrink: 0 }} fontSize="small" color="action" />
                 Incognito Profile Mode: Allows users to completely hide personal details (full name, photo,
                 description), remaining visible on the network only under their @username.
             </Typography>

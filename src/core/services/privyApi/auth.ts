@@ -93,7 +93,7 @@ export enum UserGender {
     OTHER = "OTHER",
 }
 
-export interface User {
+export interface Profile {
     id: number;
     userName: string;
     role: UserRole;
@@ -108,6 +108,8 @@ export interface User {
     isProfileIncognito: boolean;
     publicPhoto: Photo | null;
     privatePhoto: Photo | null;
+    followersCount: number;
+    followingCount: number;
     links: UserLink[];
 }
 
@@ -133,7 +135,7 @@ export interface newPasswordPayload {
 
 export const authApi = privyApi.injectEndpoints({
     endpoints: builder => ({
-        me: builder.query<User, void>({
+        me: builder.query<Profile, void>({
             query: () => "auth/me",
             providesTags: () => [USER_TAG],
             async onQueryStarted(_a: never, { dispatch, queryFulfilled }): Promise<void> {
@@ -142,7 +144,7 @@ export const authApi = privyApi.injectEndpoints({
                 dispatch(profileApi.util.upsertQueryData("getProfile", undefined, data));
             },
         }),
-        signIn: builder.mutation<TwoFactorStatus | User, SignInPayload>({
+        signIn: builder.mutation<TwoFactorStatus | Profile, SignInPayload>({
             query: body => ({
                 url: "auth/sign-in",
                 method: "POST",
@@ -157,7 +159,7 @@ export const authApi = privyApi.injectEndpoints({
                 dispatch(authApi.util.upsertQueryData("me", undefined, data));
             },
         }),
-        signUp: builder.mutation<User, SignUpPayload>({
+        signUp: builder.mutation<Profile, SignUpPayload>({
             query: body => ({
                 url: "auth/sign-up",
                 method: "POST",
@@ -170,7 +172,7 @@ export const authApi = privyApi.injectEndpoints({
                 dispatch(authApi.util.upsertQueryData("me", undefined, data));
             },
         }),
-        twoFactorSignIn: builder.mutation<User, TwoFactorSignInPayload>({
+        twoFactorSignIn: builder.mutation<Profile, TwoFactorSignInPayload>({
             query: body => ({
                 url: "auth/sign-in/two-factor",
                 method: "POST",
@@ -219,7 +221,7 @@ export const authApi = privyApi.injectEndpoints({
         }),
         changePassword: builder.mutation<unknown, ChangePasswordPayload>({
             query: body => ({
-                url: `/auth/sessions/change-password`,
+                url: `/auth/change-password`,
                 method: "POST",
                 body,
             }),

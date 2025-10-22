@@ -1,7 +1,7 @@
 import { FC } from "react";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
-import { Photo, User } from "@app/core/services";
+import { Photo, Profile } from "@app/core/services";
 import DeleteIcon from "@mui/icons-material/Delete";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import DownloadIcon from "@mui/icons-material/Download";
@@ -10,7 +10,7 @@ import CircularProgress from "@mui/material/CircularProgress";
 import { PublicIcon, PrivateIcon } from "@app/core/assets/icons";
 
 interface PhotoActionsMenuProps {
-    profile: User;
+    profile: Profile;
     anchorEl: HTMLElement | null;
     handleClose: () => void;
     photo: Photo | null;

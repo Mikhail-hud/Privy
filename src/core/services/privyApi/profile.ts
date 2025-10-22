@@ -1,4 +1,4 @@
-import { PROFILE_PHOTOS_TAG, PROFILE_TAG, privyApi, User } from "@app/core/services";
+import { PROFILE_PHOTOS_TAG, PROFILE_TAG, privyApi, Profile } from "@app/core/services";
 
 export enum PhotoUploadType {
     PRIVATE = "PRIVATE",
@@ -13,27 +13,23 @@ export interface UploadPhotoPayload {
 
 export interface Photo {
     id: string;
-    key: string;
-    userId: number;
-    createdAt: string;
     mimeType: string;
     caption: string | null;
-    fileSize: number;
     originalFilename: string;
     signedUrl: string;
 }
 
 export type ProfileUpdatePayload = Partial<
-    Pick<User, "fullName" | "biography" | "birthDate" | "gender" | "isProfileIncognito">
+    Pick<Profile, "fullName" | "biography" | "birthDate" | "gender" | "isProfileIncognito">
 >;
 
 export const profileApi = privyApi.injectEndpoints({
     endpoints: builder => ({
-        getProfile: builder.query<User, void>({
+        getProfile: builder.query<Profile, void>({
             query: (): string => "profile",
             providesTags: () => [PROFILE_TAG],
         }),
-        updateProfile: builder.mutation<User, ProfileUpdatePayload>({
+        updateProfile: builder.mutation<Profile, ProfileUpdatePayload>({
             query: (body: ProfileUpdatePayload): { url: string; method: string; body: ProfileUpdatePayload } => ({
                 url: "profile",
                 method: "PATCH",
@@ -41,7 +37,7 @@ export const profileApi = privyApi.injectEndpoints({
             }),
             invalidatesTags: (_, err) => (err ? [] : [PROFILE_TAG]),
         }),
-        updateProfileInterests: builder.mutation<User, { interests: number[] }>({
+        updateProfileInterests: builder.mutation<Profile, { interests: number[] }>({
             query: (body: { interests: number[] }): { url: string; method: string; body: { interests: number[] } } => ({
                 url: "profile/interests",
                 method: "PUT",

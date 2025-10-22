@@ -8,7 +8,7 @@
 import { store } from "@app/core/store";
 import { redirect } from "react-router-dom";
 import { enqueueSnackbar } from "notistack";
-import { authApi, User } from "@app/core/services";
+import { authApi, Profile } from "@app/core/services";
 import { QueryError } from "@app/core/interfaces";
 import { SIGN_IN_PAGE_PATH } from "@app/core/constants/pathConstants";
 import { GENERIC_ERROR_MESSAGE } from "@app/core/constants/general.ts";
@@ -18,7 +18,7 @@ import { GENERIC_ERROR_MESSAGE } from "@app/core/constants/general.ts";
  * @property user Authenticated user returned by the `me` endpoint.
  */
 export interface UserContext {
-    user: User;
+    user: Profile;
 }
 
 /**
@@ -53,7 +53,7 @@ export const appLayoutLoader = async (): Promise<UserContext | Response> => {
     const promise = store.dispatch(authApi.endpoints.me.initiate());
 
     try {
-        const user: User = await promise.unwrap();
+        const user: Profile = await promise.unwrap();
         return { user };
     } catch (error) {
         const errorMessage = (error as QueryError)?.data?.message?.toString() || GENERIC_ERROR_MESSAGE;

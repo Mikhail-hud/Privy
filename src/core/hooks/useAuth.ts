@@ -8,7 +8,7 @@ import { SKIP_TOKEN } from "@app/core/constants/general";
 import { SubmitFunction, useSubmit } from "react-router-dom";
 import { SignInFormValues } from "@app/features/auth/signIn/SignInForm";
 import { SignUpFormValues } from "@app/features/auth/signUp/SignUpForm";
-import { User, TwoFactorSignInPayload, useGetProfileQuery } from "@app/core/services";
+import { Profile, TwoFactorSignInPayload, useGetProfileQuery } from "@app/core/services";
 import { PUBLIC_ROUTES, SIGN_OUT_ACTION_ONLY_PATH } from "@app/core/constants/pathConstants";
 import { SIGN_IN_ACTION_KEY, SIGN_IN_WITH_CREDENTIALS, SIGN_IN_WITH_TWO_FACTOR } from "@app/features";
 
@@ -23,7 +23,7 @@ import { SIGN_IN_ACTION_KEY, SIGN_IN_WITH_CREDENTIALS, SIGN_IN_WITH_TWO_FACTOR }
  * signInWithTwoFactor: Submits second factor verification payload.
  */
 interface UseAuth {
-    profile: User;
+    profile: Profile;
     isLoading: boolean;
     isFetching: boolean;
     signOut: () => void;
@@ -82,7 +82,7 @@ export const useAuth = (): UseAuth => {
             isLoading,
             isFetching,
             signInWithTwoFactor,
-            profile: data as User,
+            profile: data as Profile,
         }),
         [signOut, signUp, signIn, isLoading, isFetching, signInWithTwoFactor, data]
     );

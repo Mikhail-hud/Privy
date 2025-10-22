@@ -1,11 +1,15 @@
-import { FC } from "react";
+import { FC, Ref } from "react";
 import Box from "@mui/material/Box";
 import CircularProgress, { CircularProgressProps } from "@mui/material/CircularProgress";
 
-export const Spiner: FC<CircularProgressProps> = props => {
+interface SpinerProps extends CircularProgressProps {
+    ref?: Ref<HTMLDivElement>;
+}
+
+export const Spiner: FC<SpinerProps> = ({ ref, ...rest }) => {
     return (
-        <Box sx={{ height: "100%", display: "flex", justifyContent: "center", alignItems: "center" }}>
-            <CircularProgress size="3rem" color="primary" {...props} />
+        <Box ref={ref} sx={{ height: "100%", display: "flex", justifyContent: "center", alignItems: "center", p: 1 }}>
+            <CircularProgress size="2rem" color="primary" {...rest} />
         </Box>
     );
 };

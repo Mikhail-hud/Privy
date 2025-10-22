@@ -12,7 +12,7 @@ import { SubmitHandler, useForm } from "react-hook-form";
 import { transformServerErrors } from "@app/core/utils/general";
 import { GENERIC_ERROR_MESSAGE } from "@app/core/constants/general";
 import { VALIDATE_RELES } from "@app/core/constants/rulesConstants";
-import { ProfileUpdatePayload, User, UserGender, useUpdateProfileMutation } from "@app/core/services";
+import { ProfileUpdatePayload, Profile, UserGender, useUpdateProfileMutation } from "@app/core/services";
 import { BirthDate, Biography, FullName, Gender, Switch, Interests, UserLinks } from "@app/core/components";
 
 export const PROFILE_FORM_FIELDS = {
@@ -41,7 +41,7 @@ const DEFAULT_SIGN_UP_FORM_VALUES: ProfileFormValues = {
 };
 
 interface EditProfileActionProps {
-    profile: User;
+    profile: Profile;
 }
 
 export const EditProfileAction: FC<EditProfileActionProps> = memo(({ profile }) => {
