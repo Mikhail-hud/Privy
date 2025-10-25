@@ -1,56 +1,50 @@
 import { FC } from "react";
-import { Outlet } from "react-router-dom";
 import Divider from "@mui/material/Divider";
-import { Profile } from "@app/core/services";
+import { User } from "@app/core/services";
 import Typography from "@mui/material/Typography";
 import CardHeader from "@mui/material/CardHeader";
 import CardContent from "@mui/material/CardContent";
-// import CardActions from "@mui/material/CardActions";
-import { ContentCardContainer, LinksList, ProfileAvatar, UserStats } from "@app/core/components";
-import { ProfileTabs } from "@app/features/profile/ProfileCard/ProfileTabs";
-import { EditProfileAction } from "@app/features/profile/ProfileCard/EditProfileAction";
+import { ContentCardContainer, UserStats } from "@app/core/components";
+import { UserProfileAvatar } from "@app/features/userProfile/UserProfileCard/UserProfileAvatar";
+import { UserProfileActions } from "@app/features/userProfile/UserProfileCard/UserProfileActions";
 
 interface ProfileCardProps {
-    profile: Profile;
+    user: User;
 }
 
-export const ProfileCard: FC<ProfileCardProps> = memo(({ profile }) => {
+export const UserProfileCard: FC<ProfileCardProps> = memo(({ user }) => {
     return (
         <ContentCardContainer>
             <CardHeader
                 sx={{
                     "& .MuiCardHeader-content": {
-                        display: "flex",
-                        flexDirection: "column",
                         gap: 0.5,
-                        // alignSelf: "self-start",
+                        display: "flex",
                         alignSelf: "stretch",
+                        flexDirection: "column",
                         justifyContent: "space-between",
                     },
                 }}
-                avatar={<ProfileAvatar profile={profile} />}
-                action={<EditProfileAction profile={profile} />}
+                avatar={<UserProfileAvatar user={user} />}
+                action={<UserProfileActions userId={user.id} isFollowed={user.isFollowedByCurrentUser} />}
                 title={
                     <>
-                        <Typography variant="subtitle1" color="primary">
-                            {profile.fullName}
-                        </Typography>
+                        {user?.fullName && (
+                            <Typography variant="subtitle1" color="primary">
+                                {user?.fullName}
+                            </Typography>
+                        )}
                         <Typography variant="body2" color="textSecondary">
-                            @{profile.userName}
+                            @{user.userName}
                         </Typography>
                     </>
                 }
-                subheader={
-                    <>
-                        <UserStats followersCount={profile.followersCount} followingCount={profile.followingCount} />
-                        <LinksList links={profile.links} />
-                    </>
-                }
+                subheader={<UserStats followersCount={user.followersCount} followingCount={user.followingCount} />}
             />
             {/*<CardActions disableSpacing>*/}
             {/*    <LinksList links={profile.links} />*/}
             {/*</CardActions>*/}
-            {profile.biography && (
+            {user?.biography && (
                 <>
                     <Divider textAlign="left">
                         <Typography variant="subtitle1" color="textSecondary">
@@ -59,15 +53,15 @@ export const ProfileCard: FC<ProfileCardProps> = memo(({ profile }) => {
                     </Divider>
                     <CardContent>
                         <Typography variant="body1" color="textSecondary" sx={{ whiteSpace: "pre-wrap" }}>
-                            {profile.biography}
+                            {user.biography}
                         </Typography>
                     </CardContent>
                 </>
             )}
-            <CardContent sx={{ pt: 0 }}>
-                <ProfileTabs />
-                <Outlet />
-            </CardContent>
+            {/*<CardContent sx={{ pt: 0 }}>*/}
+            {/*    <ProfileTabs />*/}
+            {/*    <Outlet />*/}
+            {/*</CardContent>*/}
         </ContentCardContainer>
     );
 });

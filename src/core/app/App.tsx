@@ -17,8 +17,9 @@ import {
     SIGN_OUT_ACTION_ONLY_PATH,
     PROFILE_FAVORITES_TAB_PATH,
     LOOKUP_PAGE_PATH,
+    USER_PROFILE_PAGE_PATH,
 } from "@app/core/constants/pathConstants";
-import { AppLayout, Spiner, TabContainer } from "@app/core/components";
+import { AppLayout, RedirectIfOwner, Spiner, TabContainer } from "@app/core/components";
 import { createBrowserRouter, RouterProvider, Navigate, redirect } from "react-router-dom";
 import {
     SignIn,
@@ -36,6 +37,8 @@ import {
     appLayoutLoader,
     signUpAction,
     publicRoutesLoader,
+    UserProfile,
+    userProfileLoader,
 } from "@app/features";
 import { ProfilePhotos, profilePhotosLoader } from "@app/features/profile/ProfileCard/ProfileTabs";
 
@@ -79,6 +82,16 @@ const router = createBrowserRouter([
             {
                 index: true,
                 element: <Navigate to={PROFILE_PAGE_PATH} replace />,
+            },
+            {
+                element: <RedirectIfOwner />,
+                children: [
+                    {
+                        path: USER_PROFILE_PAGE_PATH,
+                        loader: userProfileLoader,
+                        element: <UserProfile />,
+                    },
+                ],
             },
             {
                 path: PROFILE_PAGE_PATH,

@@ -1,15 +1,14 @@
-import { Photo, privyApi, Profile, USERS_LIST_TAG } from "@app/core/services";
+import { Photo, privyApi, Profile, Tag, UserLink, USERS_LIST_TAG } from "@app/core/services";
 import { INITIAL_PAGE_PARAM, PAGE_SIZE_LIMITS } from "@app/core/constants/ParamsConstants.ts";
 
-// TODO: Extend User model when needed
 export interface User
-    extends Pick<
-        Profile,
-        "userName" | "id" | "biography" | "isProfileIncognito" | "followingCount" | "followersCount"
-    > {
+    extends Pick<Profile, "userName" | "id" | "isProfileIncognito" | "followingCount" | "followersCount"> {
     fullName?: string;
     publicPhoto?: Photo | null;
     privatePhoto?: Photo | null;
+    biography?: string;
+    links?: UserLink[];
+    interests?: Tag[];
     isFollowedByCurrentUser: boolean;
 }
 
@@ -46,7 +45,21 @@ export const usersApi = privyApi.injectEndpoints({
                 },
             }),
 
-            providesTags: () => [USERS_LIST_TAG],
+            providesTags: result =>
+                result
+                    ? [
+                          ...result.pages.flatMap(page =>
+                              page.data.map(user => ({ type: USERS_LIST_TAG, id: user.id }) as const)
+                          ),
+                          { type: USERS_LIST_TAG, id: "LIST" },
+                      ]
+                    : [{ type: USERS_LIST_TAG, id: "LIST" }],
+        }),
+        getUserProfile: builder.query<User, { userName: string }>({
+            query: ({ userName }) => ({
+                url: `users/${userName}`,
+            }),
+            providesTags: (rusult, _error) => [{ type: USERS_LIST_TAG, id: rusult?.id }],
         }),
 
         followUser: builder.mutation<void, { id: number }>({
@@ -54,7 +67,10 @@ export const usersApi = privyApi.injectEndpoints({
                 url: `users/${id}/follow`,
                 method: "POST",
             }),
-            invalidatesTags: () => [USERS_LIST_TAG],
+            invalidatesTags: (_result, _error, { id }) => [
+                { type: USERS_LIST_TAG, id: "LIST" },
+                { type: USERS_LIST_TAG, id },
+            ],
         }),
 
         unFollowUser: builder.mutation<void, { id: number }>({
@@ -62,10 +78,14 @@ export const usersApi = privyApi.injectEndpoints({
                 url: `users/${id}/follow`,
                 method: "DELETE",
             }),
-            invalidatesTags: () => [USERS_LIST_TAG],
+            invalidatesTags: (_result, _error, { id }) => [
+                { type: USERS_LIST_TAG, id: "LIST" },
+                { type: USERS_LIST_TAG, id },
+            ],
         }),
     }),
     overrideExisting: false,
 });
 
-export const { useGetUsersInfiniteQuery, useFollowUserMutation, useUnFollowUserMutation } = usersApi;
+export const { useGetUsersInfiniteQuery, useFollowUserMutation, useUnFollowUserMutation, useGetUserProfileQuery } =
+    usersApi;

@@ -10,7 +10,6 @@ import { ActionIconButton, Avatar } from "@app/core/components";
 import { PrivateIcon, PublicIcon } from "@app/core/assets/icons";
 
 interface AvatarBackdropContentProps {
-    isOwner?: boolean;
     onClose: () => void;
     open: boolean;
     isUploading?: boolean;
@@ -38,7 +37,6 @@ export const AvatarBackdrop: React.FC<AvatarBackdropContentProps> = ({
     isDeletingProfilePhoto,
     isDeletingIncognitoPhoto,
     open,
-    isOwner = false,
 }) => {
     // TODO: Optimize re-renders
     const isPublicPhoto = photoType === PhotoUploadType.PUBLIC;
@@ -73,40 +71,39 @@ export const AvatarBackdrop: React.FC<AvatarBackdropContentProps> = ({
                         />
                     )}
                 </Box>
-                {isOwner && (
-                    <Box
-                        sx={{
-                            gap: 2,
-                            width: "100%",
-                            display: "flex",
-                            justifyContent: "center",
-                        }}
-                    >
+
+                <Box
+                    sx={{
+                        gap: 2,
+                        width: "100%",
+                        display: "flex",
+                        justifyContent: "center",
+                    }}
+                >
+                    <ActionIconButton
+                        label="Upload"
+                        loading={isUploading}
+                        icon={<AddAPhotoIcon />}
+                        onClick={onUploadClick(photoType)}
+                    />
+                    {onUnsetPhotoShown && (
                         <ActionIconButton
-                            label="Upload"
-                            loading={isUploading}
-                            icon={<AddAPhotoIcon />}
-                            onClick={onUploadClick(photoType)}
+                            onClick={onUnsetPhoto}
+                            loading={isUnSetting}
+                            icon={isPublicPhoto ? <PublicIcon /> : <PrivateIcon />}
+                            label={isPublicPhoto ? "Unset Public" : "Unset Private"}
                         />
-                        {onUnsetPhotoShown && (
-                            <ActionIconButton
-                                onClick={onUnsetPhoto}
-                                loading={isUnSetting}
-                                icon={isPublicPhoto ? <PublicIcon /> : <PrivateIcon />}
-                                label={isPublicPhoto ? "Unset Public" : "Unset Private"}
-                            />
-                        )}
-                        {currentPhotoId && (
-                            <ActionIconButton
-                                label="Delete"
-                                loading={isDeleting}
-                                icon={<DeleteIcon />}
-                                sx={{ color: "error.main" }}
-                                onClick={onDeletePhoto(currentPhotoId, photoType)}
-                            />
-                        )}
-                    </Box>
-                )}
+                    )}
+                    {currentPhotoId && (
+                        <ActionIconButton
+                            label="Delete"
+                            loading={isDeleting}
+                            icon={<DeleteIcon />}
+                            sx={{ color: "error.main" }}
+                            onClick={onDeletePhoto(currentPhotoId, photoType)}
+                        />
+                    )}
+                </Box>
             </Box>
         </Backdrop>
     );

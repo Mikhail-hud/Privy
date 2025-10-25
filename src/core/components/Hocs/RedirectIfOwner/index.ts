@@ -1,2 +1,1 @@
-export * from "./RequireAdmin";
 export * from "./RedirectIfOwner";

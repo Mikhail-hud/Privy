@@ -3,6 +3,7 @@ node_modules
 coverage
 
 # dotenv environment variable files
+.idea
 .env
 .env.development.local
 .env.test.local

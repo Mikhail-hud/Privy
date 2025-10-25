@@ -17,10 +17,9 @@ import { AvatarBackdrop } from "@app/core/components/Features/Profile/ProfileAva
 
 interface ProfileAvatarProps {
     profile: Profile;
-    isOwner?: boolean;
 }
 
-export const ProfileAvatar: FC<ProfileAvatarProps> = ({ profile, isOwner = false }) => {
+export const ProfileAvatar: FC<ProfileAvatarProps> = ({ profile }) => {
     // TODO: refactor to avoid re-renders
     const [deletePhoto] = useDeleteProfilePhotoMutation();
     const [uploadPhoto] = useUploadPhotoMutation();
@@ -179,7 +178,6 @@ export const ProfileAvatar: FC<ProfileAvatarProps> = ({ profile, isOwner = false
             </Badge>
             <input type="file" ref={fileInputRef} style={{ display: "none" }} onChange={handleAvatarChange} />
             <AvatarBackdrop
-                isOwner={isOwner}
                 profile={profile}
                 open={publicBackdropOpen}
                 onUploadClick={handleUploadClick}
@@ -194,7 +192,6 @@ export const ProfileAvatar: FC<ProfileAvatarProps> = ({ profile, isOwner = false
                 isUnSetting={isUnSettingPublicPhoto || isUnSettingPrivatePhoto}
             />
             <AvatarBackdrop
-                isOwner={isOwner}
                 profile={profile}
                 open={privateBackdropOpen}
                 onDeletePhoto={handleDeletePhoto}
