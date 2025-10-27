@@ -27,9 +27,9 @@ export const Lookup: FC = () => {
     const onSearchQueryChange = (event: ChangeEvent<HTMLInputElement>): void => setSearchQuery(event.target.value);
 
     const handleFollow = useCallback(
-        async (id: number): Promise<void> => {
+        async (id: number, userName: string): Promise<void> => {
             try {
-                await follow({ id }).unwrap();
+                await follow({ id, userName }).unwrap();
             } catch (error) {
                 const errorMessage: string = (error as QueryError)?.data?.message?.toString() || GENERIC_ERROR_MESSAGE;
                 enqueueSnackbar(errorMessage, { variant: "error" });
@@ -39,9 +39,9 @@ export const Lookup: FC = () => {
     );
 
     const handleUnfollow = useCallback(
-        async (id: number): Promise<void> => {
+        async (id: number, userName: string): Promise<void> => {
             try {
-                await unFollow({ id }).unwrap();
+                await unFollow({ id, userName }).unwrap();
             } catch (error) {
                 const errorMessage: string = (error as QueryError)?.data?.message?.toString() || GENERIC_ERROR_MESSAGE;
                 enqueueSnackbar(errorMessage, { variant: "error" });

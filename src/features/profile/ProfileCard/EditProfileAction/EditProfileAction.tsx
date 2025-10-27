@@ -2,10 +2,8 @@ import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";
 import { enqueueSnackbar } from "notistack";
 import Divider from "@mui/material/Divider";
-import IconButton from "@mui/material/IconButton";
 import { FC, MouseEvent, useState } from "react";
 import { QueryError } from "@app/core/interfaces";
-import EditIcon from "@mui/icons-material/Edit";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import { SubmitHandler, useForm } from "react-hook-form";
@@ -84,9 +82,9 @@ export const EditProfileAction: FC<EditProfileActionProps> = memo(({ profile }) 
 
     return (
         <>
-            <IconButton color="primary" size="large" onClick={handleClickOpen}>
-                <EditIcon />
-            </IconButton>
+            <Button color="primary" variant="outlined" size="medium" onClick={handleClickOpen}>
+                Edit Profile
+            </Button>
             <Dialog
                 open={open}
                 maxWidth="md"

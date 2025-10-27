@@ -8,24 +8,25 @@ import { useFollowUserMutation, useUnFollowUserMutation } from "@app/core/servic
 interface UserProfileActionsProps {
     isFollowed: boolean;
     userId: number;
+    userName: string;
 }
 
-export const UserProfileActions: FC<UserProfileActionsProps> = ({ isFollowed, userId }) => {
+export const UserProfileActions: FC<UserProfileActionsProps> = ({ isFollowed, userId, userName }) => {
     const [follow, { isLoading: isFollowLoading }] = useFollowUserMutation();
     const [unFollow, { isLoading: isUnFollowLoading }] = useUnFollowUserMutation();
 
-    const handleFollow = async (id: number): Promise<void> => {
+    const handleFollow = async (id: number, userName: string): Promise<void> => {
         try {
-            await follow({ id }).unwrap();
+            await follow({ id, userName }).unwrap();
         } catch (error) {
             const errorMessage: string = (error as QueryError)?.data?.message?.toString() || GENERIC_ERROR_MESSAGE;
             enqueueSnackbar(errorMessage, { variant: "error" });
         }
     };
 
-    const handleUnfollow = async (id: number): Promise<void> => {
+    const handleUnfollow = async (id: number, userName: string): Promise<void> => {
         try {
-            await unFollow({ id }).unwrap();
+            await unFollow({ id, userName }).unwrap();
         } catch (error) {
             const errorMessage: string = (error as QueryError)?.data?.message?.toString() || GENERIC_ERROR_MESSAGE;
             enqueueSnackbar(errorMessage, { variant: "error" });
@@ -37,9 +38,9 @@ export const UserProfileActions: FC<UserProfileActionsProps> = ({ isFollowed, us
         event.preventDefault();
 
         if (isFollowed) {
-            handleUnfollow(userId);
+            handleUnfollow(userId, userName);
         } else {
-            handleFollow(userId);
+            handleFollow(userId, userName);
         }
     };
 

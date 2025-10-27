@@ -29,21 +29,19 @@ const InfiniteScrollListComponent = <T extends object>({
 
     const loaderRef = useCallback(
         (node: HTMLDivElement | null) => {
-            if (!hasNextPage || isFetchingNextPage || isFetching || isLoading) return;
             if (observer.current) observer.current.disconnect();
 
             observer.current = new IntersectionObserver(entries => {
-                if (entries[0].isIntersecting && hasNextPage && !isFetchingNextPage) {
-                    observer.current?.disconnect();
+                if (entries[0].isIntersecting && hasNextPage && !isFetchingNextPage && !isLoading && !isFetching) {
                     fetchNextPage();
                 }
             });
 
             if (node) observer.current.observe(node);
         },
-        [hasNextPage, isFetchingNextPage, fetchNextPage, isFetching, isLoading]
-    );
 
+        [hasNextPage, isFetchingNextPage, isLoading, isFetching, fetchNextPage]
+    );
     return (
         <List sx={{ width: "100%", bgcolor: "background.paper" }}>
             {isLoading

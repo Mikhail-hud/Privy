@@ -161,6 +161,7 @@ export const ProfileAvatar: FC<ProfileAvatarProps> = ({ profile }) => {
                             width: 50,
                             height: 50,
                             cursor: "pointer",
+                            background: (theme.vars || theme).palette.background.paper,
                             border: `2px solid ${(theme.vars || theme).palette.background.paper}`,
                         })}
                     />

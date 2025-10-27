@@ -21,8 +21,8 @@ const avatarBadgeSx = (theme: Theme) => ({
 
 interface UserListItemProps {
     user: User;
-    onFollow: (id: number) => void;
-    onUnfollow: (id: number) => void;
+    onFollow: (id: number, userName: string) => void;
+    onUnfollow: (id: number, userName: string) => void;
 }
 
 export const UserListItemComponent: FC<UserListItemProps> = ({ user, onFollow, onUnfollow }) => {
@@ -35,9 +35,9 @@ export const UserListItemComponent: FC<UserListItemProps> = ({ user, onFollow, o
         event.preventDefault();
 
         if (user.isFollowedByCurrentUser) {
-            onUnfollow(user.id);
+            onUnfollow(user.id, user.userName);
         } else {
-            onFollow(user.id);
+            onFollow(user.id, user.userName);
         }
     };
 
@@ -72,24 +72,35 @@ export const UserListItemComponent: FC<UserListItemProps> = ({ user, onFollow, o
                 </ListItemAvatar>
                 <ListItemText
                     primary={
-                        <Box sx={{ display: "flex", alignItems: "center", gap: 1, flexWrap: "wrap" }}>
-                            <Typography variant="subtitle2" sx={{ fontWeight: 500 }}>
-                                @{user.userName}
-                            </Typography>
-                            <Typography color="text.secondary">{user?.fullName}</Typography>
+                        <Box
+                            sx={{
+                                gap: 1,
+                                mb: 1,
+                                display: "flex",
+                                flexWrap: "wrap",
+                                alignItems: "center",
+                                justifyContent: "space-between",
+                            }}
+                        >
+                            <Box sx={{ display: "flex", alignItems: "center", gap: 1, flexWrap: "wrap" }}>
+                                <Typography variant="subtitle2" sx={{ fontWeight: 500 }}>
+                                    @{user.userName}
+                                </Typography>
+                                <Typography color="text.secondary">{user?.fullName}</Typography>
+                            </Box>
+                            <UserFollowButton isFollowed={user.isFollowedByCurrentUser} onClick={handleFollowClick} />
                         </Box>
                     }
                     slotProps={{ secondary: { component: "div" } }}
                     secondary={
                         <>
-                            <Typography variant="body2" color="textPrimary" sx={{ whiteSpace: "pre-wrap", mt: 1 }}>
+                            <Typography variant="body1" color="textPrimary" sx={{ whiteSpace: "pre-wrap" }}>
                                 {user.biography}
                             </Typography>
                             <UserStats followersCount={user.followersCount} followingCount={user.followingCount} />
                         </>
                     }
                 />
-                <UserFollowButton isFollowed={user.isFollowedByCurrentUser} onClick={handleFollowClick} />
             </ListItem>
             <Divider variant="inset" component="li" />
         </>

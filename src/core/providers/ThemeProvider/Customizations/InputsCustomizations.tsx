@@ -13,6 +13,9 @@ export const inputsCustomizations: Components<Theme> = {
             }),
         },
     },
+    MuiButton: {
+        styleOverrides: { root: { textTransform: "none" } },
+    },
     MuiInput: {
         styleOverrides: {
             input: ({ theme }) => ({
