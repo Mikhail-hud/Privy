@@ -2,7 +2,6 @@ import Chip from "@mui/material/Chip";
 import Dialog from "@mui/material/Dialog";
 import Button from "@mui/material/Button";
 import { enqueueSnackbar } from "notistack";
-import { useDebounce } from "@app/core/hooks";
 import TextField from "@mui/material/TextField";
 import { QueryError } from "@app/core/interfaces";
 import { useState, FC, SyntheticEvent } from "react";
@@ -10,6 +9,7 @@ import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
 import { FormFieldShell } from "@app/core/components";
 import DialogActions from "@mui/material/DialogActions";
+import { useDebounce, useIsMobile } from "@app/core/hooks";
 import CircularProgress from "@mui/material/CircularProgress";
 import DialogContentText from "@mui/material/DialogContentText";
 import { transformServerErrors } from "@app/core/utils/general.ts";
@@ -35,10 +35,11 @@ interface InterestsProps {
 }
 
 export const Interests: FC<InterestsProps> = memo(({ interests }) => {
+    const isMobile: boolean = useIsMobile();
     const [open, setOpen] = useState(false);
     const [inputValue, setInputValue] = useState<string>("");
 
-    const debouncedInputValue = useDebounce(inputValue, DEBOUNCE_DELAY);
+    const debouncedInputValue: string = useDebounce(inputValue, DEBOUNCE_DELAY);
 
     const { data: allTags = [], isLoading: isLoadingTags } = useGetTagsQuery(
         { name: debouncedInputValue },
@@ -93,8 +94,9 @@ export const Interests: FC<InterestsProps> = memo(({ interests }) => {
                 open={open}
                 maxWidth={false}
                 onClose={handleClose}
-                sx={{ margin: "auto", maxWidth: 850 }}
+                fullScreen={isMobile}
                 slotProps={{ paper: { component: "form" } }}
+                sx={{ margin: "auto", maxWidth: 850 }}
             >
                 <DialogTitle variant="h3" color="primary">
                     {INTERESTS_FORM_FIELDS.interests.label}
@@ -130,7 +132,7 @@ export const Interests: FC<InterestsProps> = memo(({ interests }) => {
                                         placeholder="Start typing to search..."
                                     />
                                 )}
-                                slotProps={{ listbox: { sx: { maxHeight: "250px" } } }}
+                                slotProps={{ listbox: { sx: { maxHeight: isMobile ? "auto" : "250px" } } }}
                             />
                         )}
                     />

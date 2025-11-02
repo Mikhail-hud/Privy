@@ -2,6 +2,7 @@ import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";
 import { enqueueSnackbar } from "notistack";
 import Divider from "@mui/material/Divider";
+import { useIsMobile } from "@app/core/hooks";
 import { FC, MouseEvent, useState } from "react";
 import { QueryError } from "@app/core/interfaces";
 import DialogActions from "@mui/material/DialogActions";
@@ -43,6 +44,7 @@ interface EditProfileActionProps {
 }
 
 export const EditProfileAction: FC<EditProfileActionProps> = memo(({ profile }) => {
+    const isMobile: boolean = useIsMobile();
     const [updateProfile, { isLoading, error }] = useUpdateProfileMutation();
     const [open, setOpen] = useState<boolean>(false);
 
@@ -82,7 +84,7 @@ export const EditProfileAction: FC<EditProfileActionProps> = memo(({ profile }) 
 
     return (
         <>
-            <Button color="primary" variant="outlined" size="medium" onClick={handleClickOpen}>
+            <Button color="primary" variant="outlined" size={isMobile ? "small" : "medium"} onClick={handleClickOpen}>
                 Edit Profile
             </Button>
             <Dialog

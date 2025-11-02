@@ -13,7 +13,7 @@ import { InfiniteData } from "@reduxjs/toolkit/query";
 import { PROFILE_PAGE_PATH } from "@app/core/constants/pathConstants";
 import { GENERIC_ERROR_MESSAGE } from "@app/core/constants/general.ts";
 import { PAGE_SIZE_LIMITS } from "@app/core/constants/ParamsConstants.ts";
-import { GetAllUsersParams, User, UserList, usersApi } from "@app/core/services";
+import { UserQueryParams, User, UserListResponse, usersApi } from "@app/core/services";
 
 /**
  * User list context made available to route elements.
@@ -21,7 +21,7 @@ import { GetAllUsersParams, User, UserList, usersApi } from "@app/core/services"
  */
 export interface UsersContext {
     users: User[];
-    params: GetAllUsersParams;
+    params: UserQueryParams;
 }
 
 /**
@@ -60,7 +60,7 @@ export const lookupLoader = async (): Promise<UsersContext | Response> => {
     const promise = store.dispatch(usersApi.endpoints.getUsers.initiate(params));
 
     try {
-        const initialUsers: InfiniteData<UserList, number> = await promise.unwrap();
+        const initialUsers: InfiniteData<UserListResponse, number> = await promise.unwrap();
         const users: User[] = initialUsers?.pages.flatMap(page => page.data) ?? [];
         return { users, params };
     } catch (error) {

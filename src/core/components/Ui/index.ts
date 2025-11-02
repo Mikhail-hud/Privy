@@ -5,5 +5,7 @@ export * from "./PhotoSwiper";
 export * from "./ActionIconButton";
 export * from "./FormControllers";
 export * from "./InfiniteScrollList";
+export * from "./ProfileCardContainer";
 export * from "./ContentCardContainer";
+export * from "./BottomSheetDialog";
 export * from "./TabContainer";

@@ -14,7 +14,7 @@ const chipSx = {
 const MAX_VISIBLE_CHIPS = 5;
 
 interface InterestListProps {
-    interest?: Tag[];
+    interest: Tag[] | null | undefined;
 }
 
 const InterestListComponent: FC<InterestListProps> = ({ interest }) => {

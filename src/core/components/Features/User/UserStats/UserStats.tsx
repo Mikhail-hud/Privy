@@ -1,19 +1,65 @@
 import Box from "@mui/material/Box";
-import Typography from "@mui/material/Typography";
-import { FC } from "react";
+import { Link } from "@mui/material";
+import { FC, MouseEvent, SyntheticEvent, useState } from "react";
+import { FollowsDialog } from "@app/core/components/Features/User/UserStats/FollowsDialog";
 
 interface UserStatsProps {
     followingCount: number;
     followersCount: number;
+    userName: string;
 }
 
-export const UserStats: FC<UserStatsProps> = ({ followingCount, followersCount }) => (
-    <Box sx={{ display: "flex", gap: 1, mt: 1, flexWrap: "wrap" }}>
-        <Typography variant="body2" color="textSecondary">
-            Subscribers: {followersCount}
-        </Typography>
-        <Typography variant="body2" color="textSecondary">
-            Subscribed: {followingCount}
-        </Typography>
-    </Box>
-);
+export type UserStatsType = "followers" | "following";
+
+export const UserStats: FC<UserStatsProps> = ({ followingCount, followersCount, userName }) => {
+    const [open, setOpen] = useState(false);
+    const [initialTab, setInitialTab] = useState<UserStatsType | null>(null);
+
+    const handleOpen =
+        (tab: UserStatsType) =>
+        (event: MouseEvent<HTMLButtonElement>): void => {
+            event.stopPropagation();
+            event.preventDefault();
+            setInitialTab(tab);
+            setOpen(true);
+        };
+
+    const handleClose = (event: SyntheticEvent): void => {
+        event.stopPropagation();
+        event.preventDefault();
+        setOpen(false);
+    };
+
+    return (
+        <>
+            <Box sx={{ display: "flex", gap: 1, mt: 1, flexWrap: "wrap" }}>
+                <Link
+                    variant="body2"
+                    component="button"
+                    underline="hover"
+                    color="textSecondary"
+                    onClick={handleOpen("followers")}
+                >
+                    Subscribers: {followersCount}
+                </Link>
+                <Link
+                    variant="body2"
+                    component="button"
+                    underline="hover"
+                    color="textSecondary"
+                    onClick={handleOpen("following")}
+                >
+                    Subscribed: {followingCount}
+                </Link>
+            </Box>
+            <FollowsDialog
+                open={open}
+                onClose={handleClose}
+                userName={userName}
+                initialTab={initialTab}
+                followersCount={followersCount}
+                followingCount={followingCount}
+            />
+        </>
+    );
+};

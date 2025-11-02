@@ -4,14 +4,14 @@ import { FC, ReactElement, useRef, useCallback, memo } from "react";
 
 interface InfiniteScrollListProps<T> {
     data: T[];
+    loader?: FC;
     isLoading: boolean;
     isFetching: boolean;
-    renderSkeleton: FC;
-    skeletonCount?: number;
+    loaderCount?: number;
     fetchNextPage: () => void;
     isFetchingNextPage: boolean;
     hasNextPage: boolean | undefined;
-    renderItem: (item: T) => ReactElement;
+    renderItem: (item: T, index: number) => ReactElement;
 }
 
 const InfiniteScrollListComponent = <T extends object>({
@@ -22,8 +22,8 @@ const InfiniteScrollListComponent = <T extends object>({
     isFetching,
     isFetchingNextPage,
     renderItem,
-    renderSkeleton: SkeletonComponent,
-    skeletonCount = 5,
+    loader: Loader,
+    loaderCount = 1,
 }: InfiniteScrollListProps<T>): ReactElement => {
     const observer = useRef<IntersectionObserver | null>(null);
 
@@ -43,10 +43,10 @@ const InfiniteScrollListComponent = <T extends object>({
         [hasNextPage, isFetchingNextPage, isLoading, isFetching, fetchNextPage]
     );
     return (
-        <List sx={{ width: "100%", bgcolor: "background.paper" }}>
-            {isLoading
-                ? Array.from({ length: skeletonCount }).map((_, index) => <SkeletonComponent key={index} />)
-                : data.map(item => renderItem(item))}
+        <List sx={{ width: "100%", bgcolor: "transparent" }}>
+            {isLoading && Loader
+                ? Array.from({ length: loaderCount }).map((_, index) => <Loader key={index} />)
+                : data.map((item, index) => renderItem(item, index))}
 
             {(hasNextPage || isFetching) && !isLoading && <Spiner enableTrackSlot ref={loaderRef} />}
         </List>

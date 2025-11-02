@@ -5,7 +5,7 @@ import { UserLink } from "@app/core/services";
 import Typography from "@mui/material/Typography";
 
 interface LinksListProps {
-    links?: UserLink[];
+    links: UserLink[] | null | undefined;
 }
 
 export const LinksList: FC<LinksListProps> = memo(({ links }) => {

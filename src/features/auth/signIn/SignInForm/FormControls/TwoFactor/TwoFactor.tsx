@@ -61,7 +61,9 @@ export const TwoFactor: FC = () => {
 
     return (
         <Dialog open={open} slotProps={{ paper: { component: "form", onSubmit: handleSubmit } }}>
-            <DialogTitle variant="h3">Two Factor Authentication</DialogTitle>
+            <DialogTitle variant="h3" color="primary">
+                Two Factor Authentication
+            </DialogTitle>
             <DialogContent sx={{ display: "flex", flexDirection: "column", gap: 2, width: "100%" }}>
                 <DialogContentText>
                     Please enter the authentication code sent to your registered email address to continue. If you did
