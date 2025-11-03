@@ -10,7 +10,18 @@ interface UserAvatarBadgeProps extends BadgeProps {
 
 const avatarBadgeSx = (theme: Theme) => ({
     borderRadius: "50%",
-    background: theme.palette.mode === "light" ? theme.palette.background.paper : theme.palette.common.white,
+
+    background: `linear-gradient(
+        -45deg, 
+        ${theme.palette.info.light}, 
+        ${theme.palette.primary.main}, 
+        ${theme.palette.info.main}, 
+        ${theme.palette.primary.light}
+    )`,
+    backgroundSize: "400% 400%",
+    animation: "gradientShimmer 3s ease infinite",
+    color: theme.palette.info.contrastText,
+    padding: "1px",
 });
 
 export const UserAvatarBadge: FC<UserAvatarBadgeProps> = memo(

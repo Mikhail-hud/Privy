@@ -59,19 +59,48 @@ const UserListItemBaseComponent: FC<UserListItemBaseProps> = ({
                     primary={
                         <Box
                             sx={{
-                                gap: 1,
                                 mb: 1,
                                 display: "flex",
                                 flexWrap: "nowrap",
+                                alignItems: "flex-start",
                                 justifyContent: "space-between",
-                                alignItems: { xs: "flex-start", sm: "center" },
                             }}
                         >
-                            <Box sx={{ display: "flex", alignItems: "center", gap: 1, flexWrap: "wrap" }}>
-                                <Typography variant="subtitle2" sx={{ fontWeight: 500 }}>
+                            <Box
+                                sx={{
+                                    display: "flex",
+                                    alignItems: "self-start",
+                                    flexDirection: "column",
+                                    overflow: "hidden",
+                                    mr: { xs: 0, sm: 1 },
+                                }}
+                            >
+                                <Typography
+                                    variant="subtitle1"
+                                    color="primary"
+                                    sx={{
+                                        overflow: "hidden",
+                                        whiteSpace: "nowrap",
+                                        textOverflow: "ellipsis",
+                                        maxWidth: "100%",
+                                    }}
+                                >
                                     @{userName}
                                 </Typography>
-                                {fullName && <Typography color="text.secondary">{fullName}</Typography>}
+                                {fullName && (
+                                    <Typography
+                                        textOverflow="ellipsis"
+                                        sx={{
+                                            overflow: "hidden",
+                                            whiteSpace: "nowrap",
+                                            textOverflow: "ellipsis",
+                                            maxWidth: "100%",
+                                        }}
+                                        color="text.secondary"
+                                    >
+                                        {fullName}
+                                    </Typography>
+                                )}
                             </Box>
                             {isOwnerUserName !== userName && (
                                 <UserFollowButton isFollowed={isFollowed} onClick={handleFollowClick} />

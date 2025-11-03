@@ -7,6 +7,17 @@ export const inputsCustomizations: Components<Theme> = {
                 from: { transform: "translateY(100%)" },
                 to: { transform: "translateY(0)" },
             },
+            "@keyframes gradientShimmer": {
+                "0%": {
+                    backgroundPosition: "0% 50%",
+                },
+                "50%": {
+                    backgroundPosition: "100% 50%",
+                },
+                "100%": {
+                    backgroundPosition: "0% 50%",
+                },
+            },
         },
     },
     MuiDialog: {

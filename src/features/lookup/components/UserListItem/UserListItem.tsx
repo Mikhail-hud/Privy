@@ -29,7 +29,17 @@ const UserListItemComponent: FC<UserListItemProps> = ({ user, onFollow, onUnfoll
             secondaryContent={
                 <>
                     {user?.biography && (
-                        <Typography variant="body1" color="textPrimary" sx={{ whiteSpace: "pre-wrap" }}>
+                        <Typography
+                            variant="body1"
+                            color="textPrimary"
+                            sx={{
+                                overflow: "hidden",
+                                display: "-webkit-box",
+                                WebkitLineClamp: 3, // Limit to 3 lines
+                                whiteSpace: "pre-wrap",
+                                WebkitBoxOrient: "vertical",
+                            }}
+                        >
                             {user.biography}
                         </Typography>
                     )}
