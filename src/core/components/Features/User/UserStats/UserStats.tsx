@@ -11,7 +11,7 @@ interface UserStatsProps {
 
 export type UserStatsType = "followers" | "following";
 
-export const UserStats: FC<UserStatsProps> = ({ followingCount, followersCount, userName }) => {
+export const UserStats: FC<UserStatsProps> = memo(({ followingCount, followersCount, userName }) => {
     const [open, setOpen] = useState(false);
     const [initialTab, setInitialTab] = useState<UserStatsType | null>(null);
 
@@ -62,4 +62,4 @@ export const UserStats: FC<UserStatsProps> = ({ followingCount, followersCount, 
             />
         </>
     );
-};
+});

@@ -9,11 +9,9 @@ interface FollowingListProps {
     userName: string;
     type: UserStatsType;
     isOwnerUserName?: string;
-    onFollow: (userName: string) => void;
-    onUnfollow: (userName: string) => void;
 }
 
-export const FollowingList: FC<FollowingListProps> = ({ userName, type, onFollow, onUnfollow, isOwnerUserName }) => {
+export const FollowingList: FC<FollowingListProps> = ({ userName, type, isOwnerUserName }) => {
     const [searchQuery, setSearchQuery] = useState<string>("");
     const query: string = useDebounce(searchQuery, DEBOUNCE_DELAY);
 
@@ -40,8 +38,6 @@ export const FollowingList: FC<FollowingListProps> = ({ userName, type, onFollow
                     <UserSummaryListItem
                         key={user.id}
                         user={user}
-                        onFollow={onFollow}
-                        onUnfollow={onUnfollow}
                         isOwnerUserName={isOwnerUserName}
                         isLast={index === users.length - 1}
                     />

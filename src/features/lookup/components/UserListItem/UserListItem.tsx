@@ -6,11 +6,9 @@ import { UserListItemBase, UserStats } from "@app/core/components";
 interface UserListItemProps {
     user: User;
     isLast: boolean;
-    onFollow: (userName: string) => void;
-    onUnfollow: (userName: string) => void;
 }
 
-const UserListItemComponent: FC<UserListItemProps> = ({ user, onFollow, onUnfollow, isLast }) => {
+const UserListItemComponent: FC<UserListItemProps> = ({ user, isLast }) => {
     const isProfileIncognito: boolean = user.isProfileIncognito;
     const src: string | undefined = isProfileIncognito ? user?.privatePhoto?.signedUrl : user?.publicPhoto?.signedUrl;
     const alt: string = isProfileIncognito ? `avata_${user?.privatePhoto?.id}` : `avata_${user?.publicPhoto?.id}`;
@@ -20,8 +18,6 @@ const UserListItemComponent: FC<UserListItemProps> = ({ user, onFollow, onUnfoll
             avatarUrl={src}
             avatarAlt={alt}
             isLast={isLast}
-            onFollow={onFollow}
-            onUnfollow={onUnfollow}
             userName={user.userName}
             fullName={user.fullName}
             isFollowed={user.isFollowedByCurrentUser}

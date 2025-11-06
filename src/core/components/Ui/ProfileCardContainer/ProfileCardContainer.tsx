@@ -7,19 +7,17 @@ import CardContent from "@mui/material/CardContent";
 import CardActions from "@mui/material/CardActions";
 import { FC, PropsWithChildren, ReactNode } from "react";
 import { InterestList } from "@app/core/components/Ui/InterestList";
-import { ContentCardContainer, LinksList, UserStats } from "@app/core/components";
+import { ContentCardContainer, LinksList } from "@app/core/components";
 
 interface ProfileCardContainerProps extends PropsWithChildren {
-    isOwner?: boolean;
     fullName?: string | null | undefined;
     userName: string;
     titleAction?: ReactNode;
+    cardAction?: ReactNode;
     biography?: string | null | undefined;
     avatar: ReactNode;
     links?: UserLink[] | null | undefined;
     interests?: Tag[] | null | undefined;
-    followersCount: number;
-    followingCount: number;
 }
 
 export const ProfileCardContainer: FC<ProfileCardContainerProps> = ({
@@ -31,8 +29,7 @@ export const ProfileCardContainer: FC<ProfileCardContainerProps> = ({
     biography,
     links,
     interests,
-    followingCount,
-    followersCount,
+    cardAction,
 }) => {
     return (
         <ContentCardContainer>
@@ -79,10 +76,7 @@ export const ProfileCardContainer: FC<ProfileCardContainerProps> = ({
                     </>
                 }
             />
-            <CardActions disableSpacing>
-                <UserStats followersCount={followersCount} followingCount={followingCount} userName={userName} />
-            </CardActions>
-
+            {cardAction && <CardActions disableSpacing>{cardAction}</CardActions>}
             {biography && (
                 <>
                     <Divider textAlign="left">

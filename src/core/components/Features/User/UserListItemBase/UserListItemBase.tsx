@@ -1,8 +1,8 @@
 import Box from "@mui/material/Box";
+import { FC, ReactNode } from "react";
 import Divider from "@mui/material/Divider";
 import ListItem from "@mui/material/ListItem";
 import Typography from "@mui/material/Typography";
-import { FC, MouseEvent, ReactNode } from "react";
 import ListItemText from "@mui/material/ListItemText";
 import { Link as RouterLink } from "react-router-dom";
 import ListItemAvatar from "@mui/material/ListItemAvatar";
@@ -19,15 +19,11 @@ interface UserListItemBaseProps {
     isProfileIncognito: boolean;
     secondaryContent?: ReactNode;
     isOwnerUserName?: string;
-    onFollow: (userName: string) => void;
-    onUnfollow: (userName: string) => void;
 }
 
 const UserListItemBaseComponent: FC<UserListItemBaseProps> = ({
     userName,
-    onUnfollow,
     isLast,
-    onFollow,
     fullName,
     isFollowed,
     isProfileIncognito,
@@ -36,17 +32,6 @@ const UserListItemBaseComponent: FC<UserListItemBaseProps> = ({
     secondaryContent,
     isOwnerUserName,
 }) => {
-    const handleFollowClick = (event: MouseEvent<HTMLButtonElement>): void => {
-        event.stopPropagation();
-        event.preventDefault();
-
-        if (isFollowed) {
-            onUnfollow(userName);
-        } else {
-            onFollow(userName);
-        }
-    };
-
     return (
         <>
             <ListItem alignItems="flex-start" component={RouterLink} to={`/${USER_HANDLE_PREFIX}${userName}`}>
@@ -103,7 +88,7 @@ const UserListItemBaseComponent: FC<UserListItemBaseProps> = ({
                                 )}
                             </Box>
                             {isOwnerUserName !== userName && (
-                                <UserFollowButton isFollowed={isFollowed} onClick={handleFollowClick} />
+                                <UserFollowButton isFollowed={isFollowed} userName={userName} />
                             )}
                         </Box>
                     }
