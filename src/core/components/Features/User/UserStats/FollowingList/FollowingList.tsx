@@ -1,6 +1,6 @@
 import { useDebounce } from "@app/core/hooks";
 import { DEBOUNCE_DELAY } from "@app/core/constants/general";
-import { FC, useState, ChangeEvent, ReactElement } from "react";
+import { FC, useState, ChangeEvent, ReactElement, MouseEvent } from "react";
 import { useGetUserFollowingInfiniteQuery, UserSummary } from "@app/core/services";
 import { UserStatsType, InfiniteScrollList, Spiner, UserSearchField } from "@app/core/components";
 import { UserSummaryListItem } from "@app/core/components/Features/User/UserStats/UserSummaryListItem";
@@ -9,9 +9,10 @@ interface FollowingListProps {
     userName: string;
     type: UserStatsType;
     isOwnerUserName?: string;
+    onListItemClick?: (e: MouseEvent<HTMLAnchorElement>) => void;
 }
 
-export const FollowingList: FC<FollowingListProps> = ({ userName, type, isOwnerUserName }) => {
+export const FollowingList: FC<FollowingListProps> = ({ userName, type, isOwnerUserName, onListItemClick }) => {
     const [searchQuery, setSearchQuery] = useState<string>("");
     const query: string = useDebounce(searchQuery, DEBOUNCE_DELAY);
 
@@ -38,6 +39,7 @@ export const FollowingList: FC<FollowingListProps> = ({ userName, type, isOwnerU
                     <UserSummaryListItem
                         key={user.id}
                         user={user}
+                        onListItemClick={onListItemClick}
                         isOwnerUserName={isOwnerUserName}
                         isLast={index === users.length - 1}
                     />

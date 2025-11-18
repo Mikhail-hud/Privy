@@ -14,8 +14,8 @@ export const LinksList: FC<LinksListProps> = memo(({ links }) => {
     }
 
     return (
-        <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
-            <Typography variant="body2" color="textSecondary">
+        <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5, justifyContent: { xxs: "center", sm: "flex-start" } }}>
+            <Typography variant="body2" color="textPrimary">
                 Links:
             </Typography>
             {links.map(link => (
@@ -26,7 +26,7 @@ export const LinksList: FC<LinksListProps> = memo(({ links }) => {
                     variant="body2"
                     underline="hover"
                     rel="noopener noreferrer"
-                    color="textSecondary"
+                    color="textPrimary"
                 >
                     {link.title}
                 </Link>

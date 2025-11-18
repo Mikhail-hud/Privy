@@ -1,7 +1,7 @@
 import { FC, memo } from "react";
 import { User } from "@app/core/services";
 import Typography from "@mui/material/Typography";
-import { UserListItemBase, UserStats } from "@app/core/components";
+import { UserFollowButton, UserListItemBase, UserStats } from "@app/core/components";
 
 interface UserListItemProps {
     user: User;
@@ -9,9 +9,12 @@ interface UserListItemProps {
 }
 
 const UserListItemComponent: FC<UserListItemProps> = ({ user, isLast }) => {
-    const isProfileIncognito: boolean = user.isProfileIncognito;
-    const src: string | undefined = isProfileIncognito ? user?.privatePhoto?.signedUrl : user?.publicPhoto?.signedUrl;
-    const alt: string = isProfileIncognito ? `avata_${user?.privatePhoto?.id}` : `avata_${user?.publicPhoto?.id}`;
+    const src: string | undefined = user.canViewFullProfile
+        ? user?.publicPhoto?.signedUrl
+        : user?.privatePhoto?.signedUrl;
+    const alt: string = user.canViewFullProfile
+        ? `avatar_${user?.publicPhoto?.id}`
+        : `avatar_${user?.privatePhoto?.id}`;
 
     return (
         <UserListItemBase
@@ -20,8 +23,8 @@ const UserListItemComponent: FC<UserListItemProps> = ({ user, isLast }) => {
             isLast={isLast}
             userName={user.userName}
             fullName={user.fullName}
-            isFollowed={user.isFollowedByCurrentUser}
             isProfileIncognito={user.isProfileIncognito}
+            action={<UserFollowButton isFollowed={user.isFollowedByCurrentUser} userName={user.userName} />}
             secondaryContent={
                 <>
                     {user?.biography && (
@@ -29,6 +32,7 @@ const UserListItemComponent: FC<UserListItemProps> = ({ user, isLast }) => {
                             variant="body1"
                             color="textPrimary"
                             sx={{
+                                mb: 1,
                                 overflow: "hidden",
                                 display: "-webkit-box",
                                 WebkitLineClamp: 3, // Limit to 3 lines

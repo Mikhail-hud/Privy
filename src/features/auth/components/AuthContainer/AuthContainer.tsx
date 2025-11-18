@@ -35,7 +35,7 @@ export const AuthContainer: FC<PropsWithChildren> = ({ children }) => {
         >
             <Stack
                 spacing={2}
-                direction={{ xs: "column-reverse", md: "row" }}
+                direction={{ xxs: "column-reverse", md: "row" }}
                 sx={{ width: "100%", maxWidth: "1600px", alignItems: "center" }}
             >
                 <Box
@@ -44,13 +44,13 @@ export const AuthContainer: FC<PropsWithChildren> = ({ children }) => {
                         alignItems: "center",
                         justifyContent: "center",
                         flexDirection: "column",
-                        width: { xs: "100%", md: "50%" },
+                        width: { xxs: "100%", md: "50%" },
                     }}
                 >
                     <Mark />
                     <DescriptionContent />
                 </Box>
-                <Box sx={{ width: { xs: "100%", md: "50%" } }}>
+                <Box sx={{ width: { xxs: "100%", md: "50%" } }}>
                     <MuiCard variant="outlined">{children}</MuiCard>
                 </Box>
             </Stack>

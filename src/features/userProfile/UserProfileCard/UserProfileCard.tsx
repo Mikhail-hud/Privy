@@ -1,6 +1,6 @@
 import { FC } from "react";
 import { User } from "@app/core/services";
-import { ProfileCardContainer, UserStats } from "@app/core/components";
+import { ProfileCardContainer, UserProfileLock, UserStats } from "@app/core/components";
 import { UserProfileAvatar } from "@app/features/userProfile/UserProfileCard/UserProfileAvatar";
 import { UserProfileActions } from "@app/features/userProfile/UserProfileCard/UserProfileActions";
 
@@ -20,9 +20,12 @@ export const UserProfileCard: FC<ProfileCardProps> = memo(({ user }) => {
         publicPhoto,
         fullName,
         biography,
+        revealRequestStatus,
+        canViewFullProfile,
     } = user;
     const userlinks = useMemo(() => links, [links]);
     const userInterests = useMemo(() => interests, [interests]);
+
     return (
         <ProfileCardContainer
             cardAction={
@@ -33,15 +36,18 @@ export const UserProfileCard: FC<ProfileCardProps> = memo(({ user }) => {
                     userName={userName}
                     publicPhoto={publicPhoto}
                     privatePhoto={privatePhoto}
+                    canViewFullProfile={canViewFullProfile}
                     isProfileIncognito={isProfileIncognito}
                 />
             }
             titleAction={<UserProfileActions userName={user.userName} isFollowed={user.isFollowedByCurrentUser} />}
-            userName={userName}
             links={userlinks}
-            interests={userInterests}
+            userName={userName}
             fullName={fullName}
             biography={biography}
-        />
+            interests={userInterests}
+        >
+            {!canViewFullProfile && <UserProfileLock userName={userName} status={revealRequestStatus?.status} />}
+        </ProfileCardContainer>
     );
 });

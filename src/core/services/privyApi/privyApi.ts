@@ -3,11 +3,12 @@ import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
 export const PROFILE_TAG = "ProfileTag";
 export const TAG_TAG = "TagTag";
-export const LINKS_TAG = "LinksTag";
 export const PROFILE_PHOTOS_TAG = "ProfilePhotosTag";
 export const SESSIONS_TAG = "SessionsTag";
 export const USER_NAME_TAG = "UserNameTag";
 export const USER_TAG = "UserTag";
+export const REVEAL_STATUS_TAG = "RevealStatusTag";
+export const REVEALED_LIST_TAG = "RevealedListTag";
 export const USERS_LIST_TAG = "UsersListTag";
 
 export const TAG_TYPES = [
@@ -18,7 +19,8 @@ export const TAG_TYPES = [
     PROFILE_PHOTOS_TAG,
     TAG_TAG,
     USERS_LIST_TAG,
-    LINKS_TAG,
+    REVEALED_LIST_TAG,
+    REVEAL_STATUS_TAG,
 ] as const;
 
 export const privyApi = createApi({

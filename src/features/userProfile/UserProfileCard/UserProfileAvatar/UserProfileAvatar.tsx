@@ -5,16 +5,17 @@ import { UserAvatarBackdrop } from "@app/features/userProfile/UserProfileCard/Us
 
 interface ProfileAvatarProps {
     userName: string;
+    canViewFullProfile: boolean;
     isProfileIncognito: boolean;
     privatePhoto: Photo | null | undefined;
     publicPhoto: Photo | null | undefined;
 }
 
 export const UserProfileAvatar: FC<ProfileAvatarProps> = memo(
-    ({ privatePhoto, publicPhoto, isProfileIncognito, userName }) => {
+    ({ privatePhoto, publicPhoto, isProfileIncognito, userName, canViewFullProfile }) => {
         const [open, setOpen] = useState<boolean>(false);
-        const src: string | undefined = isProfileIncognito ? privatePhoto?.signedUrl : publicPhoto?.signedUrl;
-        const alt: string = isProfileIncognito ? `avata_${privatePhoto?.id}` : `avata_${publicPhoto?.id}`;
+        const src: string | undefined = canViewFullProfile ? publicPhoto?.signedUrl : privatePhoto?.signedUrl;
+        const alt: string = canViewFullProfile ? `avatar_${publicPhoto?.id}` : `avatar_${privatePhoto?.id}`;
 
         const onAvatarClick = (): void => setOpen(true);
 

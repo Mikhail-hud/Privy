@@ -13,7 +13,7 @@ import { InfiniteData } from "@reduxjs/toolkit/query";
 import { PROFILE_PAGE_PATH } from "@app/core/constants/pathConstants";
 import { GENERIC_ERROR_MESSAGE } from "@app/core/constants/general.ts";
 import { PAGE_SIZE_LIMITS } from "@app/core/constants/ParamsConstants.ts";
-import { UserQueryParams, User, UserListResponse, usersApi } from "@app/core/services";
+import { QueryParams, User, UserListResponse, usersApi } from "@app/core/services";
 
 /**
  * User list context made available to route elements.
@@ -21,7 +21,7 @@ import { UserQueryParams, User, UserListResponse, usersApi } from "@app/core/ser
  */
 export interface UsersContext {
     users: User[];
-    params: UserQueryParams;
+    params: QueryParams;
 }
 
 /**

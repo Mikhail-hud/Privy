@@ -17,14 +17,16 @@ interface PhotoGridProps {
 
 export const PhotoGrid: FC<PhotoGridProps> = memo(({ photos, isOwner, onImageClick, onMenuOpen }) => {
     const theme: Theme = useTheme();
-    const isMobile: boolean = useMediaQuery(theme.breakpoints.down("sm"));
-    const isTablet: boolean = useMediaQuery(theme.breakpoints.between("sm", "md"));
+    const isLegacyMobile: boolean = useMediaQuery(theme.breakpoints.down("xs"));
+    const isMobile: boolean = useMediaQuery(theme.breakpoints.between("xs", "sm"));
+    const isTablet: boolean = useMediaQuery(theme.breakpoints.between("sm", "lg"));
 
     const cols: number = useMemo((): number => {
-        if (isMobile) return 1;
-        if (isTablet) return 2;
-        return 3;
-    }, [isMobile, isTablet]);
+        if (isLegacyMobile) return 1;
+        if (isMobile) return 2;
+        if (isTablet) return 3;
+        return 4;
+    }, [isTablet, isLegacyMobile, isMobile]);
 
     return (
         <ImageList cols={cols} gap={8} variant="masonry">

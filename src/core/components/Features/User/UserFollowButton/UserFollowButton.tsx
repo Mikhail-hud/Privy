@@ -36,10 +36,7 @@ export const UserFollowButton: FC<UserFollowButtonProps> = memo(({ isFollowed, u
         }
     };
 
-    const handleClick = async (event: MouseEvent<HTMLButtonElement>): Promise<void> => {
-        event.stopPropagation();
-        event.preventDefault();
-
+    const handleClick = async (_event: MouseEvent<HTMLButtonElement>): Promise<void> => {
         if (isFollowed) {
             await handleUnfollow(userName);
         } else {

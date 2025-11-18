@@ -29,10 +29,11 @@ export const UserStats: FC<UserStatsProps> = memo(({ followingCount, followersCo
         event.preventDefault();
         setOpen(false);
     };
+    const onListItemClick = (_event: MouseEvent<HTMLAnchorElement>): void => setOpen(false);
 
     return (
         <>
-            <Box sx={{ display: "flex", gap: 1, mt: 1, flexWrap: "wrap" }}>
+            <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap" }}>
                 <Link
                     variant="body2"
                     component="button"
@@ -59,6 +60,7 @@ export const UserStats: FC<UserStatsProps> = memo(({ followingCount, followersCo
                 initialTab={initialTab}
                 followersCount={followersCount}
                 followingCount={followingCount}
+                onListItemClick={onListItemClick}
             />
         </>
     );

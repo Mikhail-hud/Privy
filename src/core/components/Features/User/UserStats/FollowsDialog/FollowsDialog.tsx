@@ -4,7 +4,7 @@ import Dialog from "@mui/material/Dialog";
 import { UserStatsType } from "@app/core/components";
 import { useAuth, useIsMobile } from "@app/core/hooks";
 import DialogContent from "@mui/material/DialogContent";
-import { FC, useState, SyntheticEvent, Activity } from "react";
+import { FC, useState, SyntheticEvent, Activity, MouseEvent } from "react";
 import { FollowersList } from "@app/core/components/Features/User/UserStats/FollowersList";
 import { FollowingList } from "@app/core/components/Features/User/UserStats/FollowingList";
 
@@ -15,6 +15,7 @@ interface FollowsDialogProps {
     followersCount: number;
     followingCount: number;
     initialTab: UserStatsType | null;
+    onListItemClick?: (e: MouseEvent<HTMLAnchorElement>) => void;
 }
 
 export const FollowsDialog: FC<FollowsDialogProps> = ({
@@ -24,6 +25,7 @@ export const FollowsDialog: FC<FollowsDialogProps> = ({
     initialTab,
     followersCount,
     followingCount,
+    onListItemClick,
 }) => {
     const {
         profile: { userName: isOwnerUserName },
@@ -59,10 +61,20 @@ export const FollowsDialog: FC<FollowsDialogProps> = ({
                     </Tabs>
                     <DialogContent>
                         <Activity mode={tab === "followers" ? "visible" : "hidden"}>
-                            <FollowersList userName={userName} type="followers" isOwnerUserName={isOwnerUserName} />
+                            <FollowersList
+                                userName={userName}
+                                type="followers"
+                                isOwnerUserName={isOwnerUserName}
+                                onListItemClick={onListItemClick}
+                            />
                         </Activity>
                         <Activity mode={tab === "following" ? "visible" : "hidden"}>
-                            <FollowingList type="following" userName={userName} isOwnerUserName={isOwnerUserName} />
+                            <FollowingList
+                                type="following"
+                                userName={userName}
+                                isOwnerUserName={isOwnerUserName}
+                                onListItemClick={onListItemClick}
+                            />
                         </Activity>
                     </DialogContent>
                 </>

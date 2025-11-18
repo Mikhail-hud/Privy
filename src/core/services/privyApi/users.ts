@@ -1,6 +1,6 @@
 import { RootState } from "@app/core/store";
 import { INITIAL_PAGE_PARAM, PAGE_SIZE_LIMITS } from "@app/core/constants/ParamsConstants.ts";
-import { Photo, privyApi, Profile, Tag, UserLink, USERS_LIST_TAG } from "@app/core/services";
+import { Photo, privyApi, Profile, RevealRequest, Tag, UserLink, USERS_LIST_TAG } from "@app/core/services";
 
 export interface User
     extends Pick<Profile, "userName" | "id" | "isProfileIncognito" | "followingCount" | "followersCount"> {
@@ -10,6 +10,8 @@ export interface User
     biography?: string;
     links?: UserLink[];
     interests?: Tag[];
+    revealRequestStatus?: RevealRequest;
+    canViewFullProfile: boolean;
     isFollowedByCurrentUser: boolean;
 }
 
@@ -17,6 +19,7 @@ export interface UserSummary extends Pick<Profile, "userName" | "id" | "isProfil
     fullName?: string;
     publicPhoto?: Photo | null;
     privatePhoto?: Photo | null;
+    canViewFullProfile: boolean;
     isFollowedByCurrentUser: boolean;
 }
 
@@ -29,12 +32,12 @@ export interface PaginatedResponse<T> {
 export type UserListResponse = PaginatedResponse<User>;
 export type FollowersListResponse = PaginatedResponse<UserSummary>;
 
-export interface UserQueryParams {
+export interface QueryParams {
     query?: string;
     limit?: number;
 }
 
-export interface UsersParamsWithUserName extends UserQueryParams {
+export interface UsersParamsWithUserName extends QueryParams {
     userName: string;
 }
 
@@ -43,7 +46,7 @@ type FollowListCache = { pages: FollowersListResponse[] };
 
 export const usersApi = privyApi.injectEndpoints({
     endpoints: builder => ({
-        getUsers: builder.infiniteQuery<UserListResponse, UserQueryParams, number>({
+        getUsers: builder.infiniteQuery<UserListResponse, QueryParams, number>({
             infiniteQueryOptions: {
                 initialPageParam: INITIAL_PAGE_PARAM,
                 getNextPageParam: (lastPage, _b, lastPageParam) => {
@@ -180,7 +183,7 @@ export const usersApi = privyApi.injectEndpoints({
                         dispatch(
                             usersApi.util.updateQueryData(
                                 "getUsers",
-                                originalArgs as UserQueryParams,
+                                originalArgs as QueryParams,
                                 updateUsersListRecipe
                             )
                         );
@@ -210,7 +213,7 @@ export const usersApi = privyApi.injectEndpoints({
                         draft.followersCount += 1;
                     })
                 );
-                // 4. // Update the current user's following count (as before)
+                // Update the current user's following count (as before)
                 // dispatch(
                 //     profileApi.util.updateQueryData("getProfile", undefined, draft => {
                 //         draft.followingCount += 1;
@@ -258,7 +261,7 @@ export const usersApi = privyApi.injectEndpoints({
                         dispatch(
                             usersApi.util.updateQueryData(
                                 "getUsers",
-                                originalArgs as UserQueryParams,
+                                originalArgs as QueryParams,
                                 updateUsersListRecipe
                             )
                         );

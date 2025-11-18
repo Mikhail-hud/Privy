@@ -1,17 +1,26 @@
-import { FC, memo } from "react";
+import { FC, memo, MouseEvent } from "react";
 import { UserSummary } from "@app/core/services";
-import { UserListItemBase } from "@app/core/components";
+import { UserFollowButton, UserListItemBase } from "@app/core/components";
 
 interface UserSummaryListItemProps {
     isLast: boolean;
     user: UserSummary;
     isOwnerUserName?: string;
+    onListItemClick?: (e: MouseEvent<HTMLAnchorElement>) => void;
 }
 
-export const UserSummaryListItemComponent: FC<UserSummaryListItemProps> = ({ user, isLast, isOwnerUserName }) => {
-    const isProfileIncognito: boolean = user.isProfileIncognito;
-    const src: string | undefined = isProfileIncognito ? user?.privatePhoto?.signedUrl : user?.publicPhoto?.signedUrl;
-    const alt: string = isProfileIncognito ? `avata_${user?.privatePhoto?.id}` : `avata_${user?.publicPhoto?.id}`;
+export const UserSummaryListItemComponent: FC<UserSummaryListItemProps> = ({
+    user,
+    isLast,
+    isOwnerUserName,
+    onListItemClick,
+}) => {
+    const src: string | undefined = user.canViewFullProfile
+        ? user?.publicPhoto?.signedUrl
+        : user?.privatePhoto?.signedUrl;
+    const alt: string = user.canViewFullProfile
+        ? `avatar_${user?.publicPhoto?.id}`
+        : `avatar_${user?.privatePhoto?.id}`;
 
     return (
         <UserListItemBase
@@ -20,9 +29,14 @@ export const UserSummaryListItemComponent: FC<UserSummaryListItemProps> = ({ use
             isLast={isLast}
             userName={user.userName}
             fullName={user.fullName}
+            onListItemClick={onListItemClick}
             isOwnerUserName={isOwnerUserName}
-            isFollowed={user.isFollowedByCurrentUser}
             isProfileIncognito={user.isProfileIncognito}
+            action={
+                isOwnerUserName !== user.userName && (
+                    <UserFollowButton isFollowed={user.isFollowedByCurrentUser} userName={user.userName} />
+                )
+            }
         />
     );
 };

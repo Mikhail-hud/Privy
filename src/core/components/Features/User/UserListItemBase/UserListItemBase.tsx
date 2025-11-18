@@ -1,40 +1,47 @@
 import Box from "@mui/material/Box";
-import { FC, ReactNode } from "react";
 import Divider from "@mui/material/Divider";
 import ListItem from "@mui/material/ListItem";
 import Typography from "@mui/material/Typography";
+import { FC, ReactNode, MouseEvent } from "react";
 import ListItemText from "@mui/material/ListItemText";
 import { Link as RouterLink } from "react-router-dom";
 import ListItemAvatar from "@mui/material/ListItemAvatar";
+import { stopEventPropagation } from "@app/core/utils/general.ts";
+import { UserAvatarBadge, Avatar } from "@app/core/components";
 import { USER_HANDLE_PREFIX } from "@app/core/constants/pathConstants.ts";
-import { UserAvatarBadge, UserFollowButton, Avatar } from "@app/core/components";
 
 interface UserListItemBaseProps {
     isLast: boolean;
     userName: string;
+    action?: ReactNode;
     avatarUrl: string | undefined;
     avatarAlt: string;
-    isFollowed: boolean;
     fullName?: string | null;
     isProfileIncognito: boolean;
     secondaryContent?: ReactNode;
     isOwnerUserName?: string;
+    onListItemClick?: (e: MouseEvent<HTMLAnchorElement>) => void;
 }
 
 const UserListItemBaseComponent: FC<UserListItemBaseProps> = ({
     userName,
     isLast,
     fullName,
-    isFollowed,
     isProfileIncognito,
     avatarAlt,
     avatarUrl,
     secondaryContent,
-    isOwnerUserName,
+    onListItemClick,
+    action,
 }) => {
     return (
         <>
-            <ListItem alignItems="flex-start" component={RouterLink} to={`/${USER_HANDLE_PREFIX}${userName}`}>
+            <ListItem
+                component={RouterLink}
+                alignItems="flex-start"
+                onClick={onListItemClick}
+                to={`/${USER_HANDLE_PREFIX}${userName}`}
+            >
                 <ListItemAvatar>
                     <UserAvatarBadge isProfileIncognito={isProfileIncognito}>
                         <Avatar userName={userName} alt={avatarAlt} src={avatarUrl} />
@@ -57,7 +64,7 @@ const UserListItemBaseComponent: FC<UserListItemBaseProps> = ({
                                     alignItems: "self-start",
                                     flexDirection: "column",
                                     overflow: "hidden",
-                                    mr: { xs: 0, sm: 1 },
+                                    mr: { xxs: 0, sm: 1 },
                                 }}
                             >
                                 <Typography
@@ -87,8 +94,14 @@ const UserListItemBaseComponent: FC<UserListItemBaseProps> = ({
                                     </Typography>
                                 )}
                             </Box>
-                            {isOwnerUserName !== userName && (
-                                <UserFollowButton isFollowed={isFollowed} userName={userName} />
+                            {action && (
+                                <Box
+                                    onClick={stopEventPropagation}
+                                    onMouseDown={stopEventPropagation}
+                                    onTouchStart={stopEventPropagation}
+                                >
+                                    {action}
+                                </Box>
                             )}
                         </Box>
                     }

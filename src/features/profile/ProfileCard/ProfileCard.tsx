@@ -1,29 +1,42 @@
 import { FC } from "react";
+import Box from "@mui/material/Box";
 import { Outlet } from "react-router-dom";
-import { Profile } from "@app/core/services";
+import { Profile, Tag, UserLink } from "@app/core/services";
 import { ProfileTabs } from "@app/features/profile/ProfileCard/ProfileTabs";
-import { ProfileAvatar, ProfileCardContainer, UserStats } from "@app/core/components";
 import { EditProfileAction } from "@app/features/profile/ProfileCard/EditProfileAction";
+import { ProfileAvatar, ProfileCardContainer, Reveals, UserStats } from "@app/core/components";
 
 interface ProfileCardProps {
     profile: Profile;
 }
 
 export const ProfileCard: FC<ProfileCardProps> = memo(({ profile }) => {
-    const { userName, followersCount, followingCount, links, fullName, interests } = profile;
-    const userlinks = useMemo(() => links, [links]);
-    const userInterests = useMemo(() => interests, [interests]);
+    const { userName, followersCount, followingCount, links, fullName, interests, biography } = profile;
+    const userlinks = useMemo((): UserLink[] => links, [links]);
+    const userInterests = useMemo((): Tag[] => interests, [interests]);
     return (
         <ProfileCardContainer
             avatar={<ProfileAvatar profile={profile} />}
             titleAction={<EditProfileAction profile={profile} />}
             cardAction={
-                <UserStats followersCount={followersCount} followingCount={followingCount} userName={userName} />
+                <Box
+                    sx={{
+                        gap: 1,
+                        width: "100%",
+                        display: "flex",
+                        alignItems: "flex-start",
+                        justifyContent: "space-between",
+                    }}
+                >
+                    <UserStats followersCount={followersCount} followingCount={followingCount} userName={userName} />
+                    <Reveals />
+                </Box>
             }
             links={userlinks}
             fullName={fullName}
             userName={userName}
             interests={userInterests}
+            biography={biography}
         >
             <>
                 <ProfileTabs />
