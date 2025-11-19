@@ -1,8 +1,18 @@
 import { Theme, Components } from "@mui/material/styles";
 
+const minHeightHeight44 = {
+    minHeight: 44,
+    height: 44,
+};
+
+const minHeightHeight52 = {
+    minHeight: 52,
+    height: 52,
+};
+
 export const inputsCustomizations: Components<Theme> = {
     MuiCssBaseline: {
-        styleOverrides: {
+        styleOverrides: (theme: Theme) => ({
             "@keyframes slideUp": {
                 from: { transform: "translateY(100%)" },
                 to: { transform: "translateY(0)" },
@@ -18,7 +28,15 @@ export const inputsCustomizations: Components<Theme> = {
                     backgroundPosition: "0% 50%",
                 },
             },
-        },
+            html: {
+                [theme.breakpoints.down("sm")]: {
+                    fontSize: "0.875rem",
+                },
+                [theme.breakpoints.between("sm", "md")]: {
+                    fontSize: "0.9375rem",
+                },
+            },
+        }),
     },
     MuiDialog: {
         styleOverrides: {
@@ -41,7 +59,6 @@ export const inputsCustomizations: Components<Theme> = {
         styleOverrides: {
             root: ({ theme }) => ({
                 [theme.breakpoints.down("sm")]: {
-                    fontSize: "1.3rem",
                     padding: theme.spacing(1, 2),
                 },
             }),
@@ -56,18 +73,79 @@ export const inputsCustomizations: Components<Theme> = {
             }),
         },
     },
+
     MuiTabs: {
         styleOverrides: {
-            list: ({ theme }) => ({
-                "& .MuiTab-root": {
-                    [theme.breakpoints.down("sm")]: {
-                        padding: theme.spacing(0.5),
-                        fontSize: "0.8rem",
+            root: ({ theme }) => ({
+                [theme.breakpoints.down("sm")]: {
+                    ...minHeightHeight44,
+                },
+            }),
+        },
+    },
+    MuiTab: {
+        styleOverrides: {
+            root: ({ theme }) => ({
+                textTransform: "none",
+                "& .MuiSvgIcon-root": {
+                    marginBottom: 0,
+                },
+                [theme.breakpoints.down("sm")]: {
+                    ...minHeightHeight44,
+                    padding: theme.spacing(0.5),
+                    "& .MuiSvgIcon-root": {
+                        fontSize: "1.1rem",
+                    },
+                },
+                [theme.breakpoints.up("sm")]: {
+                    ...minHeightHeight52,
+                },
+            }),
+        },
+    },
+
+    MuiToolbar: {
+        // TopBar widget src/core/components/Widgets/TopBar/TopBar.tsx
+        styleOverrides: {
+            root: ({ theme }) => ({
+                [theme.breakpoints.down("sm")]: {
+                    ...minHeightHeight44,
+                    padding: theme.spacing(0, 1),
+                },
+                [theme.breakpoints.up("sm")]: {
+                    ...minHeightHeight52,
+                },
+            }),
+        },
+    },
+
+    MuiBottomNavigation: {
+        styleOverrides: {
+            root: ({ theme }) => ({
+                [theme.breakpoints.down("sm")]: {
+                    ...minHeightHeight44,
+                },
+                [theme.breakpoints.up("sm")]: {
+                    ...minHeightHeight52,
+                },
+            }),
+        },
+    },
+
+    MuiBottomNavigationAction: {
+        styleOverrides: {
+            root: ({ theme }) => ({
+                minWidth: "auto",
+                [theme.breakpoints.down("sm")]: {
+                    padding: 0,
+                    "& .MuiSvgIcon-root": {
+                        fontSize: "1.1rem",
                     },
                 },
             }),
         },
     },
+
     MuiBackdrop: {
         styleOverrides: {
             root: {
@@ -123,6 +201,38 @@ export const inputsCustomizations: Components<Theme> = {
                 textDecoration: "none",
                 "&:hover": {
                     backgroundColor: (theme.vars || theme).palette.action.hover,
+                },
+            }),
+        },
+    },
+    MuiCard: {
+        styleOverrides: {
+            root: ({ theme }) => ({
+                [theme.breakpoints.down("sm")]: {
+                    padding: theme.spacing(1),
+                },
+            }),
+        },
+    },
+
+    MuiCardContent: {
+        styleOverrides: {
+            root: ({ theme }) => ({
+                [theme.breakpoints.down("sm")]: {
+                    padding: theme.spacing(1),
+                    "&:last-child": {
+                        paddingBottom: theme.spacing(1),
+                    },
+                },
+            }),
+        },
+    },
+
+    MuiCardActions: {
+        styleOverrides: {
+            root: ({ theme }) => ({
+                [theme.breakpoints.down("sm")]: {
+                    padding: theme.spacing(1),
                 },
             }),
         },

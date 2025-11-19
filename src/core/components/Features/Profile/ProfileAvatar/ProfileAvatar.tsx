@@ -9,6 +9,7 @@ import {
 import Badge from "@mui/material/Badge";
 import { enqueueSnackbar } from "notistack";
 import { Avatar } from "@app/core/components";
+import { useIsMobile } from "@app/core/hooks";
 import { QueryError } from "@app/core/interfaces";
 import { ChangeEvent, FC, RefObject, useState } from "react";
 import { GENERIC_ERROR_MESSAGE } from "@app/core/constants/general";
@@ -20,7 +21,7 @@ interface ProfileAvatarProps {
 }
 
 export const ProfileAvatar: FC<ProfileAvatarProps> = ({ profile }) => {
-    // TODO: refactor to avoid re-renders
+    const isMobile: boolean = useIsMobile();
     const [deletePhoto] = useDeleteProfilePhotoMutation();
     const [uploadPhoto] = useUploadPhotoMutation();
 
@@ -158,10 +159,9 @@ export const ProfileAvatar: FC<ProfileAvatarProps> = ({ profile }) => {
                         src={profile?.privatePhoto?.signedUrl}
                         onClick={onAvatarClick(PhotoUploadType.PRIVATE)}
                         sx={theme => ({
-                            width: 50,
-                            height: 50,
+                            width: isMobile ? 30 : 50,
+                            height: isMobile ? 30 : 50,
                             cursor: "pointer",
-                            background: (theme.vars || theme).palette.background.paper,
                             border: `2px solid ${(theme.vars || theme).palette.background.paper}`,
                         })}
                     />
@@ -174,7 +174,7 @@ export const ProfileAvatar: FC<ProfileAvatarProps> = ({ profile }) => {
                     src={profile?.publicPhoto?.signedUrl}
                     skeleton={{ width: 120, height: 120 }}
                     onClick={onAvatarClick(PhotoUploadType.PUBLIC)}
-                    sx={{ width: 120, height: 120, cursor: "pointer" }}
+                    sx={{ width: isMobile ? 90 : 120, height: isMobile ? 90 : 120, cursor: "pointer" }}
                 />
             </Badge>
             <input type="file" ref={fileInputRef} style={{ display: "none" }} onChange={handleAvatarChange} />

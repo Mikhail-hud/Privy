@@ -1,5 +1,6 @@
 import { FC, useState } from "react";
 import { Photo } from "@app/core/services";
+import { useIsMobile } from "@app/core/hooks";
 import { Avatar, UserAvatarBadge } from "@app/core/components";
 import { UserAvatarBackdrop } from "@app/features/userProfile/UserProfileCard/UserProfileAvatar/UserAvatarBackdrop";
 
@@ -13,6 +14,7 @@ interface ProfileAvatarProps {
 
 export const UserProfileAvatar: FC<ProfileAvatarProps> = memo(
     ({ privatePhoto, publicPhoto, isProfileIncognito, userName, canViewFullProfile }) => {
+        const isMobile: boolean = useIsMobile();
         const [open, setOpen] = useState<boolean>(false);
         const src: string | undefined = canViewFullProfile ? publicPhoto?.signedUrl : privatePhoto?.signedUrl;
         const alt: string = canViewFullProfile ? `avatar_${publicPhoto?.id}` : `avatar_${privatePhoto?.id}`;
@@ -29,7 +31,7 @@ export const UserProfileAvatar: FC<ProfileAvatarProps> = memo(
                         alt={alt}
                         userName={userName}
                         onClick={onAvatarClick}
-                        sx={{ width: 120, height: 120, cursor: "pointer" }}
+                        sx={{ width: isMobile ? 90 : 120, height: isMobile ? 90 : 120, cursor: "pointer" }}
                     />
                 </UserAvatarBadge>
                 <UserAvatarBackdrop

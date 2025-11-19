@@ -3,7 +3,6 @@ export const PROFILE_PAGE_PATH = "/profile";
 export const PROFILE_FAVORITES_TAB_PATH = "/profile/favorites";
 export const PROFILE_REPLIES_TAB_PATH = "/profile/replies";
 export const PROFILE_PHOTOS_TAB_PATH = "/profile/photos";
-export const PROFILE_REVEALS_TAB_PATH = "/profile/reveals";
 
 export const LOOKUP_PAGE_PATH = "/lookup";
 export const DIALOGS_PAGE_PATH = "/dialogs";

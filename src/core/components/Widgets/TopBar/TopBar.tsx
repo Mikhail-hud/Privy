@@ -4,6 +4,7 @@ import Badge from "@mui/material/Badge";
 import Paper from "@mui/material/Paper";
 import Toolbar from "@mui/material/Toolbar";
 import { Profile } from "@app/core/services";
+import { Reveals } from "@app/core/components";
 import IconButton from "@mui/material/IconButton";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import { AccountMenu } from "@app/core/components/Widgets/TopBar/AccountMenu";
@@ -19,9 +20,10 @@ export const TopBar: FC<TopBarProps> = memo(props => (
         <Toolbar sx={{ display: "flex", justifyContent: "space-between" }}>
             <AccountMenu {...props} />
             <Box>
+                <Reveals />
                 <IconButton size="large" color="inherit">
-                    <Badge badgeContent={17} color="error">
-                        <NotificationsIcon />
+                    <Badge badgeContent={17} color="primary">
+                        <NotificationsIcon color="action" />
                     </Badge>
                 </IconButton>
             </Box>

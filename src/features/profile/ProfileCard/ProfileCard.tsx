@@ -1,10 +1,9 @@
 import { FC } from "react";
-import Box from "@mui/material/Box";
 import { Outlet } from "react-router-dom";
 import { Profile, Tag, UserLink } from "@app/core/services";
 import { ProfileTabs } from "@app/features/profile/ProfileCard/ProfileTabs";
 import { EditProfileAction } from "@app/features/profile/ProfileCard/EditProfileAction";
-import { ProfileAvatar, ProfileCardContainer, Reveals, UserStats } from "@app/core/components";
+import { ProfileAvatar, ProfileCardContainer, UserStats } from "@app/core/components";
 
 interface ProfileCardProps {
     profile: Profile;
@@ -19,18 +18,7 @@ export const ProfileCard: FC<ProfileCardProps> = memo(({ profile }) => {
             avatar={<ProfileAvatar profile={profile} />}
             titleAction={<EditProfileAction profile={profile} />}
             cardAction={
-                <Box
-                    sx={{
-                        gap: 1,
-                        width: "100%",
-                        display: "flex",
-                        alignItems: "flex-start",
-                        justifyContent: "space-between",
-                    }}
-                >
-                    <UserStats followersCount={followersCount} followingCount={followingCount} userName={userName} />
-                    <Reveals />
-                </Box>
+                <UserStats followersCount={followersCount} followingCount={followingCount} userName={userName} />
             }
             links={userlinks}
             fullName={fullName}

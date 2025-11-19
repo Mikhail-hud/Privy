@@ -3,6 +3,7 @@ import Tabs from "@mui/material/Tabs";
 import Badge from "@mui/material/Badge";
 import Dialog from "@mui/material/Dialog";
 import { useIsMobile } from "@app/core/hooks";
+import IconButton from "@mui/material/IconButton";
 import DialogContent from "@mui/material/DialogContent";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import { Activity, FC, SyntheticEvent, useState } from "react";
@@ -32,18 +33,11 @@ export const Reveals: FC = memo(() => {
     };
     return (
         <>
-            <Badge
-                badgeContent={4}
-                anchorOrigin={{
-                    vertical: "top",
-                    horizontal: "left",
-                }}
-                color="primary"
-                onClick={handleOpen}
-                sx={{ cursor: "pointer" }}
-            >
-                <VisibilityIcon color="action" />
-            </Badge>
+            <IconButton size="large" color="inherit" onClick={handleOpen}>
+                <Badge badgeContent={4} color="primary">
+                    <VisibilityIcon color="action" />
+                </Badge>
+            </IconButton>
             <Dialog fullWidth open={open} maxWidth="sm" onClose={handleClose} fullScreen={isMobile}>
                 <>
                     <Tabs value={tab} onChange={handleChange} variant="fullWidth">
