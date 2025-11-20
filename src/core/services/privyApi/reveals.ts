@@ -79,6 +79,12 @@ export const revealsApi = privyApi.injectEndpoints({
                       ]
                     : [{ type: REVEAL_STATUS_TAG, id: "LIST" }],
         }),
+        getPeendingRevealRequestsCount: builder.query<{ count: number }, void>({
+            query: () => ({
+                url: "reveals/requests/count",
+            }),
+            providesTags: [{ type: REVEAL_STATUS_TAG, id: "COUNT" }],
+        }),
         sendRevealRequest: builder.mutation<RevealRequest, { userName: string }>({
             query: ({ userName }) => ({
                 url: `reveals/request/${userName}`,
@@ -152,6 +158,7 @@ export const revealsApi = privyApi.injectEndpoints({
                 }
 
                 dispatch(revealsApi.util.invalidateTags([{ type: REVEALED_LIST_TAG, id: "LIST" }]));
+                dispatch(revealsApi.util.invalidateTags([{ type: REVEAL_STATUS_TAG, id: "COUNT" }]));
             },
         }),
 
@@ -233,6 +240,7 @@ export const {
     useRevokeProfileRevealMutation,
     useRespondToRevealRequestMutation,
     useGetRevealedProfilesInfiniteQuery,
+    useGetPeendingRevealRequestsCountQuery,
     useDeleteRevealRequestByUserNameMutation,
     useGetPendingRevealRequestsInfiniteQuery,
 } = revealsApi;

@@ -7,16 +7,19 @@ import IconButton from "@mui/material/IconButton";
 import DialogContent from "@mui/material/DialogContent";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import { Activity, FC, SyntheticEvent, useState } from "react";
+import { useGetPeendingRevealRequestsCountQuery } from "@app/core/services";
+import { POLLING_INTERVAL, SKIP_TOKEN } from "@app/core/constants/general.ts";
 import { RevealRequests } from "@app/core/components/Features/User/Reveals/RevealRequests";
 import { RevealedProfiles } from "@app/core/components/Features/User/Reveals/RevealedProfiles";
 
 export type RevealsStatsType = "revealedProfiles" | "revealRequests";
 
 export const Reveals: FC = memo(() => {
-    const [open, setOpen] = useState(false);
     const isMobile: boolean = useIsMobile();
-
+    const [open, setOpen] = useState(false);
     const [tab, setTab] = useState<RevealsStatsType>("revealRequests");
+
+    const { data } = useGetPeendingRevealRequestsCountQuery(SKIP_TOKEN, { pollingInterval: POLLING_INTERVAL });
 
     const handleChange = (event: SyntheticEvent, newValue: RevealsStatsType): void => {
         event.stopPropagation();
@@ -34,7 +37,7 @@ export const Reveals: FC = memo(() => {
     return (
         <>
             <IconButton size="large" color="inherit" onClick={handleOpen}>
-                <Badge badgeContent={4} color="primary">
+                <Badge badgeContent={data?.count} color="primary">
                     <VisibilityIcon color="action" />
                 </Badge>
             </IconButton>
