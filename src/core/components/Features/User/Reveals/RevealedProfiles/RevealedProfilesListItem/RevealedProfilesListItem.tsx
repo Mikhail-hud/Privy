@@ -18,7 +18,7 @@ export const RevealedProfilesListItemComponent: FC<UserSummaryListItemProps> = (
         id,
         revealedTo: { userName, fullName, isProfileIncognito, publicPhoto, privatePhoto, canViewFullProfile },
     } = profileReveal;
-    const src: string | undefined = canViewFullProfile ? publicPhoto?.signedUrl : privatePhoto?.signedUrl;
+    const src: string | undefined = canViewFullProfile ? publicPhoto?.src : privatePhoto?.src;
     const alt: string = canViewFullProfile ? `avatar_${publicPhoto?.id}` : `avatar_${privatePhoto?.id}`;
 
     return (

@@ -156,7 +156,7 @@ export const ProfileAvatar: FC<ProfileAvatarProps> = ({ profile }) => {
                         userName={profile?.userName}
                         loading={isUploadingPrivatePhoto}
                         skeleton={{ width: 50, height: 50 }}
-                        src={profile?.privatePhoto?.signedUrl}
+                        src={profile?.privatePhoto?.src}
                         onClick={onAvatarClick(PhotoUploadType.PRIVATE)}
                         sx={theme => ({
                             width: isMobile ? 30 : 50,
@@ -171,7 +171,7 @@ export const ProfileAvatar: FC<ProfileAvatarProps> = ({ profile }) => {
                     alt="public_photo"
                     userName={profile?.userName}
                     loading={isUploadingPublicPhoto}
-                    src={profile?.publicPhoto?.signedUrl}
+                    src={profile?.publicPhoto?.src}
                     skeleton={{ width: 120, height: 120 }}
                     onClick={onAvatarClick(PhotoUploadType.PUBLIC)}
                     sx={{ width: isMobile ? 90 : 120, height: isMobile ? 90 : 120, cursor: "pointer" }}

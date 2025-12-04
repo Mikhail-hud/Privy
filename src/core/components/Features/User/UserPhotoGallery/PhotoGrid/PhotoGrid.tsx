@@ -34,8 +34,10 @@ export const PhotoGrid: FC<PhotoGridProps> = memo(({ photos, isOwner, onImageCli
                 <ImageListItem key={item.id}>
                     <img
                         loading="lazy"
-                        alt={item.signedUrl}
-                        src={item.signedUrl}
+                        alt={item.src}
+                        // TODO: Use proper image resizing service
+                        srcSet={`${item.src}?w=161&fit=crop&auto=format&dpr=2 2x`}
+                        src={`${item.src}?w=161&fit=crop&auto=format`}
                         style={{ cursor: "pointer" }}
                         onClick={onImageClick(index, item)}
                     />

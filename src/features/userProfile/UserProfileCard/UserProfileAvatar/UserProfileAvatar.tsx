@@ -16,7 +16,7 @@ export const UserProfileAvatar: FC<ProfileAvatarProps> = memo(
     ({ privatePhoto, publicPhoto, isProfileIncognito, userName, canViewFullProfile }) => {
         const isMobile: boolean = useIsMobile();
         const [open, setOpen] = useState<boolean>(false);
-        const src: string | undefined = canViewFullProfile ? publicPhoto?.signedUrl : privatePhoto?.signedUrl;
+        const src: string | undefined = canViewFullProfile ? publicPhoto?.src : privatePhoto?.src;
         const alt: string = canViewFullProfile ? `avatar_${publicPhoto?.id}` : `avatar_${privatePhoto?.id}`;
 
         const onAvatarClick = (): void => setOpen(true);

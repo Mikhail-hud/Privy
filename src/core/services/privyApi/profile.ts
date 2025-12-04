@@ -31,7 +31,7 @@ export interface Photo {
     mimeType: string;
     caption: string | null;
     originalFilename: string;
-    signedUrl: string;
+    src: string;
 }
 
 export type ProfileUpdatePayload = Partial<

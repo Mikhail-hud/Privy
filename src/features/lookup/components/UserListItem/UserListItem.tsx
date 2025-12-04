@@ -9,9 +9,7 @@ interface UserListItemProps {
 }
 
 const UserListItemComponent: FC<UserListItemProps> = ({ user, isLast }) => {
-    const src: string | undefined = user.canViewFullProfile
-        ? user?.publicPhoto?.signedUrl
-        : user?.privatePhoto?.signedUrl;
+    const src: string | undefined = user.canViewFullProfile ? user?.publicPhoto?.src : user?.privatePhoto?.src;
     const alt: string = user.canViewFullProfile
         ? `avatar_${user?.publicPhoto?.id}`
         : `avatar_${user?.privatePhoto?.id}`;

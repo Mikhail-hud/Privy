@@ -40,7 +40,7 @@ export const AvatarBackdrop: React.FC<AvatarBackdropContentProps> = ({
 }) => {
     // TODO: Optimize re-renders
     const isPublicPhoto = photoType === PhotoUploadType.PUBLIC;
-    const currentPhotoUrl = isPublicPhoto ? profile?.publicPhoto?.signedUrl : profile?.privatePhoto?.signedUrl;
+    const src = isPublicPhoto ? profile?.publicPhoto?.src : profile?.privatePhoto?.src;
     const currentPhotoId = isPublicPhoto ? profile?.publicPhoto?.id : profile?.privatePhoto?.id;
     const isDeleting = isPublicPhoto ? isDeletingProfilePhoto : isDeletingIncognitoPhoto;
 
@@ -54,16 +54,16 @@ export const AvatarBackdrop: React.FC<AvatarBackdropContentProps> = ({
                     </Typography>
                 </Box>
                 <Box sx={{ flexGrow: 1, display: "flex", justifyContent: "center", alignItems: "center" }}>
-                    {currentPhotoUrl ? (
+                    {src ? (
                         <img
-                            src={currentPhotoUrl}
+                            src={src}
                             alt={isPublicPhoto ? "public_photo" : "private_photo"}
                             style={{ maxWidth: "80vw", maxHeight: "80vh", borderRadius: "2px" }}
                         />
                     ) : (
                         <Avatar
+                            src={src}
                             loading={isUploading}
-                            src={currentPhotoUrl}
                             userName={profile?.userName}
                             sx={{ width: 250, height: 250 }}
                             skeleton={{ width: 250, height: 250 }}

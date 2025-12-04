@@ -42,7 +42,7 @@ export const AccountMenu: FC<AccountMenuProps> = memo(({ signOut, profile, onAcc
                     <Avatar
                         alt="public_photo"
                         userName={profile?.userName}
-                        src={profile.publicPhoto?.signedUrl}
+                        src={profile.publicPhoto?.src}
                         sx={{ width: 32, height: 32 }}
                         skeleton={{ width: 32, height: 32 }}
                     />
