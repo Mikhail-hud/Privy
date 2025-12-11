@@ -1,20 +1,16 @@
 /**
- * Loader for profile photos, used in profile tabs.
- * Fetches photos from the cache if available, otherwise dispatches an API call.
- * Redirects to the profile page on error.
  * @file src/features/profile/ProfileCard/ProfileTabs/loaders/profilePhotosLoader.tsx
+ * React Router loader for profile photos in profile tabs. Fetches photos from cache if available,
+ * otherwise dispatches an API call. Redirects to the profile page on error.
  */
 
-import { store } from "@app/core/store";
 import { redirect } from "react-router-dom";
 import { enqueueSnackbar } from "notistack";
-import { QueryError } from "@app/core/interfaces";
-import { Photo, profileApi } from "@app/core/services";
 import { PROFILE_PAGE_PATH } from "@app/core/constants/pathConstants";
-import { GENERIC_ERROR_MESSAGE } from "@app/core/constants/general.ts";
+import { Photo, profileApi, queryClient, PROFILE_KEYS, ApiError } from "@app/core/services";
 
 /**
- * User photos context made available to route elements.
+ * Data shape provided to route elements after successful photo load.
  * @property photos Array of user photos returned by the `getProfilePhotos` endpoint.
  */
 export interface UserPhotosContext {
@@ -22,17 +18,16 @@ export interface UserPhotosContext {
 }
 
 /**
- * React Router loader that resolves the current user's profile photos for profile tab routes.
+ * React Router loader for resolving the current user's profile photos in profile tab routes.
  *
  * Flow:
- * 1. Reads cached `getProfilePhotos` a query result from the Redux store (RTK Query selector).
- * 2. If the cached query is successful, returns the photos without a network request.
- * 3. Otherwise, dispatches `profileApi.endpoints.getProfilePhotos.initiate()` to fetch photos.
- * 4. On success returns `{ photos }`.
- * 5. On failure (e.g., network error) returns a redirect `Response` to the profile page.
- * 6. Always unsubscribes the initiated query subscription in `finally` to prevent leaks.
+ * 1. Checks cache for profile photos.
+ * 2. If cached, returns the photos.
+ * 3. Otherwise, fetches photos via API.
+ * 4. On success, returns `{ photos }`.
+ * 5. On failure (network error), shows an error notification and redirects to the profile page.
  *
- * No errors are thrown outward: failures are normalized into a redirect.
+ * All errors are handled internally; no exceptions are thrown outward.
  *
  * @returns {Promise<UserPhotosContext | Response>} Resolves with user photos context or a redirect response.
  *
@@ -46,20 +41,20 @@ export interface UserPhotosContext {
  * },
  */
 export const profilePhotosLoader = async (): Promise<UserPhotosContext | Response> => {
-    const photosInCache = profileApi.endpoints.getProfilePhotos.select()(store.getState());
-
-    if (photosInCache.isSuccess) return { photos: photosInCache.data };
-
-    const promise = store.dispatch(profileApi.endpoints.getProfilePhotos.initiate());
+    // Check cache first
+    const cachedPhotos: Photo[] | undefined = queryClient.getQueryData<Photo[]>(PROFILE_KEYS.photos());
+    if (cachedPhotos) {
+        return { photos: cachedPhotos };
+    }
 
     try {
-        const photos: Photo[] = await promise.unwrap();
+        const photos: Photo[] = await queryClient.fetchQuery({
+            queryKey: PROFILE_KEYS.photos(),
+            queryFn: profileApi.getProfilePhotos,
+        });
         return { photos };
     } catch (error) {
-        const errorMessage = (error as QueryError)?.data?.message?.toString() || GENERIC_ERROR_MESSAGE;
-        enqueueSnackbar(errorMessage, { variant: "error" });
+        enqueueSnackbar((error as ApiError)?.message, { variant: "error" });
         return redirect(PROFILE_PAGE_PATH);
-    } finally {
-        promise.unsubscribe();
     }
 };

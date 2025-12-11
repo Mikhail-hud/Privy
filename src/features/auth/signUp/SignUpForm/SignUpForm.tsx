@@ -49,7 +49,6 @@ export const SignUpForm: FC = () => {
     const { signUp } = useAuth();
     const navigation: Navigation = useNavigation();
     const actionData = useActionData() as { error: string; errors: Record<string, string> };
-
     const form = useForm<SignUpFormValues>({
         mode: "onChange",
         defaultValues: DEFAULT_SIGN_UP_FORM_VALUES,

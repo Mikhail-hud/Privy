@@ -6,7 +6,7 @@ interface InfiniteScrollListProps<T> {
     data: T[];
     loader?: FC;
     isLoading: boolean;
-    isFetching: boolean;
+    isFetching?: boolean;
     loaderCount?: number;
     fetchNextPage: () => void;
     isFetchingNextPage: boolean;

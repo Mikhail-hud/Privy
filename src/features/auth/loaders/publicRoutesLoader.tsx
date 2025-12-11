@@ -1,29 +1,22 @@
-import { store } from "@app/core/store";
 import { redirect } from "react-router-dom";
-import { authApi } from "@app/core/services";
+import { AUTH_KEYS, Profile, queryClient } from "@app/core/services";
 import { PROFILE_PAGE_PATH } from "@app/core/constants/pathConstants";
 
 /**
- * Loader function to restrict access to guest-only routes.
+ * Loader for guest-only routes.
  *
- * This function checks if the user is authenticated by querying the Redux store
- * for the result of the "me" endpoint from the auth API. If the user is authenticated,
- * they are redirected to the profile page. Otherwise, the route is accessible.
+ * Checks if the user is authenticated by retrieving cached profile data.
+ * - If authenticated, redirects to the profile page.
+ * - If not authenticated, allows access to the route.
  *
- * @returns {Response> | null} A redirect response to the profile page if the user is authenticated, or null if the user is not authenticated.
+ * @returns {Response | null} Redirect response if authenticated, otherwise null.
  */
 export const publicRoutesLoader = (): Response | null => {
-    // Retrieve the current state of the Redux store
-    const state = store.getState();
+    const cachedUser: Profile | undefined = queryClient.getQueryData<Profile>(AUTH_KEYS.me());
 
-    // Select the result of the "me" endpoint from the auth API
-    const result = authApi.endpoints.me.select()(state);
-
-    // If the user is authenticated (a result is successful), redirect to the profile page
-    if (result.isSuccess) {
+    if (cachedUser) {
         return redirect(PROFILE_PAGE_PATH);
     }
 
-    // If the user is not authenticated, allow access to the guest-only route
     return null;
 };

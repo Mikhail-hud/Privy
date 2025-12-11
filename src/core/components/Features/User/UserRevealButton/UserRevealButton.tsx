@@ -2,12 +2,11 @@ import { FC, MouseEvent } from "react";
 import Button from "@mui/material/Button";
 import { enqueueSnackbar } from "notistack";
 import { useIsMobile } from "@app/core/hooks";
-import { QueryError } from "@app/core/interfaces";
-import { GENERIC_ERROR_MESSAGE } from "@app/core/constants/general.ts";
 import {
     RevealStatus,
     useSendRevealRequestMutation,
     useDeleteRevealRequestByUserNameMutation,
+    ApiError,
 } from "@app/core/services";
 
 type StatusKey = RevealStatus.PENDING | RevealStatus.REJECTED | RevealStatus.NONE;
@@ -47,23 +46,24 @@ const getStatusButtonProps = (status: StatusKey) => statusConfig[status ?? Revea
 
 export const UserRevealButton: FC<UserRevealButtonProps> = memo(({ userName, size = "medium", status }) => {
     const isMobile: boolean = useIsMobile();
-    const [sendRevealRequest, { isLoading: isRevealRequestSending }] = useSendRevealRequestMutation();
-    const [deleteRevealRequest, { isLoading: isRevealRequestDeleting }] = useDeleteRevealRequestByUserNameMutation();
+    const { mutateAsync: sendRevealRequest, isPending: isRevealRequestSending } = useSendRevealRequestMutation();
+    const { mutateAsync: deleteRevealRequest, isPending: isRevealRequestDeleting } =
+        useDeleteRevealRequestByUserNameMutation();
 
     const handleSendRevealRequest = async (userName: string): Promise<void> => {
         try {
-            await sendRevealRequest({ userName }).unwrap();
+            await sendRevealRequest(userName);
         } catch (error) {
-            const errorMessage: string = (error as QueryError)?.data?.message?.toString() || GENERIC_ERROR_MESSAGE;
+            const errorMessage: string = (error as ApiError)?.message;
             enqueueSnackbar(errorMessage, { variant: "error" });
         }
     };
 
     const handleDeletRevealRequest = async (userName: string): Promise<void> => {
         try {
-            await deleteRevealRequest({ userName }).unwrap();
+            await deleteRevealRequest(userName);
         } catch (error) {
-            const errorMessage: string = (error as QueryError)?.data?.message?.toString() || GENERIC_ERROR_MESSAGE;
+            const errorMessage: string = (error as ApiError)?.message;
             enqueueSnackbar(errorMessage, { variant: "error" });
         }
     };

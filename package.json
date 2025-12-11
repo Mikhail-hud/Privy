@@ -1,83 +1,83 @@
 {
-  "name": "Privy Space",
-  "version": "1.0.0",
-  "description": "Incognito social media",
-  "main": "index.js",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/Mikhail-hud/privy.git"
-  },
-  "keywords": [
-    "social",
-    "media"
-  ],
-  "include": [
-    "src"
-  ],
-  "author": "MHud",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/Mikhail-hud/privy/issues"
-  },
-  "homepage": "https://github.com/Mikhail-hud/privy#readme",
-  "scripts": {
-    "start": "vite",
-    "build": "vite build",
-    "preview": "vite preview",
-    "format": "prettier --write \"./src/**/*.{js,jsx,ts,tsx,json,css,scss,md}\"",
-    "lint": "eslint 'src/**/*.{js,ts,tsx}'",
-    "typecheck": "tsc --noEmit",
-    "test": "vitest run",
-    "test:coverage": "vitest --coverage"
-  },
-  "devDependencies": {
-    "@testing-library/jest-dom": "^6.6.3",
-    "@testing-library/react": "^16.3.0",
-    "@testing-library/user-event": "^14.6.1",
-    "@types/react": "^19.2.2",
-    "@types/react-dom": "^19.2.1",
-    "@types/react-redux": "^7.1.34",
-    "@vitejs/plugin-react": "^4.7.0",
-    "@vitest/coverage-v8": "^3.2.4",
-    "eslint": "^9.37.0",
-    "eslint-config-prettier": "^10.1.8",
-    "eslint-import-resolver-typescript": "^4.4.4",
-    "eslint-plugin-import": "^2.32.0",
-    "eslint-plugin-jsx-a11y": "^6.10.2",
-    "eslint-plugin-prettier": "^5.5.4",
-    "eslint-plugin-react": "^7.37.5",
-    "eslint-plugin-react-hooks": "^6.1.1",
-    "globals": "^16.4.0",
-    "jsdom": "^26.1.0",
-    "prettier": "^3.6.2",
-    "rollup-plugin-visualizer": "^5.14.0",
-    "sass": "^1.49.8",
-    "typescript": "^5.4.5",
-    "typescript-eslint": "^8.46.0",
-    "unplugin-auto-import": "^20.2.0",
-    "vite": "^7.1.9",
-    "vitest": "^3.2.4",
-    "vitest-sonar-reporter": "^2.0.0"
-  },
-  "dependencies": {
-    "@emotion/css": "^11.13.5",
-    "@emotion/react": "^11.14.0",
-    "@emotion/styled": "^11.14.1",
-    "@mui/icons-material": "^7.2.0",
-    "@mui/material": "^7.2.0",
-    "@mui/x-date-pickers": "^8.11.1",
-    "@reduxjs/toolkit": "^2.8.1",
-    "axios": "1.8.2",
-    "dayjs": "^1.11.18",
-    "mui-one-time-password-input": "^5.0.0",
-    "nanoid": "^5.1.5",
-    "notistack": "^3.0.2",
-    "react": "^19.2.0",
-    "react-dom": "^19.2.0",
-    "react-hook-form": "^7.59.0",
-    "react-infinite-scroll-component": "^6.1.0",
-    "react-redux": "^9.2.0",
-    "react-router-dom": "^6.30.0",
-    "swiper": "^11.2.10"
-  }
+    "name": "Privy Space",
+    "version": "1.0.0",
+    "description": "Incognito social media",
+    "main": "index.js",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/Mikhail-hud/privy.git"
+    },
+    "keywords": [
+        "social",
+        "media"
+    ],
+    "include": [
+        "src"
+    ],
+    "author": "MHud",
+    "license": "ISC",
+    "bugs": {
+        "url": "https://github.com/Mikhail-hud/privy/issues"
+    },
+    "homepage": "https://github.com/Mikhail-hud/privy#readme",
+    "scripts": {
+        "start": "vite",
+        "build": "vite build",
+        "preview": "vite preview",
+        "format": "prettier --write \"./src/**/*.{js,jsx,ts,tsx,json,css,scss,md}\"",
+        "lint": "eslint 'src/**/*.{js,ts,tsx}'",
+        "typecheck": "tsc --noEmit",
+        "test": "vitest run",
+        "test:coverage": "vitest --coverage"
+    },
+    "devDependencies": {
+        "@testing-library/jest-dom": "^6.6.3",
+        "@testing-library/react": "^16.3.0",
+        "@testing-library/user-event": "^14.6.1",
+        "@types/react": "^19.2.2",
+        "@types/react-dom": "^19.2.1",
+        "@types/react-redux": "^7.1.34",
+        "@vitejs/plugin-react": "^4.7.0",
+        "@vitest/coverage-v8": "^3.2.4",
+        "eslint": "^9.37.0",
+        "eslint-config-prettier": "^10.1.8",
+        "eslint-import-resolver-typescript": "^4.4.4",
+        "eslint-plugin-import": "^2.32.0",
+        "eslint-plugin-jsx-a11y": "^6.10.2",
+        "eslint-plugin-prettier": "^5.5.4",
+        "eslint-plugin-react": "^7.37.5",
+        "eslint-plugin-react-hooks": "^6.1.1",
+        "globals": "^16.4.0",
+        "jsdom": "^26.1.0",
+        "prettier": "^3.6.2",
+        "rollup-plugin-visualizer": "^5.14.0",
+        "sass": "^1.49.8",
+        "typescript": "^5.4.5",
+        "typescript-eslint": "^8.46.0",
+        "unplugin-auto-import": "^20.2.0",
+        "vite": "7.2.6",
+        "vitest": "^3.2.4",
+        "vitest-sonar-reporter": "^2.0.0"
+    },
+    "dependencies": {
+        "@emotion/css": "^11.13.5",
+        "@emotion/react": "^11.14.0",
+        "@emotion/styled": "^11.14.1",
+        "@mui/icons-material": "^7.2.0",
+        "@mui/material": "^7.2.0",
+        "@mui/x-date-pickers": "^8.11.1",
+        "@tanstack/react-query": "^5.90.12",
+        "@tanstack/react-query-devtools": "^5.91.1",
+        "axios": "1.12.0",
+        "dayjs": "^1.11.18",
+        "mui-one-time-password-input": "^5.0.0",
+        "nanoid": "^5.1.5",
+        "notistack": "^3.0.2",
+        "react": "^19.2.0",
+        "react-dom": "^19.2.0",
+        "react-hook-form": "^7.59.0",
+        "react-infinite-scroll-component": "^6.1.0",
+        "react-router-dom": "^6.30.0",
+        "swiper": "^11.2.10"
+    }
 }

@@ -2,9 +2,7 @@ import Button from "@mui/material/Button";
 import { enqueueSnackbar } from "notistack";
 import { useIsMobile } from "@app/core/hooks";
 import { FC, MouseEvent, useState } from "react";
-import { QueryError } from "@app/core/interfaces";
-import { useRevokeProfileRevealMutation } from "@app/core/services";
-import { GENERIC_ERROR_MESSAGE } from "@app/core/constants/general.ts";
+import { ApiError, useRevokeProfileRevealMutation } from "@app/core/services";
 
 import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from "@mui/material";
 
@@ -16,7 +14,7 @@ interface RevokeProfileRevealButtonProps {
 
 export const RevokeProfileRevealButton: FC<RevokeProfileRevealButtonProps> = ({ size = "medium", userName }) => {
     const isMobile: boolean = useIsMobile();
-    const [revokeRevial, { isLoading }] = useRevokeProfileRevealMutation();
+    const { mutateAsync: revokeRevial, isPending } = useRevokeProfileRevealMutation();
 
     const [open, setOpen] = useState(false);
 
@@ -26,10 +24,10 @@ export const RevokeProfileRevealButton: FC<RevokeProfileRevealButtonProps> = ({ 
 
     const handleRevokeConfirm = async (): Promise<void> => {
         try {
-            await revokeRevial({ userName }).unwrap();
+            await revokeRevial(userName);
             enqueueSnackbar("Profile access revoked", { variant: "success" });
         } catch (error) {
-            const errorMessage: string = (error as QueryError)?.data?.message?.toString() || GENERIC_ERROR_MESSAGE;
+            const errorMessage: string = (error as ApiError)?.message;
             enqueueSnackbar(errorMessage, { variant: "error" });
         } finally {
             handleClose();
@@ -42,7 +40,7 @@ export const RevokeProfileRevealButton: FC<RevokeProfileRevealButtonProps> = ({ 
         <>
             <Button
                 color="primary"
-                loading={isLoading}
+                loading={isPending}
                 variant="contained"
                 onClick={handleClickOpen}
                 size={isMobile ? "small" : size}
@@ -60,11 +58,11 @@ export const RevokeProfileRevealButton: FC<RevokeProfileRevealButtonProps> = ({ 
                     </DialogContentText>
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={handleClose} disabled={isLoading}>
+                    <Button onClick={handleClose} disabled={isPending}>
                         Cancel
                     </Button>
-                    <Button onClick={handleRevokeConfirm} color="error" disabled={isLoading}>
-                        {isLoading ? "Revoking..." : "Yes, revoke"}
+                    <Button onClick={handleRevokeConfirm} color="error" disabled={isPending}>
+                        {isPending ? "Revoking..." : "Yes, revoke"}
                     </Button>
                 </DialogActions>
             </Dialog>

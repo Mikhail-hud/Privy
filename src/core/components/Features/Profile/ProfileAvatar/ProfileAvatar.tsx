@@ -5,14 +5,13 @@ import {
     useUnsetPublicPhotoMutation,
     useUnsetPrivatePhotoMutation,
     useDeleteProfilePhotoMutation,
+    ApiError,
 } from "@app/core/services";
 import Badge from "@mui/material/Badge";
 import { enqueueSnackbar } from "notistack";
 import { Avatar } from "@app/core/components";
 import { useIsMobile } from "@app/core/hooks";
-import { QueryError } from "@app/core/interfaces";
 import { ChangeEvent, FC, RefObject, useState } from "react";
-import { GENERIC_ERROR_MESSAGE } from "@app/core/constants/general";
 import { FILE_PATTERN, FILE_SIZE } from "@app/core/constants/patterns";
 import { AvatarBackdrop } from "@app/core/components/Features/Profile/ProfileAvatar/AvatarBackdrop";
 
@@ -22,8 +21,12 @@ interface ProfileAvatarProps {
 
 export const ProfileAvatar: FC<ProfileAvatarProps> = ({ profile }) => {
     const isMobile: boolean = useIsMobile();
-    const [deletePhoto] = useDeleteProfilePhotoMutation();
-    const [uploadPhoto] = useUploadPhotoMutation();
+
+    const { mutateAsync: deletePhoto } = useDeleteProfilePhotoMutation();
+    const { mutateAsync: uploadPhoto } = useUploadPhotoMutation();
+
+    const { mutateAsync: unsetPrivatePhoto, isPending: isUnSettingPrivatePhoto } = useUnsetPrivatePhotoMutation();
+    const { mutateAsync: unsetPublicPhoto, isPending: isUnSettingPublicPhoto } = useUnsetPublicPhotoMutation();
 
     const [isDeletingPublicPhoto, setIsDeletingPublicPhoto] = useState<boolean>(false);
     const [isDeletingPrivatePhoto, setIsDeletingPrivatePhoto] = useState<boolean>(false);
@@ -33,9 +36,6 @@ export const ProfileAvatar: FC<ProfileAvatarProps> = ({ profile }) => {
 
     const [isUploadingPublicPhoto, setIsUploadingPublicPhoto] = useState<boolean>(false);
     const [isUploadingPrivatePhoto, setIsUploadingPrivatePhoto] = useState<boolean>(false);
-
-    const [unsetPrivatePhoto, { isLoading: isUnSettingPrivatePhoto }] = useUnsetPrivatePhotoMutation();
-    const [unsetPublicPhoto, { isLoading: isUnSettingPublicPhoto }] = useUnsetPublicPhotoMutation();
 
     const [uploadType, setUploadType] = useState<PhotoUploadType>(PhotoUploadType.PUBLIC);
 
@@ -72,9 +72,9 @@ export const ProfileAvatar: FC<ProfileAvatarProps> = ({ profile }) => {
             setIsDeletingPrivatePhoto(true);
         }
         try {
-            await deletePhoto(id).unwrap();
+            await deletePhoto(id);
         } catch (error) {
-            const errorMessage: string = (error as QueryError)?.data?.message?.toString() || GENERIC_ERROR_MESSAGE;
+            const errorMessage: string = (error as ApiError)?.message;
             enqueueSnackbar(errorMessage, { variant: "error" });
         } finally {
             if (type === PhotoUploadType.PUBLIC) {
@@ -112,9 +112,9 @@ export const ProfileAvatar: FC<ProfileAvatarProps> = ({ profile }) => {
                     enqueueSnackbar("File size must not exceed 15 MB", { variant: "error" });
                     return;
                 }
-                await uploadPhoto({ file, type: uploadType }).unwrap();
+                await uploadPhoto({ file, type: uploadType });
             } catch (error) {
-                const errorMessage: string = (error as QueryError)?.data?.message?.toString() || GENERIC_ERROR_MESSAGE;
+                const errorMessage: string = (error as ApiError)?.message;
                 enqueueSnackbar(errorMessage, { variant: "error" });
             } finally {
                 if (event.target) event.target.value = "";
@@ -129,18 +129,18 @@ export const ProfileAvatar: FC<ProfileAvatarProps> = ({ profile }) => {
 
     const handlUnsetPublicPhoto = async (): Promise<void> => {
         try {
-            await unsetPublicPhoto().unwrap();
+            await unsetPublicPhoto(undefined);
         } catch (error) {
-            const errorMessage: string = (error as QueryError)?.data?.message?.toString() || GENERIC_ERROR_MESSAGE;
+            const errorMessage: string = (error as ApiError)?.message;
             enqueueSnackbar(errorMessage, { variant: "error" });
         }
     };
 
     const handleUnsetPrivatePhoto = async (): Promise<void> => {
         try {
-            await unsetPrivatePhoto().unwrap();
+            await unsetPrivatePhoto(undefined);
         } catch (error) {
-            const errorMessage: string = (error as QueryError)?.data?.message?.toString() || GENERIC_ERROR_MESSAGE;
+            const errorMessage: string = (error as ApiError)?.message;
             enqueueSnackbar(errorMessage, { variant: "error" });
         }
     };

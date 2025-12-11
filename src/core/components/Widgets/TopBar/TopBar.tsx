@@ -19,7 +19,7 @@ export const TopBar: FC<TopBarProps> = memo(props => (
     <Paper elevation={0} component="header" sx={{ top: 0, position: "sticky", zIndex: theme => theme.zIndex.appBar }}>
         <Toolbar sx={{ display: "flex", justifyContent: "space-between" }}>
             <AccountMenu {...props} />
-            <Box>
+            <Box sx={{ flexWrap: "nowrap", display: "flex" }}>
                 <Reveals />
                 <IconButton size="large" color="inherit">
                     <Badge badgeContent={17} color="primary">

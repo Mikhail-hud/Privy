@@ -4,14 +4,12 @@ import { enqueueSnackbar } from "notistack";
 import Divider from "@mui/material/Divider";
 import { useIsMobile } from "@app/core/hooks";
 import { FC, MouseEvent, useState } from "react";
-import { QueryError } from "@app/core/interfaces";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { transformServerErrors } from "@app/core/utils/general";
-import { GENERIC_ERROR_MESSAGE } from "@app/core/constants/general";
 import { VALIDATE_RELES } from "@app/core/constants/rulesConstants";
-import { ProfileUpdatePayload, Profile, UserGender, useUpdateProfileMutation } from "@app/core/services";
+import { ProfileUpdatePayload, Profile, UserGender, useUpdateProfileMutation, ApiError } from "@app/core/services";
 import { BirthDate, Biography, FullName, Gender, Switch, Interests, UserLinks } from "@app/core/components";
 
 export const PROFILE_FORM_FIELDS = {
@@ -45,7 +43,7 @@ interface EditProfileActionProps {
 
 export const EditProfileAction: FC<EditProfileActionProps> = memo(({ profile }) => {
     const isMobile: boolean = useIsMobile();
-    const [updateProfile, { isLoading, error }] = useUpdateProfileMutation();
+    const { mutateAsync: updateProfile, isPending, error } = useUpdateProfileMutation();
     const [open, setOpen] = useState<boolean>(false);
 
     const values: ProfileFormValues = {
@@ -59,7 +57,7 @@ export const EditProfileAction: FC<EditProfileActionProps> = memo(({ profile }) 
     const form = useForm<ProfileFormValues>({
         mode: "onChange",
         defaultValues: DEFAULT_SIGN_UP_FORM_VALUES,
-        errors: transformServerErrors((error as QueryError)?.data?.errors),
+        errors: transformServerErrors((error as unknown as ApiError)?.errors),
     });
 
     const { handleSubmit, control } = form;
@@ -73,10 +71,10 @@ export const EditProfileAction: FC<EditProfileActionProps> = memo(({ profile }) 
 
     const onValidSubmit: SubmitHandler<ProfileFormValues> = async data => {
         try {
-            await updateProfile(data as ProfileUpdatePayload).unwrap();
+            await updateProfile(data as ProfileUpdatePayload);
             handleClose();
         } catch (error) {
-            enqueueSnackbar((error as QueryError)?.data?.message?.toString() || GENERIC_ERROR_MESSAGE, {
+            enqueueSnackbar((error as ApiError)?.message, {
                 variant: "error",
             });
         }
@@ -132,10 +130,10 @@ export const EditProfileAction: FC<EditProfileActionProps> = memo(({ profile }) 
                     />
                 </DialogContent>
                 <DialogActions sx={{ pb: 3, px: 3 }}>
-                    <Button onClick={handleClose} disabled={isLoading}>
+                    <Button onClick={handleClose} disabled={isPending}>
                         Cancel
                     </Button>
-                    <Button variant="contained" type="submit" loadingPosition="start" loading={isLoading}>
+                    <Button variant="contained" type="submit" loadingPosition="start" loading={isPending}>
                         Save
                     </Button>
                 </DialogActions>

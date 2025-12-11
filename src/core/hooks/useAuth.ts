@@ -4,10 +4,10 @@
  * and exposing imperative actions for sign in (credentials + 2FA), sign up, and sign out.
  */
 
-import { SKIP_TOKEN } from "@app/core/constants/general";
-import { SubmitFunction, useSubmit } from "react-router-dom";
-import { SignInFormValues } from "@app/features/auth/signIn/SignInForm";
+import { useCallback, useMemo } from "react";
 import { SignUpFormValues } from "@app/features/auth/signUp/SignUpForm";
+import { SignInFormValues } from "@app/features/auth/signIn/SignInForm";
+import { SubmitFunction, useSubmit, useLocation } from "react-router-dom";
 import { Profile, TwoFactorSignInPayload, useGetProfileQuery } from "@app/core/services";
 import { PUBLIC_ROUTES, SIGN_OUT_ACTION_ONLY_PATH } from "@app/core/constants/pathConstants";
 import { SIGN_IN_ACTION_KEY, SIGN_IN_WITH_CREDENTIALS, SIGN_IN_WITH_TWO_FACTOR } from "@app/features";
@@ -49,7 +49,7 @@ export const useAuth = (): UseAuth => {
     /** Determine if the current route is public (no profile load needed) */
     const isPublicPage: boolean = PUBLIC_ROUTES.some(route => route === location.pathname);
 
-    const { data, isLoading, isFetching } = useGetProfileQuery(SKIP_TOKEN, { skip: isPublicPage });
+    const { data, isLoading, isFetching } = useGetProfileQuery({ enabled: !isPublicPage });
 
     /** Dispatches a sign-out action POST to invalidate the session server-side. */
     const signOut = useCallback(

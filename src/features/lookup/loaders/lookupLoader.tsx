@@ -5,15 +5,12 @@
  * @file src/features/lookup/loaders/lookupLoader.tsx
  */
 
-import { store } from "@app/core/store";
 import { redirect } from "react-router-dom";
 import { enqueueSnackbar } from "notistack";
-import { QueryError } from "@app/core/interfaces";
-import { InfiniteData } from "@reduxjs/toolkit/query";
+import { InfiniteData } from "@tanstack/react-query";
 import { PROFILE_PAGE_PATH } from "@app/core/constants/pathConstants";
-import { GENERIC_ERROR_MESSAGE } from "@app/core/constants/general.ts";
-import { PAGE_SIZE_LIMITS } from "@app/core/constants/ParamsConstants.ts";
-import { QueryParams, User, UserListResponse, usersApi } from "@app/core/services";
+import { PAGE_SIZE_LIMITS, INITIAL_PAGE_PARAM } from "@app/core/constants/ParamsConstants.ts";
+import { QueryParams, User, UserListResponse, usersApi, queryClient, USERS_KEYS, ApiError } from "@app/core/services";
 
 /**
  * User list context made available to route elements.
@@ -50,24 +47,24 @@ export interface UsersContext {
 export const lookupLoader = async (): Promise<UsersContext | Response> => {
     const params = { query: "", limit: PAGE_SIZE_LIMITS.DEFAULT };
 
-    const usersInCache = usersApi.endpoints.getUsers.select(params)(store.getState());
-
-    if (usersInCache.isSuccess) {
-        const users: User[] = usersInCache?.data?.pages.flatMap(page => page.data) ?? [];
+    // Check cache first
+    const cachedData = queryClient.getQueryData<InfiniteData<UserListResponse>>(USERS_KEYS.list(params));
+    if (cachedData) {
+        const users: User[] = cachedData.pages.flatMap(page => page.data);
         return { users, params };
     }
 
-    const promise = store.dispatch(usersApi.endpoints.getUsers.initiate(params));
-
     try {
-        const initialUsers: InfiniteData<UserListResponse, number> = await promise.unwrap();
-        const users: User[] = initialUsers?.pages.flatMap(page => page.data) ?? [];
+        const infiniteData = await queryClient.fetchInfiniteQuery({
+            queryKey: USERS_KEYS.list(params),
+            queryFn: ({ pageParam }): Promise<UserListResponse> => usersApi.getUsers({ ...params, page: pageParam }),
+            initialPageParam: INITIAL_PAGE_PARAM,
+        });
+        const users: User[] = infiniteData.pages.flatMap(page => page.data);
         return { users, params };
     } catch (error) {
-        const errorMessage: string = (error as QueryError)?.data?.message?.toString() || GENERIC_ERROR_MESSAGE;
+        const errorMessage: string = (error as ApiError)?.message;
         enqueueSnackbar(errorMessage, { variant: "error" });
         return redirect(PROFILE_PAGE_PATH);
-    } finally {
-        promise.unsubscribe();
     }
 };

@@ -5,23 +5,27 @@ import Dialog from "@mui/material/Dialog";
 import Button from "@mui/material/Button";
 import MuiLink from "@mui/material/Link";
 import { enqueueSnackbar } from "notistack";
-import IconButton from "@mui/material/IconButton";
 import TextField from "@mui/material/TextField";
 import EditIcon from "@mui/icons-material/Edit";
 import Typography from "@mui/material/Typography";
+import IconButton from "@mui/material/IconButton";
 import DialogTitle from "@mui/material/DialogTitle";
-import { QueryError } from "@app/core/interfaces";
 import DeleteIcon from "@mui/icons-material/Delete";
+import AddLinkIcon from "@mui/icons-material/AddLink";
 import DialogContent from "@mui/material/DialogContent";
 import DialogActions from "@mui/material/DialogActions";
-import AddLinkIcon from "@mui/icons-material/AddLink";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { LINK_PATTERN } from "@app/core/constants/patterns";
 import CircularProgress from "@mui/material/CircularProgress";
-import { GENERIC_ERROR_MESSAGE } from "@app/core/constants/general";
-import { useForm, Controller, SubmitHandler } from "react-hook-form";
 import { transformServerErrors } from "@app/core/utils/general.ts";
-import { UserLink, useDeleteLinkMutation, useCreateLinkMutation, useUpdateLinkMutation } from "@app/core/services";
+import { useForm, Controller, SubmitHandler } from "react-hook-form";
+import {
+    UserLink,
+    useDeleteLinkMutation,
+    useCreateLinkMutation,
+    useUpdateLinkMutation,
+    ApiError,
+} from "@app/core/services";
 
 export const LINKS_FORM_FIELDS = {
     title: { name: "title", label: "Title" },
@@ -48,13 +52,13 @@ export const ManageLinksDialog: FC<ManageLinksDialogProps> = memo(({ open, onClo
     const [view, setView] = useState<"list" | "form">("list");
     const [editingLink, setEditingLink] = useState<UserLink | null>(null);
 
-    const [deleteLink] = useDeleteLinkMutation();
-    const [createLink, { isLoading: isCreating, error: createError }] = useCreateLinkMutation();
-    const [updateLink, { isLoading: isUpdating, error: updateError }] = useUpdateLinkMutation();
+    const { mutateAsync: deleteLink } = useDeleteLinkMutation();
+    const { mutateAsync: createLink, isPending: isCreating, error: createError } = useCreateLinkMutation();
+    const { mutateAsync: updateLink, isPending: isUpdating, error: updateError } = useUpdateLinkMutation();
 
     const { control, handleSubmit, reset } = useForm<LinksFormValues>({
         defaultValues: LINKS_FORM_FIELDS_VALUES,
-        errors: transformServerErrors(((createError || updateError) as QueryError)?.data?.errors),
+        errors: transformServerErrors(((createError || updateError) as unknown as ApiError)?.errors),
     });
 
     const handleOpenEdit = (link: UserLink) => (): void => {
@@ -84,10 +88,10 @@ export const ManageLinksDialog: FC<ManageLinksDialogProps> = memo(({ open, onClo
 
     const handleDeleteLink = (id: number) => async (): Promise<void> => {
         try {
-            await deleteLink({ id }).unwrap();
+            await deleteLink({ id });
             enqueueSnackbar("Link deleted", { variant: "success" });
         } catch (error) {
-            const errorMessage = (error as QueryError)?.data?.message?.toString() || GENERIC_ERROR_MESSAGE;
+            const errorMessage = (error as ApiError)?.message;
             enqueueSnackbar(errorMessage, { variant: "error" });
         }
     };
@@ -95,15 +99,15 @@ export const ManageLinksDialog: FC<ManageLinksDialogProps> = memo(({ open, onClo
     const onFormSubmit: SubmitHandler<LinksFormValues> = async data => {
         try {
             if (editingLink) {
-                await updateLink({ id: editingLink.id, ...data }).unwrap();
+                await updateLink({ id: editingLink.id, ...data });
                 enqueueSnackbar("Link updated", { variant: "success" });
             } else {
-                await createLink(data).unwrap();
+                await createLink(data);
                 enqueueSnackbar("Link created", { variant: "success" });
             }
             handleBackToList();
         } catch (error) {
-            const errorMessage = (error as QueryError)?.data?.message?.toString() || GENERIC_ERROR_MESSAGE;
+            const errorMessage = (error as ApiError)?.message;
             enqueueSnackbar(errorMessage, { variant: "error" });
         }
     };

@@ -1,10 +1,8 @@
-import { FC, MouseEvent } from "react";
 import Button from "@mui/material/Button";
-import { useIsMobile } from "@app/core/hooks";
 import { enqueueSnackbar } from "notistack";
-import { QueryError } from "@app/core/interfaces";
-import { GENERIC_ERROR_MESSAGE } from "@app/core/constants/general.ts";
-import { useFollowUserMutation, useUnFollowUserMutation } from "@app/core/services";
+import { FC, MouseEvent, memo } from "react";
+import { useIsMobile } from "@app/core/hooks";
+import { ApiError, useFollowUserMutation, useUnFollowUserMutation } from "@app/core/services";
 
 interface UserFollowButtonProps {
     isFollowed: boolean;
@@ -12,26 +10,26 @@ interface UserFollowButtonProps {
     size?: "small" | "medium" | "large";
 }
 
-export const UserFollowButton: FC<UserFollowButtonProps> = memo(({ isFollowed, userName, size = "medium" }) => {
+export const UserFollowButtonComponent: FC<UserFollowButtonProps> = ({ isFollowed, userName, size = "medium" }) => {
     const isMobile: boolean = useIsMobile();
 
-    const [follow, { isLoading: isFollowLoading }] = useFollowUserMutation();
-    const [unFollow, { isLoading: isUnfollowLoadinng }] = useUnFollowUserMutation();
+    const { mutateAsync: follow, isPending: isFollowLoading } = useFollowUserMutation();
+    const { mutateAsync: unFollow, isPending: isUnfollowLoadinng } = useUnFollowUserMutation();
 
     const handleFollow = async (userName: string): Promise<void> => {
         try {
-            await follow({ userName }).unwrap();
+            await follow(userName);
         } catch (error) {
-            const errorMessage: string = (error as QueryError)?.data?.message?.toString() || GENERIC_ERROR_MESSAGE;
+            const errorMessage: string = (error as ApiError)?.message;
             enqueueSnackbar(errorMessage, { variant: "error" });
         }
     };
 
     const handleUnfollow = async (userName: string): Promise<void> => {
         try {
-            await unFollow({ userName }).unwrap();
+            await unFollow(userName);
         } catch (error) {
-            const errorMessage: string = (error as QueryError)?.data?.message?.toString() || GENERIC_ERROR_MESSAGE;
+            const errorMessage: string = (error as ApiError)?.message;
             enqueueSnackbar(errorMessage, { variant: "error" });
         }
     };
@@ -56,4 +54,6 @@ export const UserFollowButton: FC<UserFollowButtonProps> = memo(({ isFollowed, u
             {isFollowed ? "Subscribed" : "Subscribe"}
         </Button>
     );
-});
+};
+
+export const UserFollowButton = memo(UserFollowButtonComponent);

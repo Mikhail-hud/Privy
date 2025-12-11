@@ -5,10 +5,9 @@ import {
     useUnsetPublicPhotoMutation,
     useUnsetPrivatePhotoMutation,
     useDeleteProfilePhotoMutation,
+    ApiError,
 } from "@app/core/services";
 import { enqueueSnackbar } from "notistack";
-import { QueryError } from "@app/core/interfaces";
-import { GENERIC_ERROR_MESSAGE } from "@app/core/constants/general";
 import { PRIVY_API_ROOT } from "@app/config";
 
 type ActionHandler<T, U> = {
@@ -21,8 +20,8 @@ type ActionHandlerWithoutArg<T = void> = {
     isLoading: boolean;
 };
 
-type MutationHookResult<T, U> = readonly [(arg: U) => { unwrap: () => Promise<T> }, { isLoading: boolean }];
-type MutationHookResultWithoutArg<T> = readonly [() => { unwrap: () => Promise<T> }, { isLoading: boolean }];
+type MutationHookResult<T, U> = { mutateAsync: (arg: U) => Promise<T>; isPending: boolean };
+type MutationHookResultWithoutArg<T> = { mutateAsync: () => Promise<T>; isPending: boolean };
 
 export interface UseProfilActions {
     setPublic: ActionHandler<Photo, string>;
@@ -40,31 +39,25 @@ export const useProfileActions = (): UseProfilActions => {
     const unsetPublicMutation = useUnsetPublicPhotoMutation();
     const unsetPrivateMutation = useUnsetPrivatePhotoMutation();
 
-    const handleAction = async <T>(
-        action: () => { unwrap: () => Promise<T> },
-        onSuccess?: () => void
-    ): Promise<T | void> => {
+    const handleAction = async <T>(action: () => Promise<T>, onSuccess?: () => void): Promise<T | void> => {
         try {
-            const result: Awaited<T> = await action().unwrap();
+            const result: Awaited<T> = await action();
             onSuccess?.();
             return result;
         } catch (error) {
-            const errorMessage: string = (error as QueryError)?.data?.message?.toString() || GENERIC_ERROR_MESSAGE;
+            const errorMessage: string = (error as ApiError)?.message;
             enqueueSnackbar(errorMessage, { variant: "error" });
         }
     };
 
-    const buildAction = <T, U>([mutation, { isLoading }]: MutationHookResult<T, U>): ActionHandler<T, U> => ({
-        handler: (queryArg, onSuccessCallback) => handleAction(() => mutation(queryArg), onSuccessCallback),
-        isLoading,
+    const buildAction = <T, U>(mutation: MutationHookResult<T, U>): ActionHandler<T, U> => ({
+        handler: (queryArg, onSuccessCallback) => handleAction(() => mutation.mutateAsync(queryArg), onSuccessCallback),
+        isLoading: mutation.isPending,
     });
 
-    const buildActionWithoutArg = <T>([
-        mutation,
-        { isLoading },
-    ]: MutationHookResultWithoutArg<T>): ActionHandlerWithoutArg<T> => ({
-        handler: onSuccessCallback => handleAction(() => mutation(), onSuccessCallback),
-        isLoading,
+    const buildActionWithoutArg = <T>(mutation: MutationHookResultWithoutArg<T>): ActionHandlerWithoutArg<T> => ({
+        handler: onSuccessCallback => handleAction(() => mutation.mutateAsync(), onSuccessCallback),
+        isLoading: mutation.isPending,
     });
 
     const downloadPhoto = (photo: Photo): void => {

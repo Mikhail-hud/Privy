@@ -1,8 +1,13 @@
 import { useDebounce } from "@app/core/hooks";
 import { DEBOUNCE_DELAY } from "@app/core/constants/general";
-import { FC, useState, ChangeEvent, ReactElement } from "react";
-import { InfiniteScrollList, Spiner, UserSearchField, RevealsStatsType } from "@app/core/components";
-import { RevealRequest, RevealRequestListResponse, useGetPendingRevealRequestsInfiniteQuery } from "@app/core/services";
+import { ChangeEvent, FC, ReactElement, useState } from "react";
+import {
+    RevealRequest,
+    RevealStatus,
+    RevealRequestListResponse,
+    useGetRevealRequestsInfiniteQuery,
+} from "@app/core/services";
+import { InfiniteScrollList, RevealsStatsType, Spiner, UserSearchField } from "@app/core/components";
 import { RevealRequestsListItem } from "@app/core/components/Features/User/Reveals/RevealRequests/RevealRequestsListItem";
 
 interface ApprovalListProps {
@@ -14,7 +19,10 @@ export const RevealRequests: FC<ApprovalListProps> = ({ type }) => {
     const query: string = useDebounce(searchQuery, DEBOUNCE_DELAY);
 
     const { data, fetchNextPage, hasNextPage, isLoading, isFetchingNextPage, isFetching } =
-        useGetPendingRevealRequestsInfiniteQuery({ query }, { skip: type !== "revealRequests" });
+        useGetRevealRequestsInfiniteQuery(
+            { query, status: RevealStatus.PENDING },
+            { enabled: type === "revealRequests" }
+        );
 
     const requests: RevealRequest[] = useMemo<RevealRequest[]>(
         () => data?.pages.flatMap((page: RevealRequestListResponse): RevealRequest[] => page.data) ?? [],

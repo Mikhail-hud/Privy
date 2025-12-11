@@ -3,20 +3,19 @@ import Dialog from "@mui/material/Dialog";
 import Button from "@mui/material/Button";
 import { enqueueSnackbar } from "notistack";
 import TextField from "@mui/material/TextField";
-import { QueryError } from "@app/core/interfaces";
-import { useState, FC, SyntheticEvent } from "react";
 import DialogTitle from "@mui/material/DialogTitle";
-import DialogContent from "@mui/material/DialogContent";
+import { useState, FC, SyntheticEvent } from "react";
 import { FormFieldShell } from "@app/core/components";
+import DialogContent from "@mui/material/DialogContent";
 import DialogActions from "@mui/material/DialogActions";
 import { useDebounce, useIsMobile } from "@app/core/hooks";
+import { DEBOUNCE_DELAY } from "@app/core/constants/general";
 import CircularProgress from "@mui/material/CircularProgress";
 import DialogContentText from "@mui/material/DialogContentText";
 import { transformServerErrors } from "@app/core/utils/general.ts";
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
-import { DEBOUNCE_DELAY, GENERIC_ERROR_MESSAGE } from "@app/core/constants/general";
 import Autocomplete, { AutocompleteInputChangeReason } from "@mui/material/Autocomplete";
-import { useGetTagsQuery, useUpdateProfileInterestsMutation, Tag } from "@app/core/services";
+import { useGetTagsQuery, useUpdateProfileInterestsMutation, Tag, ApiError } from "@app/core/services";
 
 export const INTERESTS_FORM_FIELDS = {
     interests: { name: "interests", label: "Interests" },
@@ -43,13 +42,13 @@ export const Interests: FC<InterestsProps> = memo(({ interests }) => {
 
     const { data: allTags = [], isLoading: isLoadingTags } = useGetTagsQuery(
         { name: debouncedInputValue },
-        { skip: !open || !debouncedInputValue }
+        { enabled: open && !!debouncedInputValue }
     );
-    const [updateInterests, { isLoading: isUpdating, error }] = useUpdateProfileInterestsMutation();
+    const { mutateAsync: updateInterests, isPending, error } = useUpdateProfileInterestsMutation();
 
     const { control, handleSubmit, reset } = useForm<InterestsValues>({
         defaultValues: INTERESTS_FORM_FIELDS_VALUES,
-        errors: transformServerErrors((error as QueryError)?.data?.errors),
+        errors: transformServerErrors((error as unknown as ApiError)?.errors),
     });
 
     const handleOpen = (): void => {
@@ -63,11 +62,11 @@ export const Interests: FC<InterestsProps> = memo(({ interests }) => {
     const onValidSubmit: SubmitHandler<InterestsValues> = async data => {
         try {
             const tagIds: number[] = data.interests.map(tag => tag.id);
-            await updateInterests({ interests: tagIds }).unwrap();
+            await updateInterests({ interests: tagIds });
             enqueueSnackbar("Interests have been updated", { variant: "success" });
             handleClose();
         } catch (error) {
-            enqueueSnackbar((error as QueryError)?.data?.message?.toString() || GENERIC_ERROR_MESSAGE, {
+            enqueueSnackbar((error as ApiError)?.message, {
                 variant: "error",
             });
         }
@@ -139,8 +138,8 @@ export const Interests: FC<InterestsProps> = memo(({ interests }) => {
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={handleClose}>Cancel</Button>
-                    <Button variant="contained" disabled={isUpdating} onClick={handleSubmit(onValidSubmit)}>
-                        {isUpdating ? <CircularProgress size={24} color="inherit" /> : "Save"}
+                    <Button variant="contained" disabled={isPending} onClick={handleSubmit(onValidSubmit)}>
+                        {isPending ? <CircularProgress size={24} color="inherit" /> : "Save"}
                     </Button>
                 </DialogActions>
             </Dialog>

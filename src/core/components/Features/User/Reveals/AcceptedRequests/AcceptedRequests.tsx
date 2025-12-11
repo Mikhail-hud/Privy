@@ -1,23 +1,31 @@
 import { useDebounce } from "@app/core/hooks";
 import { DEBOUNCE_DELAY } from "@app/core/constants/general";
 import { FC, useState, ChangeEvent, ReactElement } from "react";
-import { ProfileReveal, useGetRevealedProfilesInfiniteQuery } from "@app/core/services";
+import {
+    RevealRequest,
+    RevealStatus,
+    RevealRequestListResponse,
+    useGetRevealRequestsInfiniteQuery,
+} from "@app/core/services";
 import { UserSearchField, RevealsStatsType, InfiniteScrollList, Spiner } from "@app/core/components";
-import { RevealedProfilesListItem } from "@app/core/components/Features/User/Reveals/RevealedProfiles/RevealedProfilesListItem";
+import { AcceptedRequestsListItem } from "@app/core/components/Features/User/Reveals/AcceptedRequests/AcceptedRequestsListItem";
 
 interface ApprovalListProps {
     type: RevealsStatsType;
 }
 
-export const RevealedProfiles: FC<ApprovalListProps> = ({ type }) => {
+export const AcceptedRequests: FC<ApprovalListProps> = ({ type }) => {
     const [searchQuery, setSearchQuery] = useState<string>("");
     const query: string = useDebounce(searchQuery, DEBOUNCE_DELAY);
 
     const { data, fetchNextPage, hasNextPage, isLoading, isFetchingNextPage, isFetching } =
-        useGetRevealedProfilesInfiniteQuery({ query }, { skip: type !== "revealedProfiles" });
+        useGetRevealRequestsInfiniteQuery(
+            { query, status: RevealStatus.ACCEPTED },
+            { enabled: type === "revealRequests" }
+        );
 
-    const profileReveals: ProfileReveal[] = useMemo<ProfileReveal[]>(
-        () => data?.pages.flatMap(page => page.data) ?? [],
+    const requests: RevealRequest[] = useMemo<RevealRequest[]>(
+        () => data?.pages.flatMap((page: RevealRequestListResponse): RevealRequest[] => page.data) ?? [],
         [data]
     );
     const onSearchQueryChange = (event: ChangeEvent<HTMLInputElement>): void => setSearchQuery(event.target.value);
@@ -25,8 +33,8 @@ export const RevealedProfiles: FC<ApprovalListProps> = ({ type }) => {
     return (
         <>
             <UserSearchField value={searchQuery} onChange={onSearchQueryChange} />
-            <InfiniteScrollList<ProfileReveal>
-                data={profileReveals}
+            <InfiniteScrollList<RevealRequest>
+                data={requests}
                 loaderCount={1}
                 loader={Spiner}
                 isLoading={isLoading}
@@ -34,11 +42,11 @@ export const RevealedProfiles: FC<ApprovalListProps> = ({ type }) => {
                 hasNextPage={hasNextPage}
                 fetchNextPage={fetchNextPage}
                 isFetchingNextPage={isFetchingNextPage}
-                renderItem={(profileReveal: ProfileReveal, index: number): ReactElement => (
-                    <RevealedProfilesListItem
-                        key={profileReveal.id}
-                        profileReveal={profileReveal}
-                        isLast={index === profileReveals.length - 1}
+                renderItem={(revealRequest: RevealRequest, index: number): ReactElement => (
+                    <AcceptedRequestsListItem
+                        key={revealRequest.id}
+                        revealRequest={revealRequest}
+                        isLast={index === requests.length - 1}
                     />
                 )}
             />

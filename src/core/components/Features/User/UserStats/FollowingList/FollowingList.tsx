@@ -17,7 +17,7 @@ export const FollowingList: FC<FollowingListProps> = ({ userName, type, isOwnerU
     const query: string = useDebounce(searchQuery, DEBOUNCE_DELAY);
 
     const { data, fetchNextPage, hasNextPage, isLoading, isFetchingNextPage, isFetching } =
-        useGetUserFollowingInfiniteQuery({ userName, query }, { skip: type !== "following" });
+        useGetUserFollowingInfiniteQuery({ userName, query }, { enabled: type === "following" });
 
     const users: UserSummary[] = useMemo<UserSummary[]>(() => data?.pages.flatMap(page => page.data) ?? [], [data]);
 

@@ -1,17 +1,14 @@
 /**
  * @file src/features/auth/actions/signInAction.ts
- * React Router action handling user sign-in (credentials and optional two-factor).
- * Determines intent from form data, dispatches the appropriate RTK Query mutation,
- * returns a redirect on success, or structured error data for UI consumption on failure.
+ * Handles user sign-in via React Router action, supporting both credentials and two-factor authentication flows.
+ * Determines the sign-in intent from form data, dispatches the appropriate RTK Query mutation,
+ * and returns either a redirect on success or structured error data for UI handling on failure.
  */
 
-import { store } from "@app/core/store";
 import { redirect } from "react-router-dom";
 import { enqueueSnackbar } from "notistack";
-import { QueryError } from "@app/core/interfaces";
-import { GENERIC_ERROR_MESSAGE } from "@app/core/constants/general";
 import { PROFILE_PAGE_PATH } from "@app/core/constants/pathConstants";
-import { authApi, SignInPayload, TwoFactorSignInPayload, TwoFactorStatus, Profile } from "@app/core/services";
+import { authApi, SignInPayload, TwoFactorSignInPayload, TwoFactorStatus, Profile, ApiError } from "@app/core/services";
 
 /** Name of the form field indicating which sign-in action is intended. */
 export const SIGN_IN_ACTION_KEY = "intent";
@@ -45,24 +42,24 @@ export interface TwoFactorSignInFormDataPayload extends TwoFactorSignInPayload {
 }
 
 /**
- * React Router action handling both credential and two-factor sign-in flows.
+ * React Router action for user sign-in, supporting credentials and two-factor authentication.
  *
  * Flow:
  * 1. Reads FormData and extracts the intent (`intent` field).
  * 2. If credentials flow:
  *    - Dispatches signIn mutation.
- *    - If response indicates twoFactorRequired, returns that status object (handled by UI).
- *    - Otherwise redirects to profile on success.
- *    - On failure, surfaces snackbar + returns { credentialsError }.
+ *    - If response indicates twoFactorRequired, returns that status object for UI handling.
+ *    - Otherwise, redirects to the profile page on success.
+ *    - On failure, shows a snackbar and returns `{ credentialsError }`.
  * 3. If two-factor flow:
  *    - Dispatches twoFactorSignIn mutation.
- *    - Redirects to profile on success.
- *    - On failure, surfaces snackbar + return { twoFactorError }.
- * 4. If intent is unknown, returns { error }.
+ *    - Redirects to the profile page on success.
+ *    - On failure, shows a snackbar and returns `{ twoFactorError }`.
+ * 4. If intent is unknown, returns `{ error }`.
  *
- * Errors are normalized into structured objects; no exceptions escape.
+ * All errors are normalized into structured objects; no exceptions are thrown outward.
  *
- * @param requestWrapper Wrapper containing the incoming Request from React Router.
+ * @param request Incoming Request object from React Router.
  * @returns Promise resolving to:
  * - Response (redirect) on successful authentication.
  * - AuthActionData with errors or twoFactorRequired state.
@@ -74,7 +71,7 @@ export interface TwoFactorSignInFormDataPayload extends TwoFactorSignInPayload {
  *   action: signInAction,
  *   element: <SignIn />,
  *   loader: publicRoutesLoader,
- * },
+ * }
  */
 export const signInAction = async ({ request }: { request: Request }): Promise<Response | AuthActionData> => {
     const formData: FormData = await request.formData();
@@ -85,15 +82,18 @@ export const signInAction = async ({ request }: { request: Request }): Promise<R
         const credentials = Object.fromEntries(formData) as unknown as SignInFormDataPayload;
         // TODO: validate credentials here or in the form before dispatching
         const { identifier, password, rememberMe } = credentials;
-        const promise = store.dispatch(authApi.endpoints.signIn.initiate({ identifier, password, rememberMe }));
         try {
-            const userAuthStatus: TwoFactorStatus | Profile = await promise.unwrap();
+            const userAuthStatus: TwoFactorStatus | Profile = await authApi.signIn({
+                identifier,
+                password,
+                rememberMe,
+            });
             if ("twoFactorRequired" in userAuthStatus) {
                 return userAuthStatus;
             }
             return redirect(PROFILE_PAGE_PATH);
         } catch (error) {
-            const errorMessage = (error as QueryError)?.data?.message?.toString() || GENERIC_ERROR_MESSAGE;
+            const errorMessage: string = (error as ApiError)?.message;
             enqueueSnackbar(errorMessage, { variant: "error" });
             return { credentialsError: errorMessage };
         }
@@ -101,12 +101,11 @@ export const signInAction = async ({ request }: { request: Request }): Promise<R
     if (intent === SIGN_IN_WITH_TWO_FACTOR) {
         const twoFactorPayload = Object.fromEntries(formData) as unknown as TwoFactorSignInFormDataPayload;
         const { twoFactorCode } = twoFactorPayload;
-        const promise = store.dispatch(authApi.endpoints.twoFactorSignIn.initiate({ twoFactorCode }));
         try {
-            await promise.unwrap();
+            await authApi.twoFactorSignIn({ twoFactorCode });
             return redirect(PROFILE_PAGE_PATH);
         } catch (error) {
-            const errorMessage = (error as QueryError)?.data?.message?.toString() || GENERIC_ERROR_MESSAGE;
+            const errorMessage: string = (error as ApiError)?.message;
             enqueueSnackbar(errorMessage, { variant: "error" });
             return { twoFactorError: errorMessage };
         }

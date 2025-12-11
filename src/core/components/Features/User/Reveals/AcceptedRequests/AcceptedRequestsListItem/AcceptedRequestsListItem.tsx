@@ -1,23 +1,23 @@
 import { FC, memo, MouseEvent } from "react";
-import { ProfileReveal } from "@app/core/services";
+import { RevealRequest } from "@app/core/services";
 import { UserListItemBase } from "@app/core/components";
-import { RevokeProfileRevealButton } from "@app/core/components/Features/User/Reveals/RevealedProfiles/RevokeProfileRevealButton";
+import { RevokeProfileRevealButton } from "@app/core/components/Features/User/Reveals/AcceptedRequests/RevokeProfileRevealButton";
 
-interface UserSummaryListItemProps {
+interface AcceptedRequestsListItemProps {
     isLast: boolean;
-    profileReveal: ProfileReveal;
+    revealRequest: RevealRequest;
     onListItemClick?: (e: MouseEvent<HTMLAnchorElement>) => void;
 }
 
-export const RevealedProfilesListItemComponent: FC<UserSummaryListItemProps> = ({
+export const AcceptedRequestsListItemComponent: FC<AcceptedRequestsListItemProps> = ({
     isLast,
-    profileReveal,
+    revealRequest,
     onListItemClick,
 }) => {
     const {
         id,
-        revealedTo: { userName, fullName, isProfileIncognito, publicPhoto, privatePhoto, canViewFullProfile },
-    } = profileReveal;
+        requester: { userName, fullName, isProfileIncognito, publicPhoto, privatePhoto, canViewFullProfile },
+    } = revealRequest;
     const src: string | undefined = canViewFullProfile ? publicPhoto?.src : privatePhoto?.src;
     const alt: string = canViewFullProfile ? `avatar_${publicPhoto?.id}` : `avatar_${privatePhoto?.id}`;
 
@@ -35,4 +35,4 @@ export const RevealedProfilesListItemComponent: FC<UserSummaryListItemProps> = (
     );
 };
 
-export const RevealedProfilesListItem = memo(RevealedProfilesListItemComponent);
+export const AcceptedRequestsListItem = memo(AcceptedRequestsListItemComponent);

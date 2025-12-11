@@ -1,11 +1,5 @@
+import { ApiError } from "@app/core/services";
 import { FetchBaseQueryError } from "@reduxjs/toolkit/query";
 
-export interface ApiError {
-    message: string;
-    errors?: Record<string, string>;
-    statusCode: number;
-    timestamp: string;
-    path: string;
-}
-
+// Legacy RTK Query error type
 export type QueryError = FetchBaseQueryError & { data?: ApiError };

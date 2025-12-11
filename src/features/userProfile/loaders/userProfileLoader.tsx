@@ -1,20 +1,16 @@
 /**
- * Loader for user profiles, used in profile features.
- * Fetches a user profile from the cache if available, otherwise dispatches an API call.
- * Redirects to the lookup page on error or invalid username.
  * @file src/features/userProfile/loaders/userProfileLoader.tsx
+ * React Router loader for user profiles. Fetches a user profile from cache if available,
+ * otherwise dispatches an API call. Redirects to the lookup page on error or invalid username.
  */
 
-import { store } from "@app/core/store";
 import { enqueueSnackbar } from "notistack";
-import { QueryError } from "@app/core/interfaces";
-import { usersApi, User } from "@app/core/services";
 import { LoaderFunctionArgs, redirect } from "react-router-dom";
-import { GENERIC_ERROR_MESSAGE } from "@app/core/constants/general.ts";
+import { usersApi, User, queryClient, USERS_KEYS, ApiError } from "@app/core/services";
 import { LOOKUP_PAGE_PATH, USER_HANDLE_PREFIX } from "@app/core/constants/pathConstants";
 
 /**
- * User profile context made available to route elements.
+ * Data shape provided to route elements after successful profile load.
  * @property user The loaded user object.
  * @property userName The username without prefix.
  */
@@ -24,16 +20,16 @@ export interface UserProfileLoaderData {
 }
 
 /**
- * React Router loader that resolves the current user profile for profile routes.
+ * React Router loader for resolving the current user profile in profile routes.
  *
  * Flow:
  * 1. Validates the `userName` param and strips the prefix.
- * 2. Dispatches `usersApi.endpoints.getUserProfile.initiate()` to fetch the user profile.
- * 3. On success returns `{ user, userName }`.
- * 4. On failure (e.g., network error, invalid username) returns a redirect `Response` to the lookup page.
- * 5. Always unsubscribes the initiated query subscription in `finally` to prevent leaks.
+ * 2. Checks cache for the user profile.
+ * 3. If not cached, fetches the user profile via API.
+ * 4. On success, returns `{ user, userName }`.
+ * 5. On failure (network error, invalid username), shows an error notification and redirects to the lookup page.
  *
- * No errors are thrown outward: failures are normalized into a redirect.
+ * All errors are handled internally; no exceptions are thrown outward.
  *
  * @param {LoaderFunctionArgs} args Loader function arguments containing route params.
  * @returns {Promise<UserProfileLoaderData | Response>} Resolves with user profile context or a redirect response.
@@ -53,20 +49,22 @@ export const userProfileLoader = async ({ params }: LoaderFunctionArgs): Promise
         return redirect(LOOKUP_PAGE_PATH);
     }
     const planedUserName: string = userName.replace(new RegExp(`^${USER_HANDLE_PREFIX}`), "");
-    const promise = store.dispatch(
-        usersApi.endpoints.getUserProfile.initiate({
-            userName: planedUserName,
-        })
-    );
+
+    // Check cache first
+    const cachedUser: User | undefined = queryClient.getQueryData<User>(USERS_KEYS.profile(planedUserName));
+    if (cachedUser) {
+        return { user: cachedUser, userName: planedUserName };
+    }
 
     try {
-        const user: User = await promise.unwrap();
+        const user: User = await queryClient.fetchQuery({
+            queryKey: USERS_KEYS.profile(planedUserName),
+            queryFn: (): Promise<User> => usersApi.getUserProfile(planedUserName),
+        });
         return { user, userName: planedUserName };
     } catch (error) {
-        const errorMessage: string = (error as QueryError)?.data?.message?.toString() || GENERIC_ERROR_MESSAGE;
+        const errorMessage: string = (error as ApiError)?.message;
         enqueueSnackbar(errorMessage, { variant: "error" });
         return redirect(LOOKUP_PAGE_PATH);
-    } finally {
-        promise.unsubscribe();
     }
 };

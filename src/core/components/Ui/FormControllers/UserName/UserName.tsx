@@ -1,9 +1,7 @@
 import { debounce } from "@mui/material/utils";
-import { QueryError } from "@app/core/interfaces";
 import CircularProgress from "@mui/material/CircularProgress";
 import TextField, { TextFieldProps } from "@mui/material/TextField";
 import CheckCircleOutline from "@mui/icons-material/CheckCircleOutline";
-import { useLazyCheckUserNameAvailabilityQuery } from "@app/core/services";
 import { DEBOUNCE_DELAY, GENERIC_ERROR_MESSAGE } from "@app/core/constants/general";
 import {
     Path,
@@ -15,6 +13,7 @@ import {
     ControllerRenderProps,
 } from "react-hook-form";
 import { ReactElement } from "react";
+import { ApiError, useLazyCheckUserNameAvailabilityQuery } from "@app/core/services";
 
 type UserNameProps<T extends FieldValues> = Omit<TextFieldProps, "name"> & {
     name: Path<T>;
@@ -24,7 +23,7 @@ type UserNameProps<T extends FieldValues> = Omit<TextFieldProps, "name"> & {
 };
 
 const UserNameFormControl = <T extends FieldValues>({ control, name, label, rules, ...rest }: UserNameProps<T>) => {
-    const [checkUserNameAvailability, { isFetching, data }] = useLazyCheckUserNameAvailabilityQuery();
+    const { mutateAsync: checkUserNameAvailability, isPending, data } = useLazyCheckUserNameAvailabilityQuery();
 
     const validationCache = useRef<Record<string, boolean | string>>({});
     const cache = validationCache.current;
@@ -35,12 +34,12 @@ const UserNameFormControl = <T extends FieldValues>({ control, name, label, rule
                 return resolve(cache[userName]);
             }
             try {
-                const { isAvailable } = await checkUserNameAvailability({ userName }).unwrap();
+                const { isAvailable } = await checkUserNameAvailability({ userName });
                 const result = isAvailable || "This username is already taken";
                 cache[userName] = result;
                 resolve(result);
             } catch (error) {
-                const errorMessage: string = (error as QueryError)?.data?.errors?.[name] || GENERIC_ERROR_MESSAGE;
+                const errorMessage: string = (error as ApiError)?.errors?.[name] || GENERIC_ERROR_MESSAGE;
                 cache[userName] = errorMessage;
                 resolve(errorMessage);
             }
@@ -82,8 +81,8 @@ const UserNameFormControl = <T extends FieldValues>({ control, name, label, rule
                         input: {
                             endAdornment: (
                                 <>
-                                    {isFetching && <CircularProgress color="inherit" size={20} />}
-                                    {!isFetching && !!data?.isAvailable && !error && isTouched && (
+                                    {isPending && <CircularProgress color="inherit" size={20} />}
+                                    {!isPending && !!data?.isAvailable && !error && isTouched && (
                                         <CheckCircleOutline color="success" />
                                     )}
                                 </>

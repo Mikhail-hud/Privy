@@ -3,14 +3,12 @@ import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";
 import { enqueueSnackbar } from "notistack";
 import { Email } from "@app/core/components";
-import { QueryError } from "@app/core/interfaces";
 import DialogTitle from "@mui/material/DialogTitle";
+import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import { useForm, SubmitHandler } from "react-hook-form";
-import DialogActions from "@mui/material/DialogActions";
-import { useResetPasswordMutation } from "@app/core/services";
 import DialogContentText from "@mui/material/DialogContentText";
-import { GENERIC_ERROR_MESSAGE } from "@app/core/constants/general";
+import { ApiError, useResetPasswordMutation } from "@app/core/services";
 import { VALIDATE_RELES } from "@app/core/constants/rulesConstants";
 
 export const FORGOT_PASSWOR_FIELDS = {
@@ -31,7 +29,7 @@ interface ForgotPasswordProps {
 }
 
 export const ForgotPassword: FC<ForgotPasswordProps> = ({ open, handleClose }) => {
-    const [resetPassword, { isLoading }] = useResetPasswordMutation();
+    const { mutateAsync: resetPassword, isPending } = useResetPasswordMutation();
     const emailInputRef = useRef<HTMLInputElement>(null);
 
     const { control, handleSubmit, setError } = useForm<ForgotPasswordValues>({
@@ -43,14 +41,15 @@ export const ForgotPassword: FC<ForgotPasswordProps> = ({ open, handleClose }) =
     const onValidSubmit: SubmitHandler<ForgotPasswordValues> = async (data): Promise<void> => {
         const { email } = data;
         try {
-            await resetPassword({ email }).unwrap();
+            await resetPassword({ email });
             enqueueSnackbar("Password Reset link sent to your email address.", { variant: "success" });
             handleClose();
         } catch (error) {
+            const errorMessage = (error as ApiError)?.message;
             setError("email", {
-                message: (error as QueryError)?.data?.message?.toString() || GENERIC_ERROR_MESSAGE,
+                message: errorMessage,
             });
-            enqueueSnackbar((error as QueryError)?.data?.message?.toString() || GENERIC_ERROR_MESSAGE, {
+            enqueueSnackbar(errorMessage, {
                 variant: "error",
             });
         }
@@ -84,7 +83,7 @@ export const ForgotPassword: FC<ForgotPasswordProps> = ({ open, handleClose }) =
                 <Button onClick={handleClose}>Cancel</Button>
                 <Button
                     variant="contained"
-                    loading={isLoading}
+                    loading={isPending}
                     loadingPosition="start"
                     onClick={handleSubmit(onValidSubmit)}
                 >

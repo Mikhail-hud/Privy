@@ -11,7 +11,6 @@ export const Lookup: FC = () => {
     const { params } = useLoaderData() as UsersContext;
     const [searchQuery, setSearchQuery] = useState<string>("");
     const query: string = useDebounce(searchQuery, DEBOUNCE_DELAY);
-
     const { data, fetchNextPage, hasNextPage, isLoading, isFetchingNextPage, isFetching } = useGetUsersInfiniteQuery({
         ...params,
         query,
