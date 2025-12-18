@@ -24,10 +24,6 @@ export interface ProfileReveal {
     createdAt: string;
     revealedToId: number;
     revealerId: number;
-    revealedTo: Pick<
-        User,
-        "id" | "userName" | "isProfileIncognito" | "fullName" | "publicPhoto" | "privatePhoto" | "canViewFullProfile"
-    >;
 }
 
 export interface RevealRequest {
@@ -36,25 +32,57 @@ export interface RevealRequest {
     createdAt: string;
     requesteeId: number;
     requesterId: number;
-    requester: Pick<
-        User,
-        "id" | "userName" | "isProfileIncognito" | "fullName" | "publicPhoto" | "privatePhoto" | "canViewFullProfile"
-    >;
 }
+
+export type ProfileRevealUser = Pick<
+    User,
+    "id" | "userName" | "isProfileIncognito" | "fullName" | "publicPhoto" | "privatePhoto" | "canViewFullProfile"
+>;
+
+export type RevealRequestUser = Pick<
+    User,
+    "id" | "userName" | "isProfileIncognito" | "fullName" | "publicPhoto" | "privatePhoto" | "canViewFullProfile"
+>;
+
+interface ProfileRevealWithRevealer<TUser> extends ProfileReveal {
+    revealer: TUser;
+}
+interface ProfileRevealWithRevealedTo<TUser> extends ProfileReveal {
+    revealedTo: TUser;
+}
+
+interface RevealRequestWithRequester<TUser> extends RevealRequest {
+    requester: TUser;
+}
+interface RevealRequestWithRequestee<TUser> extends RevealRequest {
+    requestee: TUser;
+}
+
+export type RequesterRevealRequest = RevealRequestWithRequester<RevealRequestUser>;
+
+export type RequesteeRevealRequest = RevealRequestWithRequestee<RevealRequestUser>;
+
+export type ProfileRevealByMe = ProfileRevealWithRevealedTo<ProfileRevealUser>;
+export type ProfileRevealToMe = ProfileRevealWithRevealer<ProfileRevealUser>;
 
 export interface RevealQueryParams extends QueryParams {
     status?: RevealStatus;
 }
 
-export type RevealRequestListResponse = PaginatedResponse<RevealRequest>;
-export type ProfileRevealListResponse = PaginatedResponse<ProfileReveal>;
+export type RequesterRevealRequestListResponse = PaginatedResponse<RequesterRevealRequest>;
+export type RequesteeRevealRequestListResponse = PaginatedResponse<RequesteeRevealRequest>;
+
+export type ProfileRevealByMeListResponse = PaginatedResponse<ProfileRevealByMe>;
+export type ProfileRevealToMeListResponse = PaginatedResponse<ProfileRevealToMe>;
 
 // Query Keys
 export const REVEALS_KEYS = {
     all: ["reveals"] as const,
     requests: (params: QueryParams) => [...REVEALS_KEYS.all, "requests", params] as const,
+    sentRequests: (params: QueryParams) => [...REVEALS_KEYS.all, "sentRequests", params] as const,
     pendingCount: () => [...REVEALS_KEYS.all, "pendingCount"] as const,
-    revealedProfiles: (params: QueryParams) => [...REVEALS_KEYS.all, "revealedProfiles", params] as const,
+    revealedByMeProfiles: (params: QueryParams) => [...REVEALS_KEYS.all, "revealedByMeProfiles", params] as const,
+    revealedToMeProfiles: (params: QueryParams) => [...REVEALS_KEYS.all, "revealedToMeProfiles", params] as const,
 };
 
 // API Functions
@@ -64,27 +92,40 @@ export const revealsApi = {
         limit = PAGE_SIZE_LIMITS.DEFAULT,
         page = INITIAL_PAGE_PARAM,
         status,
-    }: RevealQueryParams): Promise<RevealRequestListResponse> => {
-        return apiClient<RevealRequestListResponse>({
+    }: RevealQueryParams): Promise<RequesterRevealRequestListResponse> => {
+        return apiClient<RequesterRevealRequestListResponse>({
             url: "reveals/requests",
             params: { query, page, limit, status },
         });
     },
+
+    getSentRevealRequests: async ({
+        query = "",
+        limit = PAGE_SIZE_LIMITS.DEFAULT,
+        page = INITIAL_PAGE_PARAM,
+        status,
+    }: RevealQueryParams): Promise<RequesteeRevealRequestListResponse> => {
+        return apiClient<RequesteeRevealRequestListResponse>({
+            url: "reveals/requests/sent",
+            params: { query, page, limit, status },
+        });
+    },
+
     getPendingRevealRequestsCount: async (): Promise<{ count: number }> => {
         return apiClient<{ count: number }>({
             url: "reveals/requests/count",
         });
     },
 
-    sendRevealRequest: async (userName: string): Promise<RevealRequest> => {
-        return apiClient<RevealRequest>({
+    sendRevealRequest: async (userName: string): Promise<RequesterRevealRequest> => {
+        return apiClient<RequesterRevealRequest>({
             url: `reveals/request/${userName}`,
             method: "POST",
         });
     },
 
-    deleteRevealRequestByUserName: async (userName: string): Promise<RevealRequest> => {
-        return apiClient<RevealRequest>({
+    deleteRevealRequestByUserName: async (userName: string): Promise<RequesterRevealRequest> => {
+        return apiClient<RequesterRevealRequest>({
             url: `reveals/request/user/${userName}`,
             method: "DELETE",
         });
@@ -96,21 +137,31 @@ export const revealsApi = {
     }: {
         requestId: string;
         status: RevealStatus.ACCEPTED | RevealStatus.REJECTED;
-    }): Promise<RevealRequest> => {
-        return await apiClient<RevealRequest>({
+    }): Promise<RequesterRevealRequest> => {
+        return await apiClient<RequesterRevealRequest>({
             url: `reveals/request/${requestId}`,
             method: "PATCH",
             body: { status },
         });
     },
 
-    getRevealedProfiles: async ({
+    getRevealedByMeProfiles: async ({
         query = "",
         limit = PAGE_SIZE_LIMITS.DEFAULT,
         page = INITIAL_PAGE_PARAM,
-    }: QueryParams): Promise<ProfileRevealListResponse> => {
-        return apiClient<ProfileRevealListResponse>({
-            url: "reveals/revealed",
+    }: QueryParams): Promise<ProfileRevealByMeListResponse> => {
+        return apiClient<ProfileRevealByMeListResponse>({
+            url: "reveals/access/by-me",
+            params: { query, page, limit },
+        });
+    },
+    getRevealedToMeProfiles: async ({
+        query = "",
+        limit = PAGE_SIZE_LIMITS.DEFAULT,
+        page = INITIAL_PAGE_PARAM,
+    }: QueryParams): Promise<ProfileRevealToMeListResponse> => {
+        return apiClient<ProfileRevealToMeListResponse>({
+            url: "reveals/access/to-me",
             params: { query, page, limit },
         });
     },
@@ -126,7 +177,11 @@ export const revealsApi = {
 export const useGetRevealRequestsInfiniteQuery = (
     params: RevealQueryParams,
     options?: Omit<
-        UseInfiniteQueryOptions<RevealRequestListResponse, Error, InfiniteData<RevealRequestListResponse>>,
+        UseInfiniteQueryOptions<
+            RequesterRevealRequestListResponse,
+            Error,
+            InfiniteData<RequesterRevealRequestListResponse>
+        >,
         "queryKey" | "queryFn" | "getNextPageParam" | "initialPageParam"
     >
 ) => {
@@ -142,9 +197,33 @@ export const useGetRevealRequestsInfiniteQuery = (
     });
 };
 
+export const useGetSentRevealRequestsInfiniteQuery = (
+    params: RevealQueryParams,
+    options?: Omit<
+        UseInfiniteQueryOptions<
+            RequesteeRevealRequestListResponse,
+            Error,
+            InfiniteData<RequesteeRevealRequestListResponse>
+        >,
+        "queryKey" | "queryFn" | "getNextPageParam" | "initialPageParam"
+    >
+) => {
+    return useInfiniteQuery({
+        queryKey: REVEALS_KEYS.sentRequests(params),
+        queryFn: ({ pageParam }) => revealsApi.getSentRevealRequests({ ...params, page: pageParam as number }),
+        initialPageParam: INITIAL_PAGE_PARAM,
+        getNextPageParam: (lastPage, _allPages, lastPageParam) => {
+            const totalPages = Math.ceil(lastPage.total / lastPage.limit);
+            return (lastPageParam as number) < totalPages ? (lastPageParam as number) + 1 : undefined;
+        },
+        ...options,
+    });
+};
+
 export const useGetPeendingRevealRequestsCountQuery = (
     options?: Omit<UseQueryOptions<{ count: number }>, "queryKey" | "queryFn">
 ) => {
+    // Get count of pending reveal requests for the current user
     return useQuery({
         queryKey: REVEALS_KEYS.pendingCount(),
         queryFn: revealsApi.getPendingRevealRequestsCount,
@@ -152,35 +231,57 @@ export const useGetPeendingRevealRequestsCountQuery = (
     });
 };
 
-export const useSendRevealRequestMutation = (options?: UseMutationOptions<RevealRequest, Error, string>) => {
+export const useSendRevealRequestMutation = (options?: UseMutationOptions<RequesterRevealRequest, Error, string>) => {
+    // Sent reveal request from user details page
     return useMutation({
         mutationFn: revealsApi.sendRevealRequest,
-        onSuccess: (data: RevealRequest, userName: string): void => {
-            queryClient.setQueryData<User>(USERS_KEYS.profile(userName), oldUser => {
-                if (!oldUser) return oldUser;
+        onSuccess: (newRevealRequestStatus: RequesterRevealRequest, userName: string): void => {
+            // Update user profile cache to reflect the new request data
+            queryClient.setQueryData<User>(USERS_KEYS.profile(userName), user => {
+                if (!user) return user;
                 return {
-                    ...oldUser,
-                    revealRequestStatus: data,
+                    ...user,
+                    revealRequestStatus: newRevealRequestStatus,
                 };
             });
+            // Invalidate sentRequests list cache to include the new request
+            queryClient.invalidateQueries({ queryKey: REVEALS_KEYS.sentRequests({ query: "" }) });
         },
         ...options,
     });
 };
 
 export const useDeleteRevealRequestByUserNameMutation = (
-    options?: UseMutationOptions<RevealRequest, Error, string>
+    options?: UseMutationOptions<RequesterRevealRequest, Error, string>
 ) => {
+    // Cancel reveal request from user details page
     return useMutation({
         mutationFn: revealsApi.deleteRevealRequestByUserName,
-        onSuccess: (data: RevealRequest, userName: string): void => {
-            queryClient.setQueryData<User>(USERS_KEYS.profile(userName), oldUser => {
-                if (!oldUser) return oldUser;
+        onSuccess: (newRevealRequestStatus: RequesterRevealRequest, userName: string): void => {
+            // Update user profile cache to reflect the removed request
+            queryClient.setQueryData<User>(USERS_KEYS.profile(userName), user => {
+                if (!user) return user;
                 return {
-                    ...oldUser,
-                    revealRequestStatus: data,
+                    ...user,
+                    revealRequestStatus: newRevealRequestStatus,
                 };
             });
+            // Update sentRequests list cache to remove the cancelled request
+            queryClient.setQueriesData<InfiniteData<RequesteeRevealRequestListResponse>>(
+                { queryKey: ["reveals", "sentRequests"] },
+                oldData => {
+                    if (!oldData || !oldData.pages) return oldData;
+                    return {
+                        ...oldData,
+                        pages: oldData.pages.map((page: RequesteeRevealRequestListResponse) => ({
+                            ...page,
+                            data: page.data.filter(
+                                (req: RequesteeRevealRequest): boolean => req.requestee?.userName !== userName
+                            ),
+                        })),
+                    };
+                }
+            );
         },
         ...options,
     });
@@ -188,88 +289,30 @@ export const useDeleteRevealRequestByUserNameMutation = (
 
 export const useRespondToRevealRequestMutation = (
     options?: UseMutationOptions<
-        RevealRequest,
+        RequesterRevealRequest,
         Error,
         { requestId: string; status: RevealStatus.ACCEPTED | RevealStatus.REJECTED }
     >
 ) => {
     return useMutation({
         mutationFn: revealsApi.respondToRevealRequest,
-        onSuccess: (data: RevealRequest, { requestId }): void => {
-            queryClient.setQueriesData<InfiniteData<RevealRequestListResponse>>(
+        onSuccess: (data: RequesterRevealRequest, { requestId }): void => {
+            // Update requestsList cache to reflect the updated request status
+            queryClient.setQueriesData<InfiniteData<RequesterRevealRequestListResponse>>(
                 { queryKey: ["reveals", "requests"] },
                 oldData => {
                     if (!oldData || !oldData.pages) return oldData;
                     return {
                         ...oldData,
-                        pages: oldData.pages.map(page => ({
+                        pages: oldData.pages.map((page: RequesterRevealRequestListResponse) => ({
                             ...page,
-                            data: page.data.map(req => (req.id === requestId ? data : req)),
+                            data: page.data.map((req): RequesterRevealRequest => (req.id === requestId ? data : req)),
                         })),
                     };
                 }
             );
-            // IF the request was accepted, add it to ACCEPTED caches
-            if (data.status === RevealStatus.ACCEPTED) {
-                queryClient.setQueriesData<InfiniteData<RevealRequestListResponse>>(
-                    {
-                        queryKey: ["reveals", "requests"],
-                        // Filter only caches that requested ACCEPTED status.
-                        predicate: query => {
-                            const [_a, _b, params] = query.queryKey as [string, string, RevealQueryParams];
-                            return params?.status === RevealStatus.ACCEPTED;
-                        },
-                    },
-                    oldData => {
-                        // If there's no old data, return it as is.
-                        if (!oldData || !oldData.pages) return oldData;
-
-                        // Check if the request already exists in the cache to avoid duplicates.
-                        const exists: boolean = oldData.pages.some(page => page.data.some(req => req.id === data.id));
-                        if (exists) return oldData;
-
-                        const newPages = [...oldData.pages];
-                        const FIRST_PAGE_INDEX = 0;
-
-                        // Add the new accepted request to the first page.
-                        if (newPages.length > FIRST_PAGE_INDEX) {
-                            const firstPage = newPages[FIRST_PAGE_INDEX];
-
-                            newPages[FIRST_PAGE_INDEX] = {
-                                ...firstPage,
-                                data: [data, ...firstPage.data],
-                                total: firstPage.total + 1,
-                            };
-                        }
-
-                        return { ...oldData, pages: newPages };
-                    }
-                );
-            }
-
-            // IF the request was rejected, remove it from ACCEPTED caches
-            if (data.status === RevealStatus.REJECTED) {
-                queryClient.setQueriesData<InfiniteData<RevealRequestListResponse>>(
-                    {
-                        queryKey: ["reveals", "requests"],
-                        // Filter only caches that requested ACCEPTED status.
-                        predicate: query => {
-                            const [_a, _b, params] = query.queryKey as [string, string, RevealQueryParams];
-                            return params?.status === RevealStatus.ACCEPTED;
-                        },
-                    },
-                    oldData => {
-                        if (!oldData || !oldData.pages) return oldData;
-                        return {
-                            ...oldData,
-                            pages: oldData.pages.map(page => ({
-                                ...page,
-                                data: page.data.filter(req => req.id !== requestId),
-                            })),
-                        };
-                    }
-                );
-            }
+            // Invalidate revealedByMeProfiles cache to reflect any changes
+            queryClient.invalidateQueries({ queryKey: REVEALS_KEYS.revealedByMeProfiles({ query: "" }) });
         },
         ...options,
     });
@@ -281,40 +324,64 @@ export const useRevokeProfileRevealMutation = (
     return useMutation({
         mutationFn: revealsApi.revokeProfileReveal,
         onSuccess: (_data: { status: RevealStatus.NONE }, userName: string): void => {
-            // Update reveals requests cache to remove any requests to this user
-            queryClient.setQueriesData<InfiniteData<RevealRequestListResponse>>(
-                { queryKey: ["reveals", "requests"] },
+            // Update revealed by me profiles cache to remove profile reveal request
+            queryClient.setQueriesData<InfiniteData<ProfileRevealByMeListResponse>>(
+                { queryKey: ["reveals", "revealedByMeProfiles"] },
                 oldData => {
                     if (!oldData || !oldData.pages) return oldData;
                     return {
                         ...oldData,
-                        pages: oldData.pages.map(page => ({
+                        pages: oldData.pages.map((page: ProfileRevealByMeListResponse) => ({
                             ...page,
-                            data: page.data.filter(req => req.requester.userName !== userName),
+                            data: page.data.filter(
+                                (req: ProfileRevealByMe): boolean => req.revealedTo.userName !== userName
+                            ),
                         })),
                     };
                 }
             );
+
+            // Invalidate requests cache to reflect the change
+            queryClient.invalidateQueries({ queryKey: REVEALS_KEYS.requests({ query: "" }) });
         },
         ...options,
     });
 };
 
-// export const useGetRevealedProfilesInfiniteQuery = (
-//     params: QueryParams,
-//     options?: Omit<
-//         UseInfiniteQueryOptions<ProfileRevealListResponse, Error, InfiniteData<ProfileRevealListResponse>>,
-//         "queryKey" | "queryFn" | "getNextPageParam" | "initialPageParam"
-//     >
-// ) => {
-//     return useInfiniteQuery({
-//         queryKey: REVEALS_KEYS.revealedProfiles(params),
-//         queryFn: ({ pageParam }) => revealsApi.getRevealedProfiles({ ...params, pageParam: pageParam as number }),
-//         initialPageParam: INITIAL_PAGE_PARAM,
-//         getNextPageParam: (lastPage, _allPages, lastPageParam) => {
-//             const totalPages = Math.ceil(lastPage.total / lastPage.limit);
-//             return (lastPageParam as number) < totalPages ? (lastPageParam as number) + 1 : undefined;
-//         },
-//         ...options,
-//     });
-// };
+export const useGetRevealedByMeProfilesInfiniteQuery = (
+    params: QueryParams,
+    options?: Omit<
+        UseInfiniteQueryOptions<ProfileRevealByMeListResponse, Error, InfiniteData<ProfileRevealByMeListResponse>>,
+        "queryKey" | "queryFn" | "getNextPageParam" | "initialPageParam"
+    >
+) => {
+    return useInfiniteQuery({
+        queryKey: REVEALS_KEYS.revealedByMeProfiles(params),
+        queryFn: ({ pageParam }) => revealsApi.getRevealedByMeProfiles({ ...params, page: pageParam as number }),
+        initialPageParam: INITIAL_PAGE_PARAM,
+        getNextPageParam: (lastPage, _allPages, lastPageParam) => {
+            const totalPages = Math.ceil(lastPage.total / lastPage.limit);
+            return (lastPageParam as number) < totalPages ? (lastPageParam as number) + 1 : undefined;
+        },
+        ...options,
+    });
+};
+
+export const useGetRevealedToMeProfilesInfiniteQuery = (
+    params: QueryParams,
+    options?: Omit<
+        UseInfiniteQueryOptions<ProfileRevealToMeListResponse, Error, InfiniteData<ProfileRevealToMeListResponse>>,
+        "queryKey" | "queryFn" | "getNextPageParam" | "initialPageParam"
+    >
+) => {
+    return useInfiniteQuery({
+        queryKey: REVEALS_KEYS.revealedToMeProfiles(params),
+        queryFn: ({ pageParam }) => revealsApi.getRevealedToMeProfiles({ ...params, page: pageParam as number }),
+        initialPageParam: INITIAL_PAGE_PARAM,
+        getNextPageParam: (lastPage, _allPages, lastPageParam) => {
+            const totalPages = Math.ceil(lastPage.total / lastPage.limit);
+            return (lastPageParam as number) < totalPages ? (lastPageParam as number) + 1 : undefined;
+        },
+        ...options,
+    });
+};

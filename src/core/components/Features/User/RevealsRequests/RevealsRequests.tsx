@@ -8,16 +8,15 @@ import DialogContent from "@mui/material/DialogContent";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import { Activity, FC, SyntheticEvent, useState } from "react";
 import { POLLING_INTERVAL } from "@app/core/constants/general.ts";
+import { IncomingRequests, OutgoingRequests } from "@app/core/components";
 import { useGetPeendingRevealRequestsCountQuery } from "@app/core/services";
-import { RevealRequests } from "@app/core/components/Features/User/Reveals/RevealRequests";
-import { AcceptedRequests } from "@app/core/components/Features/User/Reveals/AcceptedRequests";
 
-export type RevealsStatsType = "acceptedRequests" | "revealRequests";
+export type RevealsStatsType = "incomingRequests" | "outgoingRequests";
 
-export const Reveals: FC = memo(() => {
+export const RevealsRequests: FC = memo(() => {
     const isMobile: boolean = useIsMobile();
     const [open, setOpen] = useState(false);
-    const [tab, setTab] = useState<RevealsStatsType>("revealRequests");
+    const [tab, setTab] = useState<RevealsStatsType>("incomingRequests");
 
     const { data } = useGetPeendingRevealRequestsCountQuery({ refetchInterval: POLLING_INTERVAL });
 
@@ -26,7 +25,6 @@ export const Reveals: FC = memo(() => {
         event.preventDefault();
         setTab(newValue);
     };
-
     const handleOpen = (): void => setOpen(true);
 
     const handleClose = (event: SyntheticEvent): void => {
@@ -44,15 +42,15 @@ export const Reveals: FC = memo(() => {
             <Dialog fullWidth open={open} maxWidth="sm" onClose={handleClose} fullScreen={isMobile}>
                 <>
                     <Tabs value={tab} onChange={handleChange} variant="fullWidth">
-                        <Tab label="Reveal Requests" value="revealRequests" />
-                        <Tab label="Accepted Requests" value="acceptedRequests" />
+                        <Tab label="Incoming Requests" value="incomingRequests" />
+                        <Tab label="Outgoing Requests" value="outgoingRequests" />
                     </Tabs>
                     <DialogContent>
-                        <Activity mode={tab === "revealRequests" ? "visible" : "hidden"}>
-                            <RevealRequests type={tab} />
+                        <Activity mode={tab === "incomingRequests" ? "visible" : "hidden"}>
+                            <IncomingRequests type={tab} />
                         </Activity>
-                        <Activity mode={tab === "acceptedRequests" ? "visible" : "hidden"}>
-                            <AcceptedRequests type={tab} />
+                        <Activity mode={tab === "outgoingRequests" ? "visible" : "hidden"}>
+                            <OutgoingRequests type={tab} />
                         </Activity>
                     </DialogContent>
                 </>

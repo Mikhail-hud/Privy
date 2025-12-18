@@ -1,4 +1,5 @@
-export * from "./Reveals";
+export * from "./RevealsRequests";
+export * from "./ProfileReveals";
 export * from "./UserStats";
 export * from "./UserPhotoGallery";
 export * from "./UserAvatarBadge";

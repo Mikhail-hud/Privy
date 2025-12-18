@@ -1,22 +1,20 @@
 import { FC, memo, MouseEvent } from "react";
-import { RevealRequest } from "@app/core/services";
+import { ProfileRevealToMe } from "@app/core/services";
 import { UserListItemBase } from "@app/core/components";
-import { RevealRequestsButtonGroup } from "@app/core/components/Features/User/Reveals/RevealRequests/RevealRequestsButtonGroup";
 
-interface UserSummaryListItemProps {
+interface AcceptedRequestsListItemProps {
     isLast: boolean;
-    revealRequest: RevealRequest;
+    revealRequest: ProfileRevealToMe;
     onListItemClick?: (e: MouseEvent<HTMLAnchorElement>) => void;
 }
 
-export const RevealRequestsListItemComponent: FC<UserSummaryListItemProps> = ({
+const RevealedToMeRequestsListItemComponent: FC<AcceptedRequestsListItemProps> = ({
     isLast,
     revealRequest,
     onListItemClick,
 }) => {
     const {
-        id: requesterId,
-        requester: { userName, fullName, isProfileIncognito, publicPhoto, privatePhoto, canViewFullProfile },
+        revealer: { userName, fullName, isProfileIncognito, publicPhoto, privatePhoto, canViewFullProfile },
     } = revealRequest;
     const src: string | undefined = canViewFullProfile ? publicPhoto?.src : privatePhoto?.src;
     const alt: string = canViewFullProfile ? `avatar_${publicPhoto?.id}` : `avatar_${privatePhoto?.id}`;
@@ -30,9 +28,8 @@ export const RevealRequestsListItemComponent: FC<UserSummaryListItemProps> = ({
             fullName={fullName}
             onListItemClick={onListItemClick}
             isProfileIncognito={isProfileIncognito}
-            action={<RevealRequestsButtonGroup requestId={requesterId} status={revealRequest.status} />}
         />
     );
 };
 
-export const RevealRequestsListItem = memo(RevealRequestsListItemComponent);
+export const RevealedToMeRequestsListItem = memo(RevealedToMeRequestsListItemComponent);

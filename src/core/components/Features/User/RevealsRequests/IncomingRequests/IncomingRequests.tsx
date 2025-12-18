@@ -2,30 +2,31 @@ import { useDebounce } from "@app/core/hooks";
 import { DEBOUNCE_DELAY } from "@app/core/constants/general";
 import { ChangeEvent, FC, ReactElement, useState } from "react";
 import {
-    RevealRequest,
     RevealStatus,
-    RevealRequestListResponse,
+    RequesterRevealRequest,
+    RequesterRevealRequestListResponse,
     useGetRevealRequestsInfiniteQuery,
 } from "@app/core/services";
 import { InfiniteScrollList, RevealsStatsType, Spiner, UserSearchField } from "@app/core/components";
-import { RevealRequestsListItem } from "@app/core/components/Features/User/Reveals/RevealRequests/RevealRequestsListItem";
-
+import { IncomingRequestsListItem } from "@app/core/components/Features/User/RevealsRequests/IncomingRequests/IncomingRequestsListItem";
 interface ApprovalListProps {
     type: RevealsStatsType;
 }
 
-export const RevealRequests: FC<ApprovalListProps> = ({ type }) => {
+export const IncomingRequests: FC<ApprovalListProps> = ({ type }) => {
     const [searchQuery, setSearchQuery] = useState<string>("");
     const query: string = useDebounce(searchQuery, DEBOUNCE_DELAY);
 
     const { data, fetchNextPage, hasNextPage, isLoading, isFetchingNextPage, isFetching } =
         useGetRevealRequestsInfiniteQuery(
             { query, status: RevealStatus.PENDING },
-            { enabled: type === "revealRequests" }
+            { enabled: type === "incomingRequests" }
         );
 
-    const requests: RevealRequest[] = useMemo<RevealRequest[]>(
-        () => data?.pages.flatMap((page: RevealRequestListResponse): RevealRequest[] => page.data) ?? [],
+    const requests: RequesterRevealRequest[] = useMemo<RequesterRevealRequest[]>(
+        () =>
+            data?.pages.flatMap((page: RequesterRevealRequestListResponse): RequesterRevealRequest[] => page.data) ??
+            [],
         [data]
     );
 
@@ -34,7 +35,7 @@ export const RevealRequests: FC<ApprovalListProps> = ({ type }) => {
     return (
         <>
             <UserSearchField value={searchQuery} onChange={onSearchQueryChange} />
-            <InfiniteScrollList<RevealRequest>
+            <InfiniteScrollList<RequesterRevealRequest>
                 data={requests}
                 loaderCount={1}
                 loader={Spiner}
@@ -43,8 +44,8 @@ export const RevealRequests: FC<ApprovalListProps> = ({ type }) => {
                 hasNextPage={hasNextPage}
                 fetchNextPage={fetchNextPage}
                 isFetchingNextPage={isFetchingNextPage}
-                renderItem={(revealRequest: RevealRequest, index: number): ReactElement => (
-                    <RevealRequestsListItem
+                renderItem={(revealRequest: RequesterRevealRequest, index: number): ReactElement => (
+                    <IncomingRequestsListItem
                         key={revealRequest.id}
                         revealRequest={revealRequest}
                         isLast={index === requests.length - 1}
