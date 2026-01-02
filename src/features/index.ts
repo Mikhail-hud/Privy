@@ -3,7 +3,7 @@ export * from "./profile";
 export * from "./auth";
 export * from "./dialogs";
 export * from "./settings";
-export * from "./favorites";
+export * from "./talkSpace";
 export * from "./userProfile";
 export * from "./lookup";
 export * from "./dashboard";

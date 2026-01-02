@@ -61,7 +61,7 @@ export const RevokeProfileRevealButton: FC<RevokeProfileRevealButtonProps> = ({ 
                     <Button onClick={handleClose} disabled={isPending}>
                         Cancel
                     </Button>
-                    <Button onClick={handleRevokeConfirm} color="error" disabled={isPending}>
+                    <Button onClick={handleRevokeConfirm} variant="outlined" color="error" disabled={isPending}>
                         {isPending ? "Revoking..." : "Yes, revoke"}
                     </Button>
                 </DialogActions>

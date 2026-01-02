@@ -9,8 +9,8 @@ import DialogContent from "@mui/material/DialogContent";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { transformServerErrors } from "@app/core/utils/general";
 import { VALIDATE_RELES } from "@app/core/constants/rulesConstants";
+import { BirthDate, TextField, FullName, Gender, Switch, Interests, UserLinks } from "@app/core/components";
 import { ProfileUpdatePayload, Profile, UserGender, useUpdateProfileMutation, ApiError } from "@app/core/services";
-import { BirthDate, Biography, FullName, Gender, Switch, Interests, UserLinks } from "@app/core/components";
 
 export const PROFILE_FORM_FIELDS = {
     gender: { name: "gender", label: "Gender" },
@@ -18,7 +18,7 @@ export const PROFILE_FORM_FIELDS = {
     birthDate: { name: "birthDate", label: "Birthdate" },
     fullName: { name: "fullName", label: "Full Name" },
     email: { name: "email", label: "Email" },
-    biography: { name: "biography", label: "Biography" },
+    biography: { name: "biography", label: "Biography", placeholder: "Share something about yourself" },
 } as const;
 
 export interface ProfileFormValues {
@@ -29,7 +29,7 @@ export interface ProfileFormValues {
     [PROFILE_FORM_FIELDS.fullName.name]: string;
 }
 
-const DEFAULT_SIGN_UP_FORM_VALUES: ProfileFormValues = {
+const DEFAULT_PROFILE_FORM_VALUES: ProfileFormValues = {
     [PROFILE_FORM_FIELDS.gender.name]: UserGender.OTHER,
     [PROFILE_FORM_FIELDS.incognito.name]: true,
     [PROFILE_FORM_FIELDS.birthDate.name]: null,
@@ -56,7 +56,7 @@ export const EditProfileAction: FC<EditProfileActionProps> = memo(({ profile }) 
 
     const form = useForm<ProfileFormValues>({
         mode: "onChange",
-        defaultValues: DEFAULT_SIGN_UP_FORM_VALUES,
+        defaultValues: DEFAULT_PROFILE_FORM_VALUES,
         errors: transformServerErrors((error as unknown as ApiError)?.errors),
     });
 
@@ -92,6 +92,7 @@ export const EditProfileAction: FC<EditProfileActionProps> = memo(({ profile }) 
                 slotProps={{
                     paper: {
                         component: "form",
+                        // sx: { width: "100%", maxWidth: 800 },
                         onSubmit: handleSubmit(onValidSubmit),
                     },
                 }}
@@ -103,11 +104,13 @@ export const EditProfileAction: FC<EditProfileActionProps> = memo(({ profile }) 
                         name={PROFILE_FORM_FIELDS.fullName.name}
                         label={PROFILE_FORM_FIELDS.fullName.label}
                     />
-                    <Biography<ProfileFormValues>
+                    <TextField<ProfileFormValues>
+                        variant="standard"
                         control={control}
                         rules={VALIDATE_RELES.BIOGRAPHY}
                         name={PROFILE_FORM_FIELDS.biography.name}
                         label={PROFILE_FORM_FIELDS.biography.label}
+                        placeholder={PROFILE_FORM_FIELDS.biography.placeholder}
                     />
                     <Interests interests={profile.interests} />
                     <UserLinks links={profile.links} />

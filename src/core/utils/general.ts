@@ -1,5 +1,5 @@
 import { FieldErrors, FieldValues } from "react-hook-form";
-import { MouseEvent, TouchEvent } from "react";
+import { MouseEvent, SyntheticEvent, TouchEvent } from "react";
 
 export const transformServerErrors = <T extends FieldValues>(
     errors: Record<keyof T, string> | undefined
@@ -16,7 +16,9 @@ export const transformServerErrors = <T extends FieldValues>(
     }, {} as FieldErrors<T>);
 };
 
-export const stopEventPropagation = <T extends MouseEvent<HTMLElement> | TouchEvent<HTMLElement>>(event: T): void => {
+export const stopEventPropagation = <T extends MouseEvent<HTMLElement> | TouchEvent<HTMLElement> | SyntheticEvent>(
+    event: T
+): void => {
     event.stopPropagation();
     event.preventDefault();
 };

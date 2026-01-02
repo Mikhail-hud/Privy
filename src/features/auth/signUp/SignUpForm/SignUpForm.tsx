@@ -7,7 +7,7 @@ import { SubmitHandler, useForm } from "react-hook-form";
 import { transformServerErrors } from "@app/core/utils/general";
 import { VALIDATE_RELES } from "@app/core/constants/rulesConstants";
 import { Navigation, useActionData, useNavigation } from "react-router-dom";
-import { BirthDate, UserName, Email, Password, RememberMe, FullName, Biography, Gender } from "@app/core/components";
+import { BirthDate, UserName, Email, Password, RememberMe, FullName, TextField, Gender } from "@app/core/components";
 
 export const SIGN_UP_FORM_FIELDS = {
     gender: { name: "gender", label: "Gender" },
@@ -17,7 +17,7 @@ export const SIGN_UP_FORM_FIELDS = {
     password: { name: "password", label: "Password" },
     rememberMe: { name: "rememberMe", label: "Remember Me" },
     email: { name: "email", label: "Email" },
-    biography: { name: "biography", label: "Biography" },
+    biography: { name: "biography", label: "Biography", placeholder: "Share something about yourself" },
     passwordRepeat: { name: "passwordRepeat", label: "Repeat Password" },
 } as const;
 
@@ -115,11 +115,13 @@ export const SignUpForm: FC = () => {
                 name={SIGN_UP_FORM_FIELDS.fullName.name}
                 label={SIGN_UP_FORM_FIELDS.fullName.label}
             />
-            <Biography<SignUpFormValues>
+            <TextField<SignUpFormValues>
                 control={control}
+                variant="standard"
                 rules={VALIDATE_RELES.BIOGRAPHY}
                 name={SIGN_UP_FORM_FIELDS.biography.name}
                 label={SIGN_UP_FORM_FIELDS.biography.label}
+                placeholder={SIGN_UP_FORM_FIELDS.biography.placeholder}
             />
             <Gender<SignUpFormValues>
                 control={control}

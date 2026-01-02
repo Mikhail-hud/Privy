@@ -3,7 +3,7 @@ export * from "./UserName";
 export * from "./Email";
 export * from "./RememberMe";
 export * from "./FullName";
-export * from "./Biography";
+export * from "./TextField";
 export * from "./Gender";
 export * from "./Interests";
 export * from "./Identifier";

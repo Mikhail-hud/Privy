@@ -134,7 +134,6 @@ export const USERS_KEYS = {
     followers: (params: UsersParamsWithUserName) => [...USERS_KEYS.all, "followers", params] as const,
     following: (params: UsersParamsWithUserName) => [...USERS_KEYS.all, "following", params] as const,
 };
-
 // API Functions
 export const usersApi = {
     getUsers: async ({

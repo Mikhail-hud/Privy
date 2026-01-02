@@ -41,7 +41,7 @@ const SwitchFormControl = <T extends FieldValues>({
             field: ControllerRenderProps<T, Path<T>>;
             fieldState: ControllerFieldState;
         }) => (
-            <FormControl error={!!error}>
+            <FormControl error={!!error} sx={{ width: "100%" }}>
                 <Box
                     sx={{
                         display: "flex",

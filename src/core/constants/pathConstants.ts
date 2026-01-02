@@ -6,7 +6,7 @@ export const PROFILE_PHOTOS_TAB_PATH = "/profile/photos";
 
 export const LOOKUP_PAGE_PATH = "/lookup";
 export const DIALOGS_PAGE_PATH = "/dialogs";
-export const FAVORITES_PAGE_PATH = "/favorites";
+export const TALK_SPACE_PAGE_PATH = "/talk-space";
 export const DASHBOARD_PAGE_PATH = "/dashboard";
 export const SETTINGS_PAGE_PATH = "/settings";
 export const SIGN_IN_PAGE_PATH = "/sign-in";

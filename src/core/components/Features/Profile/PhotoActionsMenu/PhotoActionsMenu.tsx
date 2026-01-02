@@ -53,7 +53,7 @@ export const PhotoActionsMenu: FC<PhotoActionsMenuProps> = memo(({ photo, handle
     return (
         <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleClose}>
             {isPublicPhoto ? (
-                <MenuItem onClick={handleUnsetPublicPhoto}>
+                <MenuItem onClick={handleUnsetPublicPhoto} disabled={isUnSettingAsPublic}>
                     <ListItemIcon>
                         {isUnSettingAsPublic ? (
                             <CircularProgress size={16} color="inherit" />
@@ -64,7 +64,7 @@ export const PhotoActionsMenu: FC<PhotoActionsMenuProps> = memo(({ photo, handle
                     Unset Public Profile Photo
                 </MenuItem>
             ) : (
-                <MenuItem onClick={handleSetPhotoAsPublic}>
+                <MenuItem onClick={handleSetPhotoAsPublic} disabled={isSettingAsPublic}>
                     <ListItemIcon>
                         {isSettingAsPublic ? (
                             <CircularProgress size={16} color="inherit" />
@@ -76,7 +76,7 @@ export const PhotoActionsMenu: FC<PhotoActionsMenuProps> = memo(({ photo, handle
                 </MenuItem>
             )}
             {isPrivatePhoto ? (
-                <MenuItem onClick={handleUnsetPrivatePhoto}>
+                <MenuItem onClick={handleUnsetPrivatePhoto} disabled={isUnSettingAsPrivate}>
                     <ListItemIcon>
                         {isUnSettingAsPrivate ? (
                             <CircularProgress size={16} color="inherit" />
@@ -87,7 +87,7 @@ export const PhotoActionsMenu: FC<PhotoActionsMenuProps> = memo(({ photo, handle
                     Unset Private Profile Photo
                 </MenuItem>
             ) : (
-                <MenuItem onClick={handleSetPhotoAsPrivate}>
+                <MenuItem onClick={handleSetPhotoAsPrivate} disabled={isSettingAsPrivate}>
                     <ListItemIcon>
                         {isSettingAsPrivate ? (
                             <CircularProgress size={16} color="inherit" />
@@ -104,7 +104,7 @@ export const PhotoActionsMenu: FC<PhotoActionsMenuProps> = memo(({ photo, handle
                 </ListItemIcon>
                 Download
             </MenuItem>
-            <MenuItem onClick={handleDeletePhoto} sx={{ color: "error.main" }}>
+            <MenuItem onClick={handleDeletePhoto} sx={{ color: "error.main" }} disabled={isDeleting}>
                 <ListItemIcon>
                     {isDeleting ? <CircularProgress size={16} color="inherit" /> : <DeleteIcon fontSize="small" />}
                 </ListItemIcon>

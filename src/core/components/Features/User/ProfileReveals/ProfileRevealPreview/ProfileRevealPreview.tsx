@@ -4,16 +4,18 @@ import {
     useGetRevealedToMeProfilesInfiniteQuery,
 } from "@app/core/services";
 import { FC, useMemo } from "react";
-import IconButton from "@mui/material/IconButton";
-import Diversity2Icon from "@mui/icons-material/Diversity2";
 import { Avatar } from "@app/core/components";
-import AvatarGroup from "@mui/material/AvatarGroup";
 import Skeleton from "@mui/material/Skeleton";
+import { useIsMobile } from "@app/core/hooks";
+import IconButton from "@mui/material/IconButton";
+import AvatarGroup from "@mui/material/AvatarGroup";
+import Diversity2Icon from "@mui/icons-material/Diversity2";
 
 interface ProfileRevealPreviewProps {
     handleOpen: () => void;
 }
 export const ProfileRevealPreview: FC<ProfileRevealPreviewProps> = ({ handleOpen }) => {
+    const isMobile: boolean = useIsMobile();
     const { data, isLoading } = useGetRevealedToMeProfilesInfiniteQuery({ page: 1, limit: 3 });
 
     const profileReveals = useMemo<{ profiles: ProfileRevealToMe[]; total: number }>(() => {
@@ -38,8 +40,9 @@ export const ProfileRevealPreview: FC<ProfileRevealPreviewProps> = ({ handleOpen
                 sx={{
                     cursor: "pointer",
                     "& .MuiAvatar-root": {
-                        width: 30,
-                        height: 30,
+                        width: isMobile ? 26 : 30,
+                        height: isMobile ? 26 : 30,
+                        fontSize: isMobile ? "small" : "medium",
                     },
                 }}
             >

@@ -21,6 +21,7 @@ export const ProfileCard: FC<ProfileCardProps> = memo(({ profile }) => {
             cardAction={
                 <Box
                     sx={{
+                        gap: 1,
                         display: "flex",
                         width: "100%",
                         flexWrap: "wrap",

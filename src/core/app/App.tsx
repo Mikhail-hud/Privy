@@ -7,7 +7,7 @@ import {
     PROFILE_PAGE_PATH,
     DIALOGS_PAGE_PATH,
     SETTINGS_PAGE_PATH,
-    FAVORITES_PAGE_PATH,
+    TALK_SPACE_PAGE_PATH,
     NOT_FOUND_PAGE_PATH,
     DASHBOARD_PAGE_PATH,
     RESET_PASSWORD_PATH,
@@ -27,7 +27,7 @@ import {
     Dialogs,
     SignUp,
     Lookup,
-    Favorites,
+    TalkSpace,
     ErrorPage,
     lookupLoader,
     ResetPassword,
@@ -129,8 +129,8 @@ const router = createBrowserRouter([
                 element: <Dialogs />,
             },
             {
-                path: FAVORITES_PAGE_PATH,
-                element: <Favorites />,
+                path: TALK_SPACE_PAGE_PATH,
+                element: <TalkSpace />,
             },
             {
                 element: <RequireAdmin />,
