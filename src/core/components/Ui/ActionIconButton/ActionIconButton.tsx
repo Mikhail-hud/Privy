@@ -18,9 +18,11 @@ export const ActionIconButton: FC<ActionIconButtonProps> = ({ icon, label, sx = 
                     (theme: Theme) => ({
                         flexDirection: "column",
                         color: (theme.vars || theme).palette.common.white,
-                        backgroundColor: "transparent",
+                        borderRadius: "10px",
+                        padding: theme.spacing(0.8),
+                        backgroundColor: alpha(theme.palette.common.black, 0.3),
                         "&:hover": {
-                            backgroundColor: "transparent",
+                            backgroundColor: alpha(theme.palette.common.black, 0.5),
                         },
                         "&.Mui-disabled": {
                             color: alpha(theme.palette.common.white, 0.3),

@@ -2,11 +2,11 @@ import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
 import { Theme } from "@mui/material";
+import { Navigation } from "swiper/modules";
 import { Photo } from "@app/core/services";
 import { FC, CSSProperties } from "react";
 import { alpha } from "@mui/material/styles";
 import { useTheme } from "@app/core/providers";
-import { Navigation, Pagination } from "swiper/modules";
 import { Swiper, SwiperProps, SwiperSlide } from "swiper/react";
 
 interface PhotoSwiperProps extends SwiperProps {
@@ -22,8 +22,8 @@ export const PhotoSwiper: FC<PhotoSwiperProps> = ({ photos = [], ...rest }) => {
             navigation
             grabCursor
             slidesPerView={1}
-            modules={[Navigation, Pagination]}
-            pagination={{ clickable: true, dynamicBullets: true }}
+            modules={[Navigation]}
+            pagination={{ clickable: true }}
             style={
                 {
                     width: "100%",
@@ -56,8 +56,7 @@ export const PhotoSwiper: FC<PhotoSwiperProps> = ({ photos = [], ...rest }) => {
                             maxWidth: "100%",
                             maxHeight: "100%",
                             objectFit: "contain",
-                            display: "flex",
-                            margin: "0 auto",
+                            borderRadius: "12px",
                         }}
                     />
                 </SwiperSlide>

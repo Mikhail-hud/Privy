@@ -6,17 +6,17 @@ import {
     SIGN_IN_PAGE_PATH,
     PROFILE_PAGE_PATH,
     DIALOGS_PAGE_PATH,
+    LOOKUP_PAGE_PATH,
     SETTINGS_PAGE_PATH,
-    TALK_SPACE_PAGE_PATH,
-    NOT_FOUND_PAGE_PATH,
     DASHBOARD_PAGE_PATH,
+    NOT_FOUND_PAGE_PATH,
     RESET_PASSWORD_PATH,
-    PROFILE_REPLIES_TAB_PATH,
+    TALK_SPACE_PAGE_PATH,
+    USER_PROFILE_PAGE_PATH,
     PROFILE_PHOTOS_TAB_PATH,
+    PROFILE_REPLIES_TAB_PATH,
     SIGN_OUT_ACTION_ONLY_PATH,
     PROFILE_FAVORITES_TAB_PATH,
-    LOOKUP_PAGE_PATH,
-    USER_PROFILE_PAGE_PATH,
 } from "@app/core/constants/pathConstants";
 import { AppLayout, RedirectIfOwner, Spiner, TabContainer } from "@app/core/components";
 import { createBrowserRouter, RouterProvider, Navigate, redirect } from "react-router-dom";
@@ -28,6 +28,7 @@ import {
     SignUp,
     Lookup,
     TalkSpace,
+    talkSpaceLoader,
     ErrorPage,
     lookupLoader,
     ResetPassword,
@@ -129,6 +130,7 @@ const router = createBrowserRouter([
                 element: <Dialogs />,
             },
             {
+                loader: talkSpaceLoader,
                 path: TALK_SPACE_PAGE_PATH,
                 element: <TalkSpace />,
             },

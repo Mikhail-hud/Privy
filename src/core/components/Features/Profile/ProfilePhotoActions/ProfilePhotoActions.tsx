@@ -48,9 +48,12 @@ export const ProfilePhotoActions: FC<ProfilePhotoActionsProps> = ({ isPublicPhot
         <Box
             sx={{
                 gap: 2,
+                bottom: 10,
                 width: "100%",
                 display: "flex",
+                position: "fixed",
                 justifyContent: "center",
+                zIndex: theme => theme.zIndex.drawer + 1,
             }}
         >
             <ActionIconButton

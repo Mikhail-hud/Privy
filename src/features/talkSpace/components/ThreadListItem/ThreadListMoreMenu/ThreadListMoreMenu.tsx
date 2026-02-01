@@ -1,6 +1,7 @@
 import Menu from "@mui/material/Menu";
 import Button from "@mui/material/Button";
 import { enqueueSnackbar } from "notistack";
+import { useAuth } from "@app/core/hooks";
 import MenuItem from "@mui/material/MenuItem";
 import EditIcon from "@mui/icons-material/Edit";
 import IconButton from "@mui/material/IconButton";
@@ -12,13 +13,20 @@ import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import CircularProgress from "@mui/material/CircularProgress";
 import { stopEventPropagation } from "@app/core/utils/general.ts";
 import ReportProblemIcon from "@mui/icons-material/ReportProblem";
-import { ApiError, Thread, useDeleteThreadMutation } from "@app/core/services";
+import { ApiError, Thread, useDeleteThreadMutation, UserRole } from "@app/core/services";
 import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from "@mui/material";
 
 interface ThreadListMoreMenuProps {
     thread: Thread;
 }
 const ThreadListMoreMenuComponent: FC<ThreadListMoreMenuProps> = ({ thread }) => {
+    const {
+        profile: { role },
+    } = useAuth();
+
+    const canDeleteEditThread: boolean =
+        thread.isOwnedByCurrentUser || role === UserRole.ADMIN || role === UserRole.MODERATOR;
+
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const isMenuOpen: boolean = Boolean(anchorEl);
 
@@ -53,6 +61,7 @@ const ThreadListMoreMenuComponent: FC<ThreadListMoreMenuProps> = ({ thread }) =>
             const errorMessage: string = (error as ApiError)?.message;
             enqueueSnackbar(errorMessage, { variant: "error" });
         }
+        enqueueSnackbar("Thread Deleted successfully", { variant: "success" });
         handleMenuClose(event);
     };
 
@@ -79,7 +88,7 @@ const ThreadListMoreMenuComponent: FC<ThreadListMoreMenuProps> = ({ thread }) =>
                 anchorOrigin={{ vertical: "top", horizontal: "right" }}
                 transformOrigin={{ vertical: "top", horizontal: "right" }}
             >
-                {thread.isOwnedByCurrentUser && (
+                {canDeleteEditThread && (
                     <MenuItem onClick={handleEdit}>
                         <ListItemIcon>
                             <EditIcon fontSize="small" />
@@ -87,7 +96,7 @@ const ThreadListMoreMenuComponent: FC<ThreadListMoreMenuProps> = ({ thread }) =>
                         Edit
                     </MenuItem>
                 )}
-                {thread.isOwnedByCurrentUser && (
+                {canDeleteEditThread && (
                     <MenuItem onClick={handleDialogOpen} sx={{ color: "error.main" }} disabled={isDeleting}>
                         <ListItemIcon>
                             {isDeleting ? (

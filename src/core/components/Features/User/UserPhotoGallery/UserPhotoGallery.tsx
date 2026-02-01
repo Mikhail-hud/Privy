@@ -28,7 +28,6 @@ export const UserPhotoGallery: FC<UserPhotoGalleryProps> = ({ photos, profile, i
     const handleImageClick = useCallback(
         (index: number, photo: Photo) =>
             (_event: MouseEvent<HTMLImageElement>): void => {
-                document.body.style.overflow = "hidden";
                 setActivePhotoInViewer(photo);
                 setSelectedImageIndex(index);
             },
@@ -41,7 +40,6 @@ export const UserPhotoGallery: FC<UserPhotoGalleryProps> = ({ photos, profile, i
     }, []);
 
     const handleCloseBackdrop = useCallback((): void => {
-        document.body.style.overflow = "unset";
         setSelectedImageIndex(null);
         setActivePhotoInViewer(null);
     }, []);

@@ -39,6 +39,10 @@ export interface Photo {
     mimeType: string;
     caption: string | null;
     originalFilename: string;
+    width: number;
+    height: number;
+    blurHash: string;
+    fileSize: number;
     src: string;
 }
 

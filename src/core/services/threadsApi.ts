@@ -8,6 +8,20 @@ import {
 import { INITIAL_PAGE_PARAM, PAGE_SIZE_LIMITS } from "@app/core/constants/ParamsConstants.ts";
 import { apiClient, PaginatedResponse, queryClient, QueryParams, User } from "@app/core/services";
 
+export enum MediaType {
+    IMAGE = "IMAGE",
+    VIDEO = "VIDEO",
+    AUDIO = "AUDIO",
+    GIF = "GIF",
+}
+
+export interface Metadata {
+    index: number;
+    width: number;
+    height: number;
+    duration: number;
+}
+
 export interface ThreadMedia {
     id: string;
     key: string;
@@ -17,6 +31,12 @@ export interface ThreadMedia {
     threadId: string;
     mimeType: string;
     createdAt: string;
+    width: number;
+    height: number;
+    blurHash: string;
+    posterKey: null | string;
+    posterUrl: null | string;
+    type: MediaType;
     originalFilename: "string";
 }
 

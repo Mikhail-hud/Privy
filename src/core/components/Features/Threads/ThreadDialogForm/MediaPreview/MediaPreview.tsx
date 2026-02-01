@@ -2,7 +2,6 @@ import "swiper/css";
 import "swiper/css/pagination";
 import { Box, Theme } from "@mui/material";
 import { FreeMode } from "swiper/modules";
-import { alpha } from "@mui/material/styles";
 import { useTheme } from "@app/core/providers";
 import CloseIcon from "@mui/icons-material/Close";
 import { Swiper, SwiperSlide } from "swiper/react";
@@ -93,15 +92,7 @@ export const MediaPreview: FC<MediaPreviewProps> = ({ files, onRemove }) => {
                             <ActionIconButton
                                 size="small"
                                 icon={<CloseIcon fontSize="small" />}
-                                sx={theme => ({
-                                    top: 4,
-                                    right: 4,
-                                    position: "absolute",
-                                    backgroundColor: alpha(theme.palette.common.black, 0.2),
-                                    "&:hover": {
-                                        backgroundColor: alpha(theme.palette.common.black, 0.4),
-                                    },
-                                })}
+                                sx={{ top: 4, right: 4, position: "absolute" }}
                                 onClick={handleRemove(index)}
                             />
                         </SwiperSlide>

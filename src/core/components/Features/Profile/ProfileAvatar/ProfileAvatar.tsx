@@ -12,7 +12,8 @@ import { enqueueSnackbar } from "notistack";
 import { Avatar } from "@app/core/components";
 import { useIsMobile } from "@app/core/hooks";
 import { ChangeEvent, FC, RefObject, useState } from "react";
-import { FILE_PATTERN, FILE_SIZE } from "@app/core/constants/patterns";
+import { compressImage } from "@app/core/utils/fileUtils.ts";
+import { COMPRESSED_IMAGE_SIZE, ALLOWED_IMAGE_MIME_TYPES, MAX_IMAGE_INPUT_SIZE } from "@app/core/constants/patterns";
 import { AvatarBackdrop } from "@app/core/components/Features/Profile/ProfileAvatar/AvatarBackdrop";
 
 interface ProfileAvatarProps {
@@ -94,7 +95,7 @@ export const ProfileAvatar: FC<ProfileAvatarProps> = ({ profile }) => {
             }
             const file: File = event.target.files[0];
 
-            if (!FILE_PATTERN.test(file.type)) {
+            if (!ALLOWED_IMAGE_MIME_TYPES.test(file.type)) {
                 enqueueSnackbar("Invalid file type. Allowed types: JPEG, PNG, GIF, WEBP, SVG.", {
                     variant: "error",
                 });
@@ -108,11 +109,18 @@ export const ProfileAvatar: FC<ProfileAvatarProps> = ({ profile }) => {
                 return;
             }
             try {
-                if (file.size > FILE_SIZE) {
-                    enqueueSnackbar("File size must not exceed 15 MB", { variant: "error" });
+                if (file.size > MAX_IMAGE_INPUT_SIZE) {
+                    enqueueSnackbar("File size must not exceed 30 MB", { variant: "error" });
                     return;
                 }
-                await uploadPhoto({ file, type: uploadType });
+                const compressed: File = await compressImage(file);
+
+                if (compressed.size > COMPRESSED_IMAGE_SIZE) {
+                    enqueueSnackbar("File size must not exceed 5 MB after compression", { variant: "error" });
+                    return;
+                }
+
+                await uploadPhoto({ file: compressed, type: uploadType });
             } catch (error) {
                 const errorMessage: string = (error as ApiError)?.message;
                 enqueueSnackbar(errorMessage, { variant: "error" });

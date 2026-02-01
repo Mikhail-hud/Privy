@@ -6,17 +6,20 @@ import IconButton from "@mui/material/IconButton";
 import PermMediaIcon from "@mui/icons-material/PermMedia";
 import AddReactionIcon from "@mui/icons-material/AddReaction";
 import AddLocationAltIcon from "@mui/icons-material/AddLocationAlt";
+import { POST_ACCEPT_ATTRIBUTE } from "@app/core/constants/patterns.ts";
 
 interface ThreadActionIconsProps {
     fileInputRef: Ref<HTMLInputElement> | undefined;
     handleFileSelect?: (event: ChangeEvent<HTMLInputElement>) => void;
     handleAttachClick?: () => void;
+    isProcessingFiles: boolean;
 }
 
 export const ThreadActionIcons: FC<ThreadActionIconsProps> = ({
     fileInputRef,
     handleFileSelect,
     handleAttachClick,
+    isProcessingFiles,
 }) => {
     return (
         <Box sx={{ display: "flex", gap: 1 }}>
@@ -24,12 +27,17 @@ export const ThreadActionIcons: FC<ThreadActionIconsProps> = ({
                 multiple
                 type="file"
                 ref={fileInputRef}
-                accept="image/*,video/*"
+                accept={POST_ACCEPT_ATTRIBUTE}
                 style={{ display: "none" }}
                 onChange={handleFileSelect}
             />
             <Tooltip title="Attach Media" placement="top">
-                <IconButton size="small" onClick={handleAttachClick} sx={{ width: 26, height: 26 }}>
+                <IconButton
+                    size="small"
+                    onClick={handleAttachClick}
+                    sx={{ width: 26, height: 26 }}
+                    disabled={isProcessingFiles}
+                >
                     <PermMediaIcon sx={{ fontSize: 18 }} color="action" />
                 </IconButton>
             </Tooltip>

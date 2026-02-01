@@ -4,8 +4,8 @@ import { PrivateIcon } from "@app/core/assets/icons";
 import { Link as RouterLink } from "react-router-dom";
 import { getRelativeTime } from "@app/core/utils/dateUtils.ts";
 import { Avatar, ReadMore, UserAvatarBadge } from "@app/core/components";
-import { ThreadListActions, ThreadListMoreMenu, ThreadMediaGallery } from "@app/features/talkSpace/components";
 import { Box, ListItem, Typography, Divider, ListItemText, ListItemAvatar } from "@mui/material";
+import { ThreadListActions, ThreadListMoreMenu, ThreadMediaGallery } from "@app/features/talkSpace/components";
 
 interface ThreadListItemProps {
     thread: Thread;
@@ -49,6 +49,12 @@ const ThreadListItemComponent: FC<ThreadListItemProps> = ({ thread, isLast }) =>
                 // TODO: Implement navigation to thread detail
                 component={RouterLink}
                 to={`/thread/${thread.id}`}
+                sx={{
+                    "&:hover": {
+                        backgroundColor: "transparent",
+                        textDecoration: "none",
+                    },
+                }}
             >
                 <ListItemAvatar>
                     {isIncognito && !isOwnedByCurrentUser ? (

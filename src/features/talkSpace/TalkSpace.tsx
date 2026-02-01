@@ -1,16 +1,18 @@
 import { useDebounce } from "@app/core/hooks";
+import { useLoaderData } from "react-router-dom";
 import { DEBOUNCE_DELAY } from "@app/core/constants/general";
+import { ThreadsContext } from "@app/features/talkSpace/loaders";
 import { FC, useState, ChangeEvent, ReactElement } from "react";
 import { Thread, useGetThreadsInfiniteQuery } from "@app/core/services";
 import { ThreadListItemSkeleton, ThreadListItem } from "@app/features/talkSpace/components";
 import { ContentCardContainer, InfiniteScrollList, UserSearchField } from "@app/core/components";
 
 export const TalkSpace: FC = () => {
-    // const { params } = useLoaderData() as UsersContext;
+    const { params } = useLoaderData() as ThreadsContext;
     const [searchQuery, setSearchQuery] = useState<string>("");
     const query: string = useDebounce(searchQuery, DEBOUNCE_DELAY);
     const { data, fetchNextPage, hasNextPage, isLoading, isFetchingNextPage, isFetching } = useGetThreadsInfiniteQuery({
-        page: 1,
+        ...params,
         query,
     });
 

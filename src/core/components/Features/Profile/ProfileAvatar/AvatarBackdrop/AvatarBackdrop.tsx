@@ -4,6 +4,7 @@ import Backdrop from "@mui/material/Backdrop";
 import CloseIcon from "@mui/icons-material/Close";
 import Typography from "@mui/material/Typography";
 import DeleteIcon from "@mui/icons-material/Delete";
+import { useBodyOverflowLock } from "@app/core/hooks";
 import AddAPhotoIcon from "@mui/icons-material/AddAPhoto";
 import { PhotoUploadType, Profile } from "@app/core/services";
 import { ActionIconButton, Avatar } from "@app/core/components";
@@ -38,6 +39,7 @@ export const AvatarBackdrop: React.FC<AvatarBackdropContentProps> = ({
     isDeletingIncognitoPhoto,
     open,
 }) => {
+    useBodyOverflowLock(open);
     // TODO: Optimize re-renders
     const isPublicPhoto = photoType === PhotoUploadType.PUBLIC;
     const src = isPublicPhoto ? profile?.publicPhoto?.src : profile?.privatePhoto?.src;
@@ -47,18 +49,33 @@ export const AvatarBackdrop: React.FC<AvatarBackdropContentProps> = ({
     return (
         <Backdrop open={open} sx={{ zIndex: theme => theme.zIndex.drawer + 1, background: "black" }}>
             <Box sx={{ width: "100%", height: "100%", display: "flex", flexDirection: "column" }}>
-                <Box sx={{ p: 2, width: "100%", display: "flex", justifyContent: "space-between" }}>
+                <Box sx={{ p: 2, width: "100%", display: "flex", justifyContent: "space-between", position: "fixed" }}>
                     <ActionIconButton icon={<CloseIcon />} onClick={onClose} />
                     <Typography component="h1" variant="h3" color="white">
                         {isPublicPhoto ? "Public Photo" : "Private Photo"}
                     </Typography>
                 </Box>
-                <Box sx={{ flexGrow: 1, display: "flex", justifyContent: "center", alignItems: "center" }}>
+                <Box
+                    sx={{
+                        display: "flex",
+                        justifyContent: "center",
+                        alignItems: "center",
+                        width: "100%",
+                        height: "100%",
+                        overflow: "hidden",
+                        p: 1,
+                    }}
+                >
                     {src ? (
                         <img
                             src={src}
                             alt={isPublicPhoto ? "public_photo" : "private_photo"}
-                            style={{ maxWidth: "80vw", maxHeight: "80vh", borderRadius: "2px" }}
+                            style={{
+                                maxWidth: "100%",
+                                maxHeight: "100%",
+                                objectFit: "contain",
+                                borderRadius: "12px",
+                            }}
                         />
                     ) : (
                         <Avatar
@@ -70,39 +87,41 @@ export const AvatarBackdrop: React.FC<AvatarBackdropContentProps> = ({
                             alt={isPublicPhoto ? "public_photo" : "private_photo"}
                         />
                     )}
-                </Box>
-
-                <Box
-                    sx={{
-                        gap: 2,
-                        width: "100%",
-                        display: "flex",
-                        justifyContent: "center",
-                    }}
-                >
-                    <ActionIconButton
-                        label="Upload"
-                        loading={isUploading}
-                        icon={<AddAPhotoIcon />}
-                        onClick={onUploadClick(photoType)}
-                    />
-                    {onUnsetPhotoShown && (
+                    <Box
+                        sx={{
+                            gap: 2,
+                            mb: 1,
+                            bottom: 5,
+                            width: "100%",
+                            display: "flex",
+                            position: "fixed",
+                            justifyContent: "center",
+                        }}
+                    >
                         <ActionIconButton
-                            onClick={onUnsetPhoto}
-                            loading={isUnSetting}
-                            icon={isPublicPhoto ? <PublicIcon /> : <PrivateIcon />}
-                            label={isPublicPhoto ? "Unset Public" : "Unset Private"}
+                            label="Upload"
+                            loading={isUploading}
+                            icon={<AddAPhotoIcon />}
+                            onClick={onUploadClick(photoType)}
                         />
-                    )}
-                    {currentPhotoId && (
-                        <ActionIconButton
-                            label="Delete"
-                            loading={isDeleting}
-                            icon={<DeleteIcon />}
-                            sx={{ color: "error.main" }}
-                            onClick={onDeletePhoto(currentPhotoId, photoType)}
-                        />
-                    )}
+                        {onUnsetPhotoShown && (
+                            <ActionIconButton
+                                onClick={onUnsetPhoto}
+                                loading={isUnSetting}
+                                icon={isPublicPhoto ? <PublicIcon /> : <PrivateIcon />}
+                                label={isPublicPhoto ? "Unset Public" : "Unset Private"}
+                            />
+                        )}
+                        {currentPhotoId && (
+                            <ActionIconButton
+                                label="Delete"
+                                loading={isDeleting}
+                                icon={<DeleteIcon />}
+                                sx={{ color: "error.main" }}
+                                onClick={onDeletePhoto(currentPhotoId, photoType)}
+                            />
+                        )}
+                    </Box>
                 </Box>
             </Box>
         </Backdrop>

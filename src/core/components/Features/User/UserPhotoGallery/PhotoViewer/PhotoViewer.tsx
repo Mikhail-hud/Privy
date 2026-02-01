@@ -1,7 +1,8 @@
 import { FC } from "react";
 import { Backdrop, Box } from "@mui/material";
-import { Photo, Profile } from "@app/core/services";
 import CloseIcon from "@mui/icons-material/Close";
+import { Photo, Profile } from "@app/core/services";
+import { useBodyOverflowLock } from "@app/core/hooks";
 import { PublicIcon, PrivateIcon } from "@app/core/assets/icons";
 import { PhotoSwiper, ActionIconButton, ProfilePhotoActions } from "@app/core/components";
 
@@ -18,21 +19,23 @@ interface PhotoViewerProps {
 
 export const PhotoViewer: FC<PhotoViewerProps> = memo(
     ({ open, onClose, photo, photos, initialSlide, onSlideChange, isOwner, profile }) => {
-        const isPublicPhoto = profile?.publicPhoto?.id === photo?.id;
-        const isPrivatePhoto = profile?.privatePhoto?.id === photo?.id;
+        useBodyOverflowLock(open);
+        const isPublicPhoto: boolean = profile?.publicPhoto?.id === photo?.id;
+        const isPrivatePhoto: boolean = profile?.privatePhoto?.id === photo?.id;
         return (
             <Backdrop sx={{ zIndex: theme => theme.zIndex.drawer + 1, background: "black" }} open={open}>
-                <Box
-                    sx={{
-                        p: 2,
-                        gap: 2,
-                        width: "100%",
-                        height: "100%",
-                        display: "flex",
-                        flexDirection: "column",
-                    }}
-                >
-                    <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                <Box sx={{ width: "100%", height: "100%", p: 1 }}>
+                    <Box
+                        sx={{
+                            display: "flex",
+                            justifyContent: "space-between",
+                            alignItems: "center",
+                            position: "fixed",
+                            width: "100%",
+                            p: 1,
+                            zIndex: theme => theme.zIndex.drawer,
+                        }}
+                    >
                         <ActionIconButton icon={<CloseIcon />} onClick={onClose} sx={{ alignSelf: "flex-start" }} />
                         {(isPublicPhoto || isPrivatePhoto) && (
                             <Box
