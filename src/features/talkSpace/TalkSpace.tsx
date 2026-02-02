@@ -1,8 +1,8 @@
 import { useDebounce } from "@app/core/hooks";
 import { useLoaderData } from "react-router-dom";
 import { DEBOUNCE_DELAY } from "@app/core/constants/general";
-import { FC, useState, ChangeEvent, ReactElement } from "react";
 import { ThreadsContext } from "@app/features/talkSpace/loaders";
+import { FC, useState, ChangeEvent, ReactElement, useCallback, useMemo } from "react";
 import { ThreadListItem, ThreadListItemSkeleton } from "@app/features/talkSpace/components";
 import { ContentCardContainer, InfiniteScrollList, UserSearchField } from "@app/core/components";
 import { Thread, ThreadListResponse, ThreadMedia, useGetThreadsInfiniteQuery } from "@app/core/services";
@@ -33,15 +33,21 @@ export const TalkSpace: FC = () => {
         open: false,
     });
 
-    const handleOpenThreadMediaGalleryBackdrop = (media: ThreadMedia[], index: number): void =>
+    const handleOpenThreadMediaGalleryBackdrop = useCallback((media: ThreadMedia[], index: number): void => {
         setMediaGalleryState({ isOpen: true, media, initialSlide: index });
+    }, []);
 
-    const handleCloseMediaGalleryBackdrop = (): void =>
+    const handleCloseMediaGalleryBackdrop = useCallback((): void => {
         setMediaGalleryState({ media: [], isOpen: false, initialSlide: 0 });
+    }, []);
 
-    const handleOpenThreadMediaBackdrop = (media: ThreadMedia): void => setThreadMediaState({ media, open: true });
+    const handleOpenThreadMediaBackdrop = useCallback((media: ThreadMedia): void => {
+        setThreadMediaState({ media, open: true });
+    }, []);
 
-    const handleCloseThreadMediaBackdrop = (): void => setThreadMediaState({ media: null, open: false });
+    const handleCloseThreadMediaBackdrop = useCallback((): void => {
+        setThreadMediaState({ media: null, open: false });
+    }, []);
 
     const threads: Thread[] = useMemo<Thread[]>(
         (): Thread[] => data?.pages.flatMap((page: ThreadListResponse): Thread[] => page.data) ?? [],

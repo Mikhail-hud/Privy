@@ -1,5 +1,5 @@
 import Box from "@mui/material/Box";
-import React, { MouseEvent } from "react";
+import React, { memo, MouseEvent } from "react";
 import Backdrop from "@mui/material/Backdrop";
 import { ThreadMedia } from "@app/core/services";
 import CloseIcon from "@mui/icons-material/Close";
@@ -13,7 +13,7 @@ interface ThreadMediaBackdropProps {
     media: ThreadMedia | null;
 }
 
-export const ThreadMediaBackdrop: React.FC<ThreadMediaBackdropProps> = ({ onClose, open, media }) => {
+const ThreadMediaBackdropComponent: React.FC<ThreadMediaBackdropProps> = ({ onClose, open, media }) => {
     useBodyOverflowLock(open);
     if (!open || !media) return null;
 
@@ -64,3 +64,5 @@ export const ThreadMediaBackdrop: React.FC<ThreadMediaBackdropProps> = ({ onClos
         </Backdrop>
     );
 };
+
+export const ThreadMediaBackdrop = memo(ThreadMediaBackdropComponent);

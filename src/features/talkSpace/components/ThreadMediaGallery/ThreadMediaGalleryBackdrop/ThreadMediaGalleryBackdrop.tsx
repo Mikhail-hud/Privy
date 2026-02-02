@@ -11,7 +11,7 @@ import { ThreadMedia } from "@app/core/services";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Pagination } from "swiper/modules";
 import { useBodyOverflowLock } from "@app/core/hooks";
-import { FC, MouseEvent, CSSProperties } from "react";
+import { FC, MouseEvent, CSSProperties, memo } from "react";
 import { ActionIconButton } from "@app/core/components";
 import { stopEventPropagation } from "@app/core/utils/general.ts";
 
@@ -22,7 +22,7 @@ interface ThreadMediaGalleryBackdropProps {
     onClose: (e: MouseEvent<HTMLElement>) => void;
 }
 
-export const ThreadMediaGalleryBackdrop: FC<ThreadMediaGalleryBackdropProps> = ({
+const ThreadMediaGalleryBackdropComponent: FC<ThreadMediaGalleryBackdropProps> = ({
     open,
     onClose,
     media,
@@ -124,3 +124,5 @@ export const ThreadMediaGalleryBackdrop: FC<ThreadMediaGalleryBackdropProps> = (
         </Backdrop>
     );
 };
+
+export const ThreadMediaGalleryBackdrop = memo(ThreadMediaGalleryBackdropComponent);

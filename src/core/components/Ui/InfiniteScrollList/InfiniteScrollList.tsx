@@ -1,7 +1,6 @@
 import List from "@mui/material/List";
-import { Spiner } from "@app/core/components";
 import { FC, ReactElement, useRef, memo } from "react";
-import { VirtualizedItem } from "@app/core/components/Ui/InfiniteScrollList/VirtualizedItem.tsx";
+import { Spiner, VirtualizationProvider, VirtualizedItem } from "@app/core/components";
 
 interface InfiniteScrollListProps<T> {
     data: T[];
@@ -45,17 +44,19 @@ const InfiniteScrollListComponent = <T extends { id: number | string }>({
     }, [fetchNextPage, hasNextPage, isFetchingNextPage, isLoading, isFetching, data.length]);
 
     return (
-        <List sx={{ width: "100%", bgcolor: "transparent", padding: 0 }}>
-            {isLoading && Loader
-                ? Array.from({ length: loaderCount }).map((_, index) => <Loader key={index} />)
-                : data.map((item, index) => (
-                      <VirtualizedItem id={item.id} key={item.id}>
-                          {renderItem(item, index)}
-                      </VirtualizedItem>
-                  ))}
+        <VirtualizationProvider>
+            <List sx={{ width: "100%", bgcolor: "transparent", padding: 0 }}>
+                {isLoading && Loader
+                    ? Array.from({ length: loaderCount }).map((_, index) => <Loader key={index} />)
+                    : data.map((item, index) => (
+                          <VirtualizedItem id={item.id} key={item.id}>
+                              {renderItem(item, index)}
+                          </VirtualizedItem>
+                      ))}
 
-            {(hasNextPage || isFetching) && !isLoading && <Spiner enableTrackSlot ref={loaderNodeRef} />}
-        </List>
+                {(hasNextPage || isFetching) && !isLoading && <Spiner enableTrackSlot ref={loaderNodeRef} />}
+            </List>
+        </VirtualizationProvider>
     );
 };
 
