@@ -1,6 +1,7 @@
 import List from "@mui/material/List";
 import { Spiner } from "@app/core/components";
-import { FC, ReactElement, useRef, useCallback, memo } from "react";
+import { FC, ReactElement, useRef, memo } from "react";
+import { VirtualizedItem } from "@app/core/components/Ui/InfiniteScrollList/VirtualizedItem.tsx";
 
 interface InfiniteScrollListProps<T> {
     data: T[];
@@ -14,7 +15,7 @@ interface InfiniteScrollListProps<T> {
     renderItem: (item: T, index: number) => ReactElement;
 }
 
-const InfiniteScrollListComponent = <T extends object>({
+const InfiniteScrollListComponent = <T extends { id: number | string }>({
     data,
     fetchNextPage,
     hasNextPage,
@@ -25,30 +26,35 @@ const InfiniteScrollListComponent = <T extends object>({
     loader: Loader,
     loaderCount = 1,
 }: InfiniteScrollListProps<T>): ReactElement => {
-    const observer = useRef<IntersectionObserver | null>(null);
+    const observerRef = useRef<IntersectionObserver | null>(null);
+    const loaderNodeRef = useRef<HTMLDivElement | null>(null);
 
-    const loaderRef = useCallback(
-        (node: HTMLDivElement | null) => {
-            if (observer.current) observer.current.disconnect();
+    useEffect(() => {
+        if (!loaderNodeRef.current) return;
+        if (data.length === 0) return;
 
-            observer.current = new IntersectionObserver(entries => {
-                if (entries[0].isIntersecting && hasNextPage && !isFetchingNextPage && !isLoading && !isFetching) {
-                    fetchNextPage();
-                }
-            });
+        observerRef.current = new IntersectionObserver(([entry]) => {
+            if (entry.isIntersecting && hasNextPage && !isFetchingNextPage && !isLoading && !isFetching) {
+                fetchNextPage();
+            }
+        });
 
-            if (node) observer.current.observe(node);
-        },
+        observerRef.current.observe(loaderNodeRef.current);
 
-        [hasNextPage, isFetchingNextPage, isLoading, isFetching, fetchNextPage]
-    );
+        return () => observerRef.current?.disconnect();
+    }, [fetchNextPage, hasNextPage, isFetchingNextPage, isLoading, isFetching, data.length]);
+
     return (
-        <List sx={{ width: "100%", bgcolor: "transparent" }}>
+        <List sx={{ width: "100%", bgcolor: "transparent", padding: 0 }}>
             {isLoading && Loader
                 ? Array.from({ length: loaderCount }).map((_, index) => <Loader key={index} />)
-                : data.map((item, index) => renderItem(item, index))}
+                : data.map((item, index) => (
+                      <VirtualizedItem id={item.id} key={item.id}>
+                          {renderItem(item, index)}
+                      </VirtualizedItem>
+                  ))}
 
-            {(hasNextPage || isFetching) && !isLoading && <Spiner enableTrackSlot ref={loaderRef} />}
+            {(hasNextPage || isFetching) && !isLoading && <Spiner enableTrackSlot ref={loaderNodeRef} />}
         </List>
     );
 };

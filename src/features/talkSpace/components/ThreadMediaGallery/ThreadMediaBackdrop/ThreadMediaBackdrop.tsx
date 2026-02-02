@@ -1,19 +1,24 @@
 import Box from "@mui/material/Box";
 import React, { MouseEvent } from "react";
 import Backdrop from "@mui/material/Backdrop";
+import { ThreadMedia } from "@app/core/services";
 import CloseIcon from "@mui/icons-material/Close";
 import { useBodyOverflowLock } from "@app/core/hooks";
 import { ActionIconButton } from "@app/core/components";
 import { stopEventPropagation } from "@app/core/utils/general.ts";
 
-interface SingleThreadMediaBackdropProps {
+interface ThreadMediaBackdropProps {
     onClose: (e: MouseEvent<HTMLElement>) => void;
     open: boolean;
-    src: string;
+    media: ThreadMedia | null;
 }
 
-export const SingleThreadMediaBackdrop: React.FC<SingleThreadMediaBackdropProps> = ({ onClose, open, src }) => {
+export const ThreadMediaBackdrop: React.FC<ThreadMediaBackdropProps> = ({ onClose, open, media }) => {
     useBodyOverflowLock(open);
+    if (!open || !media) return null;
+
+    const { src } = media;
+
     const handleBackdropClick = (e: MouseEvent<HTMLElement>) => {
         stopEventPropagation(e);
         onClose(e);

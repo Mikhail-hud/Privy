@@ -1,5 +1,5 @@
 import { FC, memo } from "react";
-import { Thread } from "@app/core/services";
+import { Thread, ThreadMedia } from "@app/core/services";
 import { PrivateIcon } from "@app/core/assets/icons";
 import { Link as RouterLink } from "react-router-dom";
 import { getRelativeTime } from "@app/core/utils/dateUtils.ts";
@@ -10,6 +10,8 @@ import { ThreadListActions, ThreadListMoreMenu, ThreadMediaGallery } from "@app/
 interface ThreadListItemProps {
     thread: Thread;
     isLast: boolean;
+    handleOpenThreadMediaBackdrop: (media: ThreadMedia) => void;
+    handleOpenThreadMediaGalleryBackdrop: (media: ThreadMedia[], index: number) => void;
 }
 
 const getAuthorDisplayName = (thread: Thread): string => {
@@ -35,7 +37,12 @@ const getAuthorAvatarSrc = (thread: Thread): string | undefined => {
     return thread?.author?.publicPhoto?.src || thread?.author?.privatePhoto?.src;
 };
 
-const ThreadListItemComponent: FC<ThreadListItemProps> = ({ thread, isLast }) => {
+const ThreadListItemComponent: FC<ThreadListItemProps> = ({
+    thread,
+    isLast,
+    handleOpenThreadMediaBackdrop,
+    handleOpenThreadMediaGalleryBackdrop,
+}) => {
     const { author, isIncognito, isOwnedByCurrentUser, isLikedByCurrentUser, likeCount, replyCount, media } = thread;
 
     const showMedia: boolean = Array.isArray(media) && media.length > 0;
@@ -89,7 +96,13 @@ const ThreadListItemComponent: FC<ThreadListItemProps> = ({ thread, isLast }) =>
                     secondary={
                         <Box sx={{ mt: 0.5 }}>
                             <ReadMore text={thread.content} />
-                            {showMedia && <ThreadMediaGallery threadMedia={thread.media} />}
+                            {showMedia && (
+                                <ThreadMediaGallery
+                                    threadMedia={thread.media}
+                                    handleOpenThreadMediaBackdrop={handleOpenThreadMediaBackdrop}
+                                    handleOpenThreadMediaGalleryBackdrop={handleOpenThreadMediaGalleryBackdrop}
+                                />
+                            )}
                             <ThreadListActions
                                 id={thread.id}
                                 likeCount={likeCount}

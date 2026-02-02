@@ -8,8 +8,8 @@ interface SpinerProps extends CircularProgressProps {
 
 export const Spiner: FC<SpinerProps> = ({ ref, ...rest }) => {
     return (
-        <Box ref={ref} sx={{ height: "100%", display: "flex", justifyContent: "center", alignItems: "center", p: 1 }}>
-            <CircularProgress size="2rem" color="primary" {...rest} />
+        <Box ref={ref} sx={{ height: "100%", display: "flex", justifyContent: "center", alignItems: "center", py: 1 }}>
+            <CircularProgress size="1rem" color="info" {...rest} />
         </Box>
     );
 };

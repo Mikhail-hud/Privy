@@ -8,35 +8,29 @@ import { CSSProperties, FC, MouseEvent } from "react";
 import { stopEventPropagation } from "@app/core/utils/general.ts";
 import { MediaItem } from "@app/features/talkSpace/components/ThreadMediaGallery/MediaItem";
 import { SingleThreadMedia } from "@app/features/talkSpace/components/ThreadMediaGallery/SingleThreadMedia";
-import { ThreadMediaFullscreenGallery } from "@app/features/talkSpace/components/ThreadMediaGallery/ThreadMediaFullscreenGallery";
 
 interface ThreadMediaGalleryProps {
     threadMedia: ThreadMedia[];
+    handleOpenThreadMediaBackdrop: (media: ThreadMedia) => void;
+    handleOpenThreadMediaGalleryBackdrop: (media: ThreadMedia[], index: number) => void;
 }
 
-export const ThreadMediaGallery: FC<ThreadMediaGalleryProps> = ({ threadMedia }) => {
-    const [fullscreenOpen, setFullscreenOpen] = useState<boolean>(false);
-    const [initialSlide, setInitialSlide] = useState<number>(0);
-
-    const handleOpenGallery = (index: number): void => {
-        setInitialSlide(index);
-        setFullscreenOpen(true);
-    };
-
-    const handleCloseGallery = (e: MouseEvent<HTMLElement>): void => {
-        stopEventPropagation(e);
-        setFullscreenOpen(false);
-    };
-
+export const ThreadMediaGallery: FC<ThreadMediaGalleryProps> = ({
+    threadMedia,
+    handleOpenThreadMediaBackdrop,
+    handleOpenThreadMediaGalleryBackdrop,
+}) => {
     const handleMediaClick =
         (index: number) =>
         (e: MouseEvent<HTMLElement>): void => {
             stopEventPropagation(e);
-            handleOpenGallery(index);
+            handleOpenThreadMediaGalleryBackdrop?.(threadMedia, index);
         };
 
     if (threadMedia.length === 1) {
-        return <SingleThreadMedia media={threadMedia[0]} />;
+        return (
+            <SingleThreadMedia media={threadMedia[0]} handleOpenThreadMediaBackdrop={handleOpenThreadMediaBackdrop} />
+        );
     }
 
     return (
@@ -64,12 +58,6 @@ export const ThreadMediaGallery: FC<ThreadMediaGalleryProps> = ({ threadMedia })
                     ))}
                 </Swiper>
             </Box>
-            <ThreadMediaFullscreenGallery
-                open={fullscreenOpen}
-                onClose={handleCloseGallery}
-                media={threadMedia}
-                initialSlide={initialSlide}
-            />
         </>
     );
 };

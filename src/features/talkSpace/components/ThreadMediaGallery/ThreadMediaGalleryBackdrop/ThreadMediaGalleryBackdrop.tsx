@@ -15,14 +15,14 @@ import { FC, MouseEvent, CSSProperties } from "react";
 import { ActionIconButton } from "@app/core/components";
 import { stopEventPropagation } from "@app/core/utils/general.ts";
 
-interface ThreadMediaFullscreenGalleryProps {
+interface ThreadMediaGalleryBackdropProps {
     open: boolean;
     media: ThreadMedia[];
     initialSlide: number;
     onClose: (e: MouseEvent<HTMLElement>) => void;
 }
 
-export const ThreadMediaFullscreenGallery: FC<ThreadMediaFullscreenGalleryProps> = ({
+export const ThreadMediaGalleryBackdrop: FC<ThreadMediaGalleryBackdropProps> = ({
     open,
     onClose,
     media,

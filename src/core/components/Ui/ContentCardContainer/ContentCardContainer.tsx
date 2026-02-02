@@ -11,7 +11,8 @@ export const ContentCardContainer: FC<CardProps> = ({ children, sx, ...rest }) =
                 {
                     maxWidth: 800,
                     margin: "auto",
-                    height: "100%",
+                    height: "auto",
+                    minHeight: "100%",
                 },
                 sx,
             ].filter(Boolean) as SxProps<Theme>
