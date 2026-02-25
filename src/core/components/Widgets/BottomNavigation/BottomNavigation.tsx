@@ -26,10 +26,10 @@ import PersonOutlineOutlinedIcon from "@mui/icons-material/PersonOutlineOutlined
 
 export const NAV_ITEMS = [
     {
-        path: PROFILE_PAGE_PATH,
-        icon: <PersonOutlineOutlinedIcon />,
-        activeIcon: <PersonIcon />,
-        label: "Profile",
+        path: TALK_SPACE_PAGE_PATH,
+        icon: <Diversity3Outlined />,
+        activeIcon: <Diversity3Icon />,
+        label: "Talk Space",
     },
     {
         path: LOOKUP_PAGE_PATH,
@@ -44,10 +44,10 @@ export const NAV_ITEMS = [
         label: "Dialogs",
     },
     {
-        path: TALK_SPACE_PAGE_PATH,
-        icon: <Diversity3Outlined />,
-        activeIcon: <Diversity3Icon />,
-        label: "Talk Space",
+        path: PROFILE_PAGE_PATH,
+        icon: <PersonOutlineOutlinedIcon />,
+        activeIcon: <PersonIcon />,
+        label: "Profile",
     },
 ];
 

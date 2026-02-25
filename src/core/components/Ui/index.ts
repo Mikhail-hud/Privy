@@ -9,5 +9,4 @@ export * from "./InfiniteScrollList";
 export * from "./ProfileCardContainer";
 export * from "./ContentCardContainer";
 export * from "./BottomSheetDialog";
-export * from "./InfiniteLoader";
 export * from "./TabContainer";

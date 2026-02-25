@@ -7,19 +7,22 @@ import { alpha } from "@mui/material/styles";
 import Backdrop from "@mui/material/Backdrop";
 import { useTheme } from "@app/core/providers";
 import CloseIcon from "@mui/icons-material/Close";
-import { ThreadMedia } from "@app/core/services";
 import { Swiper, SwiperSlide } from "swiper/react";
-import { Navigation, Pagination } from "swiper/modules";
 import { useBodyOverflowLock } from "@app/core/hooks";
-import { FC, MouseEvent, CSSProperties, memo } from "react";
+import { Navigation, Pagination } from "swiper/modules";
 import { ActionIconButton } from "@app/core/components";
+import { MediaType, ThreadMedia } from "@app/core/services";
+import { FC, MouseEvent, CSSProperties, memo } from "react";
 import { stopEventPropagation } from "@app/core/utils/general.ts";
+import { useVideoFeed } from "@app/features/talkSpace/components";
+import { GalleryVideoPlayer } from "@app/features/talkSpace/components/ThreadMediaGallery/GalleryVideoPlayer";
 
 interface ThreadMediaGalleryBackdropProps {
     open: boolean;
     media: ThreadMedia[];
     initialSlide: number;
     onClose: (e: MouseEvent<HTMLElement>) => void;
+    initialTime: number;
 }
 
 const ThreadMediaGalleryBackdropComponent: FC<ThreadMediaGalleryBackdropProps> = ({
@@ -27,9 +30,16 @@ const ThreadMediaGalleryBackdropComponent: FC<ThreadMediaGalleryBackdropProps> =
     onClose,
     media,
     initialSlide,
+    initialTime,
 }) => {
     const theme: Theme = useTheme();
     useBodyOverflowLock(open);
+    const { setGlobalPause } = useVideoFeed();
+
+    // When the backdrop opens, we want to pause all videos in the gallery to prevent multiple videos from playing at the same time. When it closes, we want to unpause them so that if the user opens the gallery again, the videos will play from where they left off.
+    useEffect((): void => {
+        setGlobalPause(open);
+    }, [open, setGlobalPause]);
 
     if (!open) return null;
 
@@ -76,17 +86,14 @@ const ThreadMediaGalleryBackdropComponent: FC<ThreadMediaGalleryBackdropProps> =
                                 display: "flex",
                                 alignItems: "center",
                                 justifyContent: "center",
-                                padding: "8px 0",
                                 "--swiper-navigation-color": theme.palette.common.white,
                                 "--swiper-pagination-color": theme.palette.common.white,
                                 "--swiper-pagination-bullet-inactive-color": alpha(theme.palette.common.white, 0.9),
                             } as CSSProperties
                         }
                     >
-                        {media.map(item => {
-                            const isVideo: boolean =
-                                item.mimeType.startsWith("video/") ||
-                                item.mimeType.startsWith("application/octet-stream");
+                        {media.map((item, index) => {
+                            const isVideo: boolean = item.type === MediaType.VIDEO;
 
                             return (
                                 <SwiperSlide
@@ -97,24 +104,40 @@ const ThreadMediaGalleryBackdropComponent: FC<ThreadMediaGalleryBackdropProps> =
                                         justifyContent: "center",
                                     }}
                                 >
-                                    {isVideo ? (
-                                        <video
-                                            controls
-                                            src={item.src}
-                                            style={{ maxWidth: "100%", maxHeight: "100%", outline: "none" }}
-                                        />
-                                    ) : (
-                                        <img
-                                            src={item.src}
-                                            alt={item.src}
-                                            style={{
-                                                maxWidth: "100%",
-                                                maxHeight: "100%",
-                                                objectFit: "contain",
-                                                borderRadius: "12px",
-                                            }}
-                                        />
-                                    )}
+                                    {({ isActive }) =>
+                                        isVideo ? (
+                                            <GalleryVideoPlayer
+                                                item={item}
+                                                isActive={isActive}
+                                                initialTime={initialSlide === index ? initialTime : 0}
+                                            />
+                                        ) : (
+                                            <Box
+                                                sx={{
+                                                    width: "100%",
+                                                    height: "100%",
+                                                    display: "flex",
+                                                    alignItems: "center",
+                                                    justifyContent: "center",
+                                                    WebkitTouchCallout: "none",
+                                                    userSelect: "none",
+                                                }}
+                                            >
+                                                <img
+                                                    src={item.src}
+                                                    draggable={false}
+                                                    alt={item.src}
+                                                    style={{
+                                                        maxWidth: "100%",
+                                                        maxHeight: "100%",
+                                                        objectFit: "contain",
+                                                        borderRadius: "12px",
+                                                        pointerEvents: "none",
+                                                    }}
+                                                />
+                                            </Box>
+                                        )
+                                    }
                                 </SwiperSlide>
                             );
                         })}

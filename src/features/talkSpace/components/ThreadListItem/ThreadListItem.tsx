@@ -1,7 +1,7 @@
 import { FC, memo } from "react";
-import { Thread, ThreadMedia } from "@app/core/services";
 import { PrivateIcon } from "@app/core/assets/icons";
 import { Link as RouterLink } from "react-router-dom";
+import { Thread, ThreadMedia } from "@app/core/services";
 import { getRelativeTime } from "@app/core/utils/dateUtils.ts";
 import { Avatar, ReadMore, UserAvatarBadge } from "@app/core/components";
 import { Box, ListItem, Typography, Divider, ListItemText, ListItemAvatar } from "@mui/material";
@@ -10,8 +10,8 @@ import { ThreadListActions, ThreadListMoreMenu, ThreadMediaGallery } from "@app/
 interface ThreadListItemProps {
     thread: Thread;
     isLast: boolean;
-    handleOpenThreadMediaBackdrop: (media: ThreadMedia) => void;
-    handleOpenThreadMediaGalleryBackdrop: (media: ThreadMedia[], index: number) => void;
+    handleOpenThreadMediaBackdrop: (media: ThreadMedia, initialTime: number) => void;
+    handleOpenThreadMediaGalleryBackdrop: (media: ThreadMedia[], index: number, initialTime: number) => void;
 }
 
 const getAuthorDisplayName = (thread: Thread): string => {
@@ -45,7 +45,7 @@ const ThreadListItemComponent: FC<ThreadListItemProps> = ({
 }) => {
     const { author, isIncognito, isOwnedByCurrentUser, isLikedByCurrentUser, likeCount, replyCount, media } = thread;
 
-    const showMedia: boolean = Array.isArray(media) && media.length > 0;
+    const showMediaGallery: boolean = Array.isArray(media) && media.length > 0;
     const titleUserName: string = getAuthorDisplayName(thread);
     const src: string | undefined = getAuthorAvatarSrc(thread);
 
@@ -96,7 +96,7 @@ const ThreadListItemComponent: FC<ThreadListItemProps> = ({
                     secondary={
                         <Box sx={{ mt: 0.5 }}>
                             <ReadMore text={thread.content} />
-                            {showMedia && (
+                            {showMediaGallery && (
                                 <ThreadMediaGallery
                                     threadMedia={thread.media}
                                     handleOpenThreadMediaBackdrop={handleOpenThreadMediaBackdrop}
