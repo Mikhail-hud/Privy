@@ -6,13 +6,13 @@ import { MediaItem } from "@app/features/talkSpace/components/ThreadMediaGallery
 
 interface SingleThreadMediaProps {
     media: ThreadMedia;
-    handleOpenThreadMediaBackdrop: (media: ThreadMedia, initialTime: number) => void;
+    handleOpenThreadMediaBackdrop: (media: ThreadMedia) => void;
 }
 
 export const SingleThreadMedia: FC<SingleThreadMediaProps> = memo(({ media, handleOpenThreadMediaBackdrop }) => {
-    const handleOpen = (e: MouseEvent<HTMLElement>, initialTime: number): void => {
+    const handleOpen = (e: MouseEvent<HTMLElement>): void => {
         stopEventPropagation(e);
-        handleOpenThreadMediaBackdrop(media, initialTime);
+        handleOpenThreadMediaBackdrop(media);
     };
     return (
         <Box sx={{ my: 1, borderRadius: "12px" }}>

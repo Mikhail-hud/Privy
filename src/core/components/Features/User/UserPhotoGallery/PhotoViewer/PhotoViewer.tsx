@@ -1,4 +1,4 @@
-import { FC } from "react";
+import { FC, MouseEvent } from "react";
 import { Backdrop, Box } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import { Photo, Profile } from "@app/core/services";
@@ -8,12 +8,12 @@ import { PhotoSwiper, ActionIconButton, ProfilePhotoActions } from "@app/core/co
 
 interface PhotoViewerProps {
     open: boolean;
-    onClose: () => void;
     photo: Photo | null;
     photos: Photo[];
     profile: Profile;
     initialSlide: number | null;
     onSlideChange: (index: number) => void;
+    onClose: (e: MouseEvent<HTMLElement>) => void;
     isOwner: boolean;
 }
 
@@ -24,7 +24,7 @@ export const PhotoViewer: FC<PhotoViewerProps> = memo(
         const isPrivatePhoto: boolean = profile?.privatePhoto?.id === photo?.id;
         return (
             <Backdrop sx={{ zIndex: theme => theme.zIndex.drawer + 1, background: "black" }} open={open}>
-                <Box sx={{ width: "100%", height: "100%", p: 1 }}>
+                <Box sx={{ width: "100%", height: "100%" }}>
                     <Box
                         sx={{
                             display: "flex",
@@ -49,6 +49,7 @@ export const PhotoViewer: FC<PhotoViewerProps> = memo(
                     {initialSlide !== null && (
                         <PhotoSwiper
                             photos={photos}
+                            onSwiperSlideClick={onClose}
                             initialSlide={initialSlide}
                             onSlideChange={swiper => onSlideChange(swiper.realIndex)}
                         />

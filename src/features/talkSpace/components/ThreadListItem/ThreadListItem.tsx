@@ -10,8 +10,8 @@ import { ThreadListActions, ThreadListMoreMenu, ThreadMediaGallery } from "@app/
 interface ThreadListItemProps {
     thread: Thread;
     isLast: boolean;
-    handleOpenThreadMediaBackdrop: (media: ThreadMedia, initialTime: number) => void;
-    handleOpenThreadMediaGalleryBackdrop: (media: ThreadMedia[], index: number, initialTime: number) => void;
+    handleOpenThreadMediaBackdrop: (media: ThreadMedia) => void;
+    handleOpenThreadMediaGalleryBackdrop: (media: ThreadMedia[], index: number) => void;
 }
 
 const getAuthorDisplayName = (thread: Thread): string => {
@@ -81,11 +81,28 @@ const ThreadListItemComponent: FC<ThreadListItemProps> = ({
                 <ListItemText
                     primary={
                         <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                            <Box sx={{ display: "flex", gap: 1, textAlign: "center", alignItems: "center" }}>
+                            <Box
+                                sx={{
+                                    gap: 1,
+                                    display: "flex",
+                                    textAlign: "center",
+                                    alignItems: "center",
+                                    whiteSpace: "nowrap",
+                                    overflow: "hidden",
+                                }}
+                            >
                                 <Typography variant="subtitle1" color="primary">
                                     {titleUserName}
                                 </Typography>
-                                <Typography variant="caption" color="text.secondary">
+                                <Typography
+                                    variant="caption"
+                                    color="text.secondary"
+                                    sx={{
+                                        overflow: "hidden",
+                                        whiteSpace: "nowrap",
+                                        textOverflow: "ellipsis",
+                                    }}
+                                >
                                     {getRelativeTime(thread.createdAt)}
                                 </Typography>
                             </Box>

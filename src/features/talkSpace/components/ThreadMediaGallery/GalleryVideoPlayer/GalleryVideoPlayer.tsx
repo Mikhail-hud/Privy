@@ -1,3 +1,6 @@
+import "swiper/css";
+import "swiper/css/navigation";
+import "swiper/css/pagination";
 import Box from "@mui/material/Box";
 import { useIsMobile } from "@app/core/hooks";
 import { ThreadMedia } from "@app/core/services";
@@ -8,69 +11,114 @@ import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import { stopEventPropagation } from "@app/core/utils/general.ts";
 import { useVideoFeed } from "@app/features/talkSpace/components";
 import { RATIO_16_9, RATIO_4_3 } from "@app/core/constants/general.ts";
-import { FC, MouseEvent, RefObject, useEffect, useRef, useState } from "react";
+import { FC, MouseEvent, useEffect, useRef, useState, useMemo, RefObject, useLayoutEffect } from "react";
 
 interface GalleryVideoPlayerProps {
     item: ThreadMedia;
     isActive: boolean;
-    initialTime?: number;
 }
 
-export const GalleryVideoPlayer: FC<GalleryVideoPlayerProps> = ({ item, isActive, initialTime }) => {
+export const GalleryVideoPlayer: FC<GalleryVideoPlayerProps> = ({ item, isActive }) => {
     const isMobile: boolean = useIsMobile();
-    const { toggleGlobalMute, isGlobalMuted, syncTimeFromModal } = useVideoFeed();
-    const [isPlaying, setIsPlaying] = useState(false);
-    const videoRef: RefObject<HTMLVideoElement | null> = useRef<HTMLVideoElement | null>(null);
+    const { toggleGlobalMute, isGlobalMuted, getFeedVideoElement, setGlobalPause } = useVideoFeed();
+    const isInitialMount: RefObject<boolean> = useRef<boolean>(true);
+
+    const containerRef: RefObject<HTMLDivElement | null> = useRef<HTMLDivElement>(null);
+    const fallbackVideoRef: RefObject<HTMLVideoElement | null> = useRef<HTMLVideoElement>(null);
+    const originalStateRef = useRef<{ parent: HTMLElement | null; styles: string | null } | null>(null);
+
     const defaultRatio: number = isMobile ? RATIO_4_3 : RATIO_16_9;
-    const ratio: number = item.width && item.height ? item.width / item.height : defaultRatio;
+    const [isPlaying, setIsPlaying] = useState(false);
+    const [ratio, setRatio] = useState<number>(defaultRatio);
 
-    // Ref to track if we've set the initial time for the video. This is necessary because when we switch between videos in the gallery, we want to reset the time to 0, but if we come back to a video we've already played, we want to start from where we left off (or the provided initialTime if it's the first time we're playing it).
-    const hasSetInitialTime: RefObject<boolean> = useRef(false);
+    const onPlay = (): void => setIsPlaying(true);
+    const onPause = (): void => setIsPlaying(false);
 
-    useEffect((): void | (() => void) => {
-        const video: HTMLVideoElement | null = videoRef.current;
-        if (!video) return undefined; // Explicitly return undefined for early exit
+    const feedVideoNode: HTMLVideoElement | null = useMemo(
+        (): HTMLVideoElement | null => getFeedVideoElement(item.id),
+        [getFeedVideoElement, item.id]
+    );
+    const activeVideo: HTMLVideoElement | null = feedVideoNode || fallbackVideoRef.current;
 
-        if (isActive) {
-            if (!hasSetInitialTime.current && initialTime) {
-                video.currentTime = initialTime;
-                hasSetInitialTime.current = true;
+    useLayoutEffect(() => {
+        if (feedVideoNode && containerRef.current) {
+            if (feedVideoNode.videoWidth && feedVideoNode.videoHeight) {
+                setRatio(feedVideoNode.videoWidth / feedVideoNode.videoHeight);
             }
 
-            video
-                .play()
-                .then((): void => setIsPlaying(true))
-                .catch((): void => setIsPlaying(false));
-        } else {
-            if (video.currentTime > 0) {
-                syncTimeFromModal(item.src, video.currentTime);
+            originalStateRef.current = {
+                parent: feedVideoNode.parentElement,
+                styles: feedVideoNode.getAttribute("style"),
+            };
+
+            if (feedVideoNode.parentElement !== containerRef.current) {
+                containerRef.current.appendChild(feedVideoNode);
             }
-            video.pause();
-            setIsPlaying(false);
-            hasSetInitialTime.current = false;
+
+            feedVideoNode.style.height = "100%";
+            feedVideoNode.style.width = "auto";
+            feedVideoNode.style.maxWidth = "100%";
+            feedVideoNode.style.objectFit = "cover";
+            feedVideoNode.style.display = "block";
+            feedVideoNode.style.pointerEvents = "none";
+            feedVideoNode.style.borderRadius = "12px";
+
+            return () => {
+                const state = originalStateRef.current;
+                if (state && state.parent) {
+                    state.parent.appendChild(feedVideoNode);
+                    if (state.styles) {
+                        feedVideoNode.setAttribute("style", state.styles);
+                    } else {
+                        feedVideoNode.removeAttribute("style");
+                    }
+                }
+            };
         }
+    }, [feedVideoNode, isActive]);
 
-        // Return a cleanup function, not a function call
-        return () => {
-            if (video && video.currentTime > 0) {
-                syncTimeFromModal(item.src, video.currentTime);
+    useEffect(() => {
+        if (!activeVideo) return;
+        const onLoadedMetadata = (): void => {
+            if (activeVideo.videoWidth && activeVideo.videoHeight) {
+                setRatio(activeVideo.videoWidth / activeVideo.videoHeight);
             }
         };
-    }, [isActive, initialTime, syncTimeFromModal, item.src]);
+
+        activeVideo.addEventListener("play", onPlay);
+        activeVideo.addEventListener("pause", onPause);
+        activeVideo.addEventListener("loadedmetadata", onLoadedMetadata);
+        setIsPlaying(!activeVideo.paused);
+
+        return (): void => {
+            activeVideo.removeEventListener("play", onPlay);
+            activeVideo.removeEventListener("pause", onPause);
+            activeVideo.removeEventListener("loadedmetadata", onLoadedMetadata);
+        };
+    }, [activeVideo]);
+
+    useEffect((): void => {
+        if (!activeVideo) return;
+
+        if (isActive) {
+            isInitialMount.current = false;
+            setGlobalPause(true, item.id);
+            activeVideo.play();
+        } else {
+            if (!isInitialMount.current) {
+                activeVideo.pause();
+                if (!feedVideoNode) activeVideo.currentTime = 0;
+            }
+        }
+    }, [isActive, activeVideo, feedVideoNode, setGlobalPause, item.id]);
 
     const handleTogglePlay = (e: MouseEvent<HTMLElement>): void => {
         stopEventPropagation(e);
-        const video: HTMLVideoElement | null = videoRef.current;
-        if (!video) return;
-
-        if (video.paused) {
-            video
-                .play()
-                .then((): void => setIsPlaying(true))
-                .catch((): void => setIsPlaying(false));
+        if (!activeVideo) return;
+        if (activeVideo.paused) {
+            activeVideo.play();
         } else {
-            video.pause();
-            setIsPlaying(false);
+            activeVideo.pause();
         }
     };
 
@@ -81,7 +129,6 @@ export const GalleryVideoPlayer: FC<GalleryVideoPlayerProps> = ({ item, isActive
 
     return (
         <Box
-            onClick={handleTogglePlay}
             sx={{
                 position: "relative",
                 width: "100%",
@@ -95,6 +142,7 @@ export const GalleryVideoPlayer: FC<GalleryVideoPlayerProps> = ({ item, isActive
             }}
         >
             <Box
+                onClick={handleTogglePlay}
                 sx={{
                     position: "relative",
                     display: "flex",
@@ -102,25 +150,30 @@ export const GalleryVideoPlayer: FC<GalleryVideoPlayerProps> = ({ item, isActive
                     height: `min(100%, calc(100dvw / ${ratio}))`,
                 }}
             >
-                <video
-                    ref={videoRef}
-                    src={item.src}
-                    poster={item?.posterUrl ?? ""}
-                    style={{
-                        width: "100%",
-                        height: "100%",
-                        objectFit: "cover",
-                        display: "block",
-                        pointerEvents: "none",
-                        borderRadius: "12px",
-                    }}
-                    controls={false}
-                    controlsList="nodownload"
-                    muted={isGlobalMuted}
-                    playsInline
-                    loop
-                    preload="metadata"
-                />
+                {feedVideoNode ? (
+                    <div ref={containerRef} style={{ display: "contents" }} />
+                ) : (
+                    <video
+                        ref={fallbackVideoRef}
+                        src={item.src}
+                        poster={item?.posterUrl ?? ""}
+                        style={{
+                            height: "100%",
+                            width: "auto",
+                            maxWidth: "100%",
+                            objectFit: "cover",
+                            display: "block",
+                            pointerEvents: "none",
+                            borderRadius: "12px",
+                        }}
+                        controls={false}
+                        controlsList="nodownload"
+                        muted={isGlobalMuted}
+                        playsInline
+                        loop
+                        preload="metadata"
+                    />
+                )}
 
                 {!isPlaying && (
                     <ActionIconButton
@@ -134,6 +187,7 @@ export const GalleryVideoPlayer: FC<GalleryVideoPlayerProps> = ({ item, isActive
                         }}
                     />
                 )}
+
                 <ActionIconButton
                     onClick={handleMuteClick}
                     sx={{ position: "absolute", bottom: 16, right: 16, zIndex: 11 }}

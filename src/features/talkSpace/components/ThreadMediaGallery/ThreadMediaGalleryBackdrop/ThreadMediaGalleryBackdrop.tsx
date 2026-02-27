@@ -22,7 +22,6 @@ interface ThreadMediaGalleryBackdropProps {
     media: ThreadMedia[];
     initialSlide: number;
     onClose: (e: MouseEvent<HTMLElement>) => void;
-    initialTime: number;
 }
 
 const ThreadMediaGalleryBackdropComponent: FC<ThreadMediaGalleryBackdropProps> = ({
@@ -30,7 +29,6 @@ const ThreadMediaGalleryBackdropComponent: FC<ThreadMediaGalleryBackdropProps> =
     onClose,
     media,
     initialSlide,
-    initialTime,
 }) => {
     const theme: Theme = useTheme();
     useBodyOverflowLock(open);
@@ -38,8 +36,9 @@ const ThreadMediaGalleryBackdropComponent: FC<ThreadMediaGalleryBackdropProps> =
 
     // When the backdrop opens, we want to pause all videos in the gallery to prevent multiple videos from playing at the same time. When it closes, we want to unpause them so that if the user opens the gallery again, the videos will play from where they left off.
     useEffect((): void => {
-        setGlobalPause(open);
-    }, [open, setGlobalPause]);
+        const activeMedia: ThreadMedia = media[initialSlide];
+        setGlobalPause(open, activeMedia?.id);
+    }, [open, setGlobalPause, media, initialSlide]);
 
     if (!open) return null;
 
@@ -92,12 +91,13 @@ const ThreadMediaGalleryBackdropComponent: FC<ThreadMediaGalleryBackdropProps> =
                             } as CSSProperties
                         }
                     >
-                        {media.map((item, index) => {
+                        {media.map(item => {
                             const isVideo: boolean = item.type === MediaType.VIDEO;
 
                             return (
                                 <SwiperSlide
                                     key={item.id}
+                                    onClick={onClose}
                                     style={{
                                         display: "flex",
                                         alignItems: "center",
@@ -106,11 +106,7 @@ const ThreadMediaGalleryBackdropComponent: FC<ThreadMediaGalleryBackdropProps> =
                                 >
                                     {({ isActive }) =>
                                         isVideo ? (
-                                            <GalleryVideoPlayer
-                                                item={item}
-                                                isActive={isActive}
-                                                initialTime={initialSlide === index ? initialTime : 0}
-                                            />
+                                            <GalleryVideoPlayer item={item} isActive={isActive} />
                                         ) : (
                                             <Box
                                                 sx={{

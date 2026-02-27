@@ -4,17 +4,21 @@ import "swiper/css/pagination";
 import { Theme } from "@mui/material";
 import { Navigation } from "swiper/modules";
 import { Photo } from "@app/core/services";
-import { FC, CSSProperties } from "react";
 import { alpha } from "@mui/material/styles";
 import { useTheme } from "@app/core/providers";
+import { FC, CSSProperties, MouseEvent } from "react";
 import { Swiper, SwiperProps, SwiperSlide } from "swiper/react";
+import { stopEventPropagation } from "@app/core/utils/general.ts";
 
 interface PhotoSwiperProps extends SwiperProps {
     photos: Photo[];
+    onSwiperSlideClick?: (e: MouseEvent<HTMLElement>) => void;
 }
 
-export const PhotoSwiper: FC<PhotoSwiperProps> = ({ photos = [], ...rest }) => {
+export const PhotoSwiper: FC<PhotoSwiperProps> = ({ photos = [], onSwiperSlideClick, ...rest }) => {
     const theme: Theme = useTheme();
+    const handleImageClick = (e: MouseEvent<HTMLElement>): void => stopEventPropagation(e);
+
     return (
         <Swiper
             loop
@@ -47,8 +51,10 @@ export const PhotoSwiper: FC<PhotoSwiperProps> = ({ photos = [], ...rest }) => {
                         justifyContent: "center",
                         userSelect: "none",
                     }}
+                    onClick={onSwiperSlideClick}
                 >
                     <img
+                        onClick={handleImageClick}
                         src={photo.src}
                         alt={`photo_${photo.id}`}
                         draggable="false"

@@ -22,40 +22,33 @@ export const TalkSpace: FC = () => {
         isOpen: boolean;
         media: ThreadMedia[];
         initialSlide: number;
-        initialTime: number;
     }>({
         isOpen: false,
         media: [],
         initialSlide: 0,
-        initialTime: 0,
     });
 
     const [threadMediaState, setThreadMediaState] = useState<{
         media: ThreadMedia | null;
         open: boolean;
-        initialTime: number;
     }>({
         media: null,
         open: false,
-        initialTime: 0,
     });
 
-    const handleOpenThreadMediaGalleryBackdrop = useCallback(
-        (media: ThreadMedia[], index: number, initialTime: number): void => {
-            setMediaGalleryState({ isOpen: true, media, initialSlide: index, initialTime: initialTime ?? 0 });
-        },
-        []
-    );
+    const handleOpenThreadMediaGalleryBackdrop = useCallback((media: ThreadMedia[], index: number): void => {
+        setMediaGalleryState({ isOpen: true, media, initialSlide: index });
+    }, []);
     const handleCloseMediaGalleryBackdrop = useCallback((): void => {
-        setMediaGalleryState({ media: [], isOpen: false, initialSlide: 0, initialTime: 0 });
+        setMediaGalleryState({ media: [], isOpen: false, initialSlide: 0 });
     }, []);
 
-    const handleOpenThreadMediaBackdrop = useCallback((media: ThreadMedia, initialTime: number): void => {
-        setThreadMediaState({ media, open: true, initialTime: initialTime ?? 0 });
+    const handleOpenThreadMediaBackdrop = useCallback((media: ThreadMedia): void => {
+        setThreadMediaState({ media, open: true });
     }, []);
 
     const handleCloseThreadMediaBackdrop = useCallback((): void => {
-        setThreadMediaState({ media: null, open: false, initialTime: 0 });
+        setThreadMediaState({ media: null, open: false });
     }, []);
 
     const threads: Thread[] = useMemo<Thread[]>(
@@ -102,13 +95,11 @@ export const TalkSpace: FC = () => {
                 media={mediaGalleryState.media}
                 onClose={handleCloseMediaGalleryBackdrop}
                 initialSlide={mediaGalleryState.initialSlide}
-                initialTime={mediaGalleryState.initialTime}
             />
             <ThreadMediaBackdrop
                 open={threadMediaState.open}
                 media={threadMediaState.media}
                 onClose={handleCloseThreadMediaBackdrop}
-                initialTime={threadMediaState.initialTime}
             />
         </VideoFeedProvider>
     );

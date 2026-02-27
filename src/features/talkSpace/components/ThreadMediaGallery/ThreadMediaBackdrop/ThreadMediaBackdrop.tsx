@@ -13,18 +13,17 @@ interface ThreadMediaBackdropProps {
     onClose: (e: MouseEvent<HTMLElement>) => void;
     open: boolean;
     media: ThreadMedia | null;
-    initialTime: number;
 }
 
-const ThreadMediaBackdropComponent: FC<ThreadMediaBackdropProps> = ({ onClose, open, media, initialTime }) => {
+const ThreadMediaBackdropComponent: FC<ThreadMediaBackdropProps> = ({ onClose, open, media }) => {
     useBodyOverflowLock(open);
 
     const { setGlobalPause } = useVideoFeed();
 
     // When the backdrop opens, we want to pause all videos in the gallery to prevent multiple videos from playing at the same time. When it closes, we want to unpause them so that if the user opens the gallery again, the videos will play from where they left off.
     useEffect((): void => {
-        setGlobalPause(open);
-    }, [open, setGlobalPause]);
+        setGlobalPause(open, media?.id);
+    }, [open, setGlobalPause, media]);
 
     if (!open || !media) return null;
 
@@ -60,7 +59,7 @@ const ThreadMediaBackdropComponent: FC<ThreadMediaBackdropProps> = ({ onClose, o
                     onClick={handleBackdropClick}
                 >
                     {isVideo ? (
-                        <GalleryVideoPlayer isActive={true} item={media} initialTime={initialTime} />
+                        <GalleryVideoPlayer isActive={true} item={media} />
                     ) : (
                         <img
                             onClick={handleImageClick}

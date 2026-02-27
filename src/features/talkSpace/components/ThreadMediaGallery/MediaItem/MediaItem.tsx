@@ -12,7 +12,7 @@ import { FC, MouseEvent, useState, useRef, useEffect, RefObject } from "react";
 
 interface MediaItemProps {
     media: ThreadMedia;
-    onClick?: (e: MouseEvent<HTMLElement>, time: number) => void;
+    onClick?: (e: MouseEvent<HTMLElement>) => void;
 }
 
 export const MediaItem: FC<MediaItemProps> = ({ media, onClick }) => {
@@ -27,13 +27,13 @@ export const MediaItem: FC<MediaItemProps> = ({ media, onClick }) => {
         media.width && media.height ? `${media.width} / ${media.height}` : defaultRatio;
 
     useEffect(() => {
-        const videoElement = videoRef.current;
+        const videoElement: HTMLVideoElement | null = videoRef.current;
         if (!isVideo || !videoElement) return;
-        registerVideo(videoElement);
+        registerVideo(media.id, videoElement);
         return (): void => {
-            unregisterVideo(videoElement);
+            unregisterVideo(media.id, videoElement);
         };
-    }, [isVideo, registerVideo, unregisterVideo]);
+    }, [isVideo, registerVideo, unregisterVideo, media.id]);
 
     const handleLoad = (): void => setIsLoaded(true);
 
@@ -43,10 +43,7 @@ export const MediaItem: FC<MediaItemProps> = ({ media, onClick }) => {
     };
     const handleContextMenu = (e: MouseEvent<HTMLElement>): void => e.preventDefault();
 
-    const handleBoxClick = (e: MouseEvent<HTMLElement>): void => {
-        const currentTime: number = videoRef.current ? videoRef.current.currentTime : 0;
-        onClick?.(e, currentTime);
-    };
+    const handleBoxClick = (e: MouseEvent<HTMLElement>): void => onClick?.(e);
 
     return (
         <Box

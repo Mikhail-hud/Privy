@@ -11,8 +11,8 @@ import { SingleThreadMedia } from "@app/features/talkSpace/components/ThreadMedi
 
 interface ThreadMediaGalleryProps {
     threadMedia: ThreadMedia[];
-    handleOpenThreadMediaBackdrop: (media: ThreadMedia, initialTime: number) => void;
-    handleOpenThreadMediaGalleryBackdrop: (media: ThreadMedia[], index: number, initialTime: number) => void;
+    handleOpenThreadMediaBackdrop: (media: ThreadMedia) => void;
+    handleOpenThreadMediaGalleryBackdrop: (media: ThreadMedia[], index: number) => void;
 }
 
 export const ThreadMediaGallery: FC<ThreadMediaGalleryProps> = ({
@@ -22,9 +22,9 @@ export const ThreadMediaGallery: FC<ThreadMediaGalleryProps> = ({
 }) => {
     const handleMediaClick =
         (index: number) =>
-        (e: MouseEvent<HTMLElement>, initialTime: number): void => {
+        (e: MouseEvent<HTMLElement>): void => {
             stopEventPropagation(e);
-            handleOpenThreadMediaGalleryBackdrop?.(threadMedia, index, initialTime);
+            handleOpenThreadMediaGalleryBackdrop?.(threadMedia, index);
         };
 
     if (threadMedia.length === 1) {

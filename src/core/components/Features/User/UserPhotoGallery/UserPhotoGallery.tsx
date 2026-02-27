@@ -39,7 +39,7 @@ export const UserPhotoGallery: FC<UserPhotoGalleryProps> = ({ photos, profile, i
         setPhoto(null);
     }, []);
 
-    const handleCloseBackdrop = useCallback((): void => {
+    const handleCloseBackdrop = useCallback((_e: MouseEvent<HTMLElement>): void => {
         setSelectedImageIndex(null);
         setActivePhotoInViewer(null);
     }, []);

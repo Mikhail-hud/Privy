@@ -13,11 +13,11 @@ import {
 
 interface VideoFeedContextType {
     isGlobalMuted: boolean;
-    setGlobalPause: (pause: boolean) => void;
-    registerVideo: (element: HTMLVideoElement) => void;
-    unregisterVideo: (element: HTMLVideoElement) => void;
+    setGlobalPause: (pause: boolean, activeId?: string) => void;
+    registerVideo: (id: string, element: HTMLVideoElement) => void;
+    unregisterVideo: (id: string, element: HTMLVideoElement) => void;
     toggleGlobalMute: (event: MouseEvent<HTMLElement>) => void;
-    syncTimeFromModal: (src: string, time: number) => void;
+    getFeedVideoElement: (id: string) => HTMLVideoElement | null;
 }
 
 const VideoFeedContext = createContext<VideoFeedContextType | null>(null);
@@ -31,9 +31,14 @@ export const useVideoFeed = (): VideoFeedContextType => {
 export const VideoFeedProvider: FC<{ children: ReactNode }> = ({ children }) => {
     const [isGlobalMuted, setIsGlobalMuted] = useState<boolean>(true);
     const isGlobalPausedRef: RefObject<boolean> = useRef(false);
+    const activeModalIdRef: RefObject<string | null> = useRef<string | null>(null);
+
+    const videoElementsMapRef: RefObject<Map<string, HTMLVideoElement>> = useRef<Map<string, HTMLVideoElement>>(
+        new Map()
+    );
 
     const videosRef: RefObject<Map<HTMLVideoElement, number>> = useRef<Map<HTMLVideoElement, number>>(new Map());
-    const observerRef: RefObject<IntersectionObserver | null> = useRef<IntersectionObserver | null>(null);
+    const observerRef: RefObject<IntersectionObserver | null> = useRef(null);
 
     const toggleGlobalMute = useCallback((_event: MouseEvent<HTMLElement>): void => {
         setIsGlobalMuted(prev => !prev);
@@ -42,7 +47,11 @@ export const VideoFeedProvider: FC<{ children: ReactNode }> = ({ children }) => 
     const calculateAndPlay = useCallback((): void => {
         if (isGlobalPausedRef.current) {
             videosRef.current.forEach((_ratio: number, video: HTMLVideoElement): void => {
-                if (!video.paused) video.pause();
+                const videoId: string | undefined = video.dataset.mediaId;
+                // If the video is the one in the active modal, we want to keep it playing, otherwise we pause it.
+                if (videoId !== activeModalIdRef.current) {
+                    if (!video.paused) video.pause();
+                }
             });
             return;
         }
@@ -67,19 +76,16 @@ export const VideoFeedProvider: FC<{ children: ReactNode }> = ({ children }) => 
     }, []);
 
     const setGlobalPause = useCallback(
-        (pause: boolean): void => {
+        (pause: boolean, activeId?: string): void => {
             isGlobalPausedRef.current = pause;
+            activeModalIdRef.current = activeId || null;
             calculateAndPlay();
         },
         [calculateAndPlay]
     );
-    const syncTimeFromModal = useCallback((src: string, time: number): void => {
-        videosRef.current.forEach((_, video: HTMLVideoElement): void => {
-            const videoSrc: string | null = video.getAttribute("src");
-            if (videoSrc === src) {
-                video.currentTime = time;
-            }
-        });
+
+    const getFeedVideoElement = useCallback((id: string): HTMLVideoElement | null => {
+        return videoElementsMapRef.current.get(id) || null;
     }, []);
 
     useEffect(() => {
@@ -102,14 +108,19 @@ export const VideoFeedProvider: FC<{ children: ReactNode }> = ({ children }) => 
         return () => observerRef.current?.disconnect();
     }, [calculateAndPlay]);
 
-    const registerVideo = useCallback((element: HTMLVideoElement): void => {
+    const registerVideo = useCallback((id: string, element: HTMLVideoElement): void => {
+        element.dataset.mediaId = id;
+        videoElementsMapRef.current.set(id, element);
+
         if (observerRef.current) {
             observerRef.current.observe(element);
             videosRef.current.set(element, 0);
         }
     }, []);
 
-    const unregisterVideo = useCallback((element: HTMLVideoElement): void => {
+    const unregisterVideo = useCallback((id: string, element: HTMLVideoElement): void => {
+        videoElementsMapRef.current.delete(id);
+
         if (observerRef.current) {
             observerRef.current.unobserve(element);
             videosRef.current.delete(element);
@@ -125,7 +136,7 @@ export const VideoFeedProvider: FC<{ children: ReactNode }> = ({ children }) => 
                 isGlobalMuted,
                 toggleGlobalMute,
                 setGlobalPause,
-                syncTimeFromModal,
+                getFeedVideoElement,
             }}
         >
             {children}
