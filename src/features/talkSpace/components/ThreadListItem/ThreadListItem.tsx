@@ -1,9 +1,11 @@
-import { FC, memo } from "react";
+import { FC, memo, MouseEvent } from "react";
 import { PrivateIcon } from "@app/core/assets/icons";
-import { Link as RouterLink } from "react-router-dom";
 import { Thread, ThreadMedia } from "@app/core/services";
 import { getRelativeTime } from "@app/core/utils/dateUtils.ts";
-import { Avatar, ReadMore, UserAvatarBadge } from "@app/core/components";
+import { stopEventPropagation } from "@app/core/utils/general.ts";
+import { Link as RouterLink, NavigateFunction } from "react-router-dom";
+import { USER_HANDLE_PREFIX } from "@app/core/constants/pathConstants.ts";
+import { Avatar, ReadMore, UserAvatarBadge, UserHoverCard } from "@app/core/components";
 import { Box, ListItem, Typography, Divider, ListItemText, ListItemAvatar } from "@mui/material";
 import { ThreadListActions, ThreadListMoreMenu, ThreadMediaGallery } from "@app/features/talkSpace/components";
 
@@ -43,11 +45,20 @@ const ThreadListItemComponent: FC<ThreadListItemProps> = ({
     handleOpenThreadMediaBackdrop,
     handleOpenThreadMediaGalleryBackdrop,
 }) => {
+    const navigate: NavigateFunction = useNavigate();
     const { author, isIncognito, isOwnedByCurrentUser, isLikedByCurrentUser, likeCount, replyCount, media } = thread;
 
     const showMediaGallery: boolean = Array.isArray(media) && media.length > 0;
     const titleUserName: string = getAuthorDisplayName(thread);
     const src: string | undefined = getAuthorAvatarSrc(thread);
+
+    const handleNavigateToProfilePage = (e: MouseEvent<HTMLSpanElement>): void => {
+        if (thread?.isIncognito) {
+            return;
+        }
+        stopEventPropagation(e);
+        navigate(`/${USER_HANDLE_PREFIX}${thread?.author?.userName}`);
+    };
 
     return (
         <>
@@ -67,13 +78,11 @@ const ThreadListItemComponent: FC<ThreadListItemProps> = ({
                     {isIncognito && !isOwnedByCurrentUser ? (
                         <PrivateIcon color="info" sx={{ width: 40, height: 40 }} />
                     ) : (
-                        <UserAvatarBadge isProfileIncognito={!!author?.isProfileIncognito}>
-                            <Avatar
-                                alt={src}
-                                src={src}
-                                sx={{ width: 40, height: 40 }}
-                                userName={thread?.author?.userName}
-                            />
+                        <UserAvatarBadge
+                            isProfileIncognito={!!author?.isProfileIncognito}
+                            onClick={handleNavigateToProfilePage}
+                        >
+                            <Avatar alt={src} src={src} sx={{ width: 40, height: 40 }} userName={author?.userName} />
                         </UserAvatarBadge>
                     )}
                 </ListItemAvatar>
@@ -91,9 +100,24 @@ const ThreadListItemComponent: FC<ThreadListItemProps> = ({
                                     overflow: "hidden",
                                 }}
                             >
-                                <Typography variant="subtitle1" color="primary">
-                                    {titleUserName}
-                                </Typography>
+                                <UserHoverCard
+                                    user={author}
+                                    userProfileActionsShown={!isOwnedByCurrentUser}
+                                    disabled={!isOwnedByCurrentUser && isIncognito}
+                                >
+                                    <Typography
+                                        variant="subtitle1"
+                                        color="primary"
+                                        sx={{
+                                            "&:hover": {
+                                                textDecoration:
+                                                    !isOwnedByCurrentUser && isIncognito ? "none" : "underline",
+                                            },
+                                        }}
+                                    >
+                                        {titleUserName}
+                                    </Typography>
+                                </UserHoverCard>
                                 <Typography
                                     variant="caption"
                                     color="text.secondary"

@@ -5,11 +5,12 @@ import { ThreadsContext } from "@app/features/talkSpace/loaders";
 import { FC, useState, ChangeEvent, ReactElement, useCallback, useMemo } from "react";
 import { ContentCardContainer, InfiniteScrollList, UserSearchField } from "@app/core/components";
 import { Thread, ThreadListResponse, ThreadMedia, useGetThreadsInfiniteQuery } from "@app/core/services";
-import { ThreadListItem, ThreadListItemSkeleton, VideoFeedProvider } from "@app/features/talkSpace/components";
+import { ThreadListItem, ThreadListItemSkeleton, useVideoFeed } from "@app/features/talkSpace/components";
 import { ThreadMediaBackdrop } from "@app/features/talkSpace/components/ThreadMediaGallery/ThreadMediaBackdrop";
 import { ThreadMediaGalleryBackdrop } from "@app/features/talkSpace/components/ThreadMediaGallery/ThreadMediaGalleryBackdrop";
 
 export const TalkSpace: FC = () => {
+    const { setGlobalPause } = useVideoFeed();
     const { params } = useLoaderData() as ThreadsContext;
     const [searchQuery, setSearchQuery] = useState<string>("");
     const query: string = useDebounce(searchQuery, DEBOUNCE_DELAY);
@@ -36,20 +37,31 @@ export const TalkSpace: FC = () => {
         open: false,
     });
 
-    const handleOpenThreadMediaGalleryBackdrop = useCallback((media: ThreadMedia[], index: number): void => {
-        setMediaGalleryState({ isOpen: true, media, initialSlide: index });
-    }, []);
+    const handleOpenThreadMediaGalleryBackdrop = useCallback(
+        (media: ThreadMedia[], index: number): void => {
+            const activeMedia: ThreadMedia = media[index];
+            setGlobalPause(true, activeMedia?.id);
+            setMediaGalleryState({ isOpen: true, media, initialSlide: index });
+        },
+        [setGlobalPause]
+    );
     const handleCloseMediaGalleryBackdrop = useCallback((): void => {
+        setGlobalPause(false);
         setMediaGalleryState({ media: [], isOpen: false, initialSlide: 0 });
-    }, []);
+    }, [setGlobalPause]);
 
-    const handleOpenThreadMediaBackdrop = useCallback((media: ThreadMedia): void => {
-        setThreadMediaState({ media, open: true });
-    }, []);
+    const handleOpenThreadMediaBackdrop = useCallback(
+        (media: ThreadMedia): void => {
+            setGlobalPause(true, media?.id);
+            setThreadMediaState({ media, open: true });
+        },
+        [setGlobalPause]
+    );
 
     const handleCloseThreadMediaBackdrop = useCallback((): void => {
+        setGlobalPause(false);
         setThreadMediaState({ media: null, open: false });
-    }, []);
+    }, [setGlobalPause]);
 
     const threads: Thread[] = useMemo<Thread[]>(
         (): Thread[] => data?.pages.flatMap((page: ThreadListResponse): Thread[] => page.data) ?? [],
@@ -59,7 +71,7 @@ export const TalkSpace: FC = () => {
     const onSearchQueryChange = (event: ChangeEvent<HTMLInputElement>): void => setSearchQuery(event.target.value);
 
     return (
-        <VideoFeedProvider>
+        <>
             <ContentCardContainer
                 sx={theme => ({
                     minHeight: "100vh",
@@ -101,6 +113,6 @@ export const TalkSpace: FC = () => {
                 media={threadMediaState.media}
                 onClose={handleCloseThreadMediaBackdrop}
             />
-        </VideoFeedProvider>
+        </>
     );
 };

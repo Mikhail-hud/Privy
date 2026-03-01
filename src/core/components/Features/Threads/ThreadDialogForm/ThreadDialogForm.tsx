@@ -15,7 +15,7 @@ import Typography from "@mui/material/Typography";
 import DialogContent from "@mui/material/DialogContent";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { VALIDATE_RELES } from "@app/core/constants/rulesConstants.ts";
-import { ThreadMediaGallery } from "@app/features/talkSpace/components";
+// import { ThreadMediaGallery } from "@app/features/talkSpace/components";
 import { ChangeEvent, FC, ReactNode, SyntheticEvent, useRef } from "react";
 import { compressImage, isImageFile, isVideoFile } from "@app/core/utils/fileUtils.ts";
 import { stopEventPropagation, transformServerErrors } from "@app/core/utils/general.ts";
@@ -74,7 +74,7 @@ export const ThreadDialogForm: FC<ThreadDialogProps> = ({ open, setOpen, mode = 
     const { mutateAsync: updateThread, isPending: isUpdating, error: updateTreadError } = useUpdateThreadMutation();
 
     const isMediaPreviewShown: boolean = !!selectedFiles.length && isCreatingMode;
-    const isTreadMediaShown: boolean = !!thread?.media?.length && !isCreatingMode;
+    // const isTreadMediaShown: boolean = !!thread?.media?.length && !isCreatingMode;
 
     const { control, handleSubmit, reset, watch } = useForm<ThreadFormValues>({
         mode: "onChange",
@@ -126,7 +126,7 @@ export const ThreadDialogForm: FC<ThreadDialogProps> = ({ open, setOpen, mode = 
 
                 if (isImageFile(file)) {
                     if (file.size > MAX_IMAGE_INPUT_SIZE) {
-                        const sizeMB = Math.round(MAX_IMAGE_INPUT_SIZE / 1024 / 1024);
+                        const sizeMB: number = Math.round(MAX_IMAGE_INPUT_SIZE / 1024 / 1024);
                         enqueueSnackbar(`Image ${file.name} is too large (Max ${sizeMB}MB input)`, {
                             variant: "error",
                         });
@@ -273,7 +273,7 @@ export const ThreadDialogForm: FC<ThreadDialogProps> = ({ open, setOpen, mode = 
                                 {isMediaPreviewShown && (
                                     <MediaPreview files={selectedFiles} onRemove={handleRemoveFile} />
                                 )}
-                                {isTreadMediaShown && <ThreadMediaGallery threadMedia={thread?.media || []} />}
+                                {/*{isTreadMediaShown && <ThreadMediaGallery threadMedia={thread?.media || []} />}*/}
                                 {isCreatingMode && (
                                     <ThreadActionIcons
                                         fileInputRef={fileInputRef}

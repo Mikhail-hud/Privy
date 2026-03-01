@@ -11,7 +11,7 @@ import {
 } from "@tanstack/react-query";
 import { apiClient } from "@app/core/services/apiClient";
 import { queryClient } from "@app/core/services/queryClient";
-import { Photo, Profile, RevealRequest, Tag, UserLink } from "@app/core/services";
+import { Photo, Profile, RevealRequest, Tag, Thread, ThreadListResponse, UserLink } from "@app/core/services";
 import { INITIAL_PAGE_PARAM, PAGE_SIZE_LIMITS } from "@app/core/constants/ParamsConstants";
 
 export interface User
@@ -108,6 +108,31 @@ const updateUserCacheAfterFollow = (userName: string, isFollowing: boolean) => {
 
     updateSummaryLists(["users", "followers"]);
     updateSummaryLists(["users", "following"]);
+
+    queryClient.setQueriesData<InfiniteData<ThreadListResponse>>({ queryKey: ["threads", "list"] }, oldData => {
+        if (!oldData) return oldData;
+        return {
+            ...oldData,
+            pages: oldData.pages.map(
+                (page: ThreadListResponse): ThreadListResponse => ({
+                    ...page,
+                    data: page.data.map((thread: Thread): Thread => {
+                        if (thread.author && thread.author.userName === userName) {
+                            return {
+                                ...thread,
+                                author: {
+                                    ...thread.author,
+                                    isFollowedByCurrentUser: isFollowing,
+                                    followersCount: Math.max(0, thread.author.followersCount + (isFollowing ? 1 : -1)),
+                                },
+                            };
+                        }
+                        return thread;
+                    }),
+                })
+            ),
+        };
+    });
 
     // // 4. Update Current User Profile
     // queryClient.setQueryData<Profile>(PROFILE_KEYS.getProfile(), myProfile => {

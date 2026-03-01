@@ -10,18 +10,22 @@ interface ProfileAvatarProps {
     isProfileIncognito: boolean;
     privatePhoto: Photo | null | undefined;
     publicPhoto: Photo | null | undefined;
+    width?: number;
+    height?: number;
 }
 
 export const UserProfileAvatar: FC<ProfileAvatarProps> = memo(
-    ({ privatePhoto, publicPhoto, isProfileIncognito, userName, canViewFullProfile }) => {
+    ({ privatePhoto, publicPhoto, isProfileIncognito, userName, canViewFullProfile, width, height }) => {
         const isMobile: boolean = useIsMobile();
         const [open, setOpen] = useState<boolean>(false);
         const src: string | undefined = canViewFullProfile ? publicPhoto?.src : privatePhoto?.src;
         const alt: string = canViewFullProfile ? `avatar_${publicPhoto?.id}` : `avatar_${privatePhoto?.id}`;
 
         const onAvatarClick = (): void => setOpen(true);
-
         const onClose = (): void => setOpen(false);
+
+        const avatarWidth: number = width ?? (isMobile ? 90 : 120);
+        const avatarHeight: number = height ?? (isMobile ? 90 : 120);
 
         return (
             <>
@@ -31,7 +35,7 @@ export const UserProfileAvatar: FC<ProfileAvatarProps> = memo(
                         alt={alt}
                         userName={userName}
                         onClick={onAvatarClick}
-                        sx={{ width: isMobile ? 90 : 120, height: isMobile ? 90 : 120, cursor: "pointer" }}
+                        sx={{ width: avatarWidth, height: avatarHeight, cursor: "pointer" }}
                     />
                 </UserAvatarBadge>
                 <UserAvatarBackdrop

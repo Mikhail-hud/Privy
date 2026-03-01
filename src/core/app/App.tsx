@@ -41,6 +41,7 @@ import {
     userProfileLoader,
 } from "@app/features";
 import { ProfilePhotos, profilePhotosLoader } from "@app/features/profile/ProfileCard/ProfileTabs";
+import { VideoFeedProvider } from "@app/features/talkSpace/components";
 
 // Lazy-loaded components to optimize initial load time
 const RequireAdmin = lazy(() => import("@app/core/components/Hocs").then(module => ({ default: module.RequireAdmin })));
@@ -132,7 +133,11 @@ const router = createBrowserRouter([
             {
                 loader: talkSpaceLoader,
                 path: TALK_SPACE_PAGE_PATH,
-                element: <TalkSpace />,
+                element: (
+                    <VideoFeedProvider>
+                        <TalkSpace />
+                    </VideoFeedProvider>
+                ),
             },
             {
                 element: <RequireAdmin />,

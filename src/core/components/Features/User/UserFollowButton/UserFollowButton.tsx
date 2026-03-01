@@ -1,16 +1,20 @@
-import Button from "@mui/material/Button";
 import { enqueueSnackbar } from "notistack";
 import { FC, MouseEvent, memo } from "react";
 import { useIsMobile } from "@app/core/hooks";
+import Button, { ButtonProps } from "@mui/material/Button";
 import { ApiError, useFollowUserMutation, useUnFollowUserMutation } from "@app/core/services";
 
-interface UserFollowButtonProps {
+interface UserFollowButtonProps extends ButtonProps {
     isFollowed: boolean;
     userName: string;
-    size?: "small" | "medium" | "large";
 }
 
-export const UserFollowButtonComponent: FC<UserFollowButtonProps> = ({ isFollowed, userName, size = "medium" }) => {
+export const UserFollowButtonComponent: FC<UserFollowButtonProps> = ({
+    isFollowed,
+    userName,
+    size = "medium",
+    ...rest
+}) => {
     const isMobile: boolean = useIsMobile();
 
     const { mutateAsync: follow, isPending: isFollowLoading } = useFollowUserMutation();
@@ -50,6 +54,7 @@ export const UserFollowButtonComponent: FC<UserFollowButtonProps> = ({ isFollowe
             sx={{ minWidth: isMobile ? 90 : 110 }}
             loading={isFollowLoading || isUnfollowLoadinng}
             variant={isFollowed ? "outlined" : "contained"}
+            {...rest}
         >
             {isFollowed ? "Subscribed" : "Subscribe"}
         </Button>

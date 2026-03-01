@@ -12,16 +12,15 @@ import { useBodyOverflowLock } from "@app/core/hooks";
 import { Navigation, Pagination } from "swiper/modules";
 import { ActionIconButton } from "@app/core/components";
 import { MediaType, ThreadMedia } from "@app/core/services";
-import { FC, MouseEvent, CSSProperties, memo } from "react";
 import { stopEventPropagation } from "@app/core/utils/general.ts";
-import { useVideoFeed } from "@app/features/talkSpace/components";
+import { FC, MouseEvent, CSSProperties, memo, useCallback, WheelEventHandler } from "react";
 import { GalleryVideoPlayer } from "@app/features/talkSpace/components/ThreadMediaGallery/GalleryVideoPlayer";
 
 interface ThreadMediaGalleryBackdropProps {
     open: boolean;
     media: ThreadMedia[];
     initialSlide: number;
-    onClose: (e: MouseEvent<HTMLElement>) => void;
+    onClose: (e: MouseEvent<HTMLElement> | WheelEventHandler<HTMLDivElement> | undefined) => void;
 }
 
 const ThreadMediaGalleryBackdropComponent: FC<ThreadMediaGalleryBackdropProps> = ({
@@ -32,21 +31,21 @@ const ThreadMediaGalleryBackdropComponent: FC<ThreadMediaGalleryBackdropProps> =
 }) => {
     const theme: Theme = useTheme();
     useBodyOverflowLock(open);
-    const { setGlobalPause } = useVideoFeed();
 
-    // When the backdrop opens, we want to pause all videos in the gallery to prevent multiple videos from playing at the same time. When it closes, we want to unpause them so that if the user opens the gallery again, the videos will play from where they left off.
-    useEffect((): void => {
-        const activeMedia: ThreadMedia = media[initialSlide];
-        setGlobalPause(open, activeMedia?.id);
-    }, [open, setGlobalPause, media, initialSlide]);
-
-    if (!open) return null;
+    const handleCloseInternal = useCallback(
+        (e: WheelEventHandler<HTMLDivElement> | MouseEvent<HTMLElement>): void => {
+            onClose(e);
+        },
+        [onClose]
+    );
 
     const handleBackdropClick = (e: MouseEvent<HTMLElement>): void => stopEventPropagation(e);
 
     return (
         <Backdrop
             open={open}
+            unmountOnExit
+            transitionDuration={400}
             onClick={handleBackdropClick}
             sx={{
                 zIndex: theme => theme.zIndex.drawer + 1,
@@ -54,9 +53,18 @@ const ThreadMediaGalleryBackdropComponent: FC<ThreadMediaGalleryBackdropProps> =
                 touchAction: "none",
             }}
         >
-            <Box sx={{ width: "100%", height: "100%", display: "flex", flexDirection: "column" }}>
+            <Box
+                onWheel={handleCloseInternal}
+                sx={{
+                    width: "100%",
+                    height: "100%",
+                    display: "flex",
+                    flexDirection: "column",
+                    outline: "none",
+                }}
+            >
                 <Box sx={{ p: 2, position: "fixed", zIndex: 10 }}>
-                    <ActionIconButton icon={<CloseIcon />} onClick={onClose} />
+                    <ActionIconButton icon={<CloseIcon />} onClick={handleCloseInternal} />
                 </Box>
                 <Box
                     sx={{
