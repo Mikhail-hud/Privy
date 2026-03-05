@@ -82,7 +82,12 @@ export const UserHoverCard: FC<UserHoverCardProps> = ({
     };
 
     return (
-        <Box component="span" onMouseEnter={handleOpen} onMouseLeave={handleClose} sx={sx}>
+        <Box
+            component="span"
+            onMouseEnter={handleOpen}
+            onMouseLeave={handleClose}
+            sx={{ display: "inline-flex", ...sx }}
+        >
             {children}
             <Popper
                 open={open}
