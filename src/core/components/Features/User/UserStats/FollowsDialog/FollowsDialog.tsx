@@ -1,8 +1,8 @@
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
 import Dialog from "@mui/material/Dialog";
+import { useIsMobile } from "@app/core/hooks";
 import { UserStatsType } from "@app/core/components";
-import { useAuth, useIsMobile } from "@app/core/hooks";
 import DialogContent from "@mui/material/DialogContent";
 import { FC, useState, SyntheticEvent, Activity, MouseEvent } from "react";
 import { FollowersList } from "@app/core/components/Features/User/UserStats/FollowersList";
@@ -27,9 +27,6 @@ export const FollowsDialog: FC<FollowsDialogProps> = ({
     followingCount,
     onListItemClick,
 }) => {
-    const {
-        profile: { userName: isOwnerUserName },
-    } = useAuth();
     const isMobile: boolean = useIsMobile();
 
     const [tab, setTab] = useState<UserStatsType | null>(initialTab);
@@ -61,20 +58,10 @@ export const FollowsDialog: FC<FollowsDialogProps> = ({
                     </Tabs>
                     <DialogContent>
                         <Activity mode={tab === "followers" ? "visible" : "hidden"}>
-                            <FollowersList
-                                userName={userName}
-                                type="followers"
-                                isOwnerUserName={isOwnerUserName}
-                                onListItemClick={onListItemClick}
-                            />
+                            <FollowersList userName={userName} type="followers" onListItemClick={onListItemClick} />
                         </Activity>
                         <Activity mode={tab === "following" ? "visible" : "hidden"}>
-                            <FollowingList
-                                type="following"
-                                userName={userName}
-                                isOwnerUserName={isOwnerUserName}
-                                onListItemClick={onListItemClick}
-                            />
+                            <FollowingList type="following" userName={userName} onListItemClick={onListItemClick} />
                         </Activity>
                     </DialogContent>
                 </>

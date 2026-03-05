@@ -10,14 +10,22 @@ import { enqueueSnackbar } from "notistack";
 import { InfiniteData } from "@tanstack/react-query";
 import { PROFILE_PAGE_PATH } from "@app/core/constants/pathConstants";
 import { PAGE_SIZE_LIMITS, INITIAL_PAGE_PARAM } from "@app/core/constants/ParamsConstants.ts";
-import { QueryParams, User, UserListResponse, usersApi, queryClient, USERS_KEYS, ApiError } from "@app/core/services";
+import {
+    QueryParams,
+    UserListResponse,
+    usersApi,
+    queryClient,
+    USERS_KEYS,
+    ApiError,
+    UserSummary,
+} from "@app/core/services";
 
 /**
  * User list context made available to route elements.
  * @property users Array of users returned by the `getUsers` endpoint.
  */
 export interface UsersContext {
-    users: User[];
+    users: UserSummary[];
     params: QueryParams;
 }
 
@@ -50,7 +58,7 @@ export const lookupLoader = async (): Promise<UsersContext | Response> => {
     // Check cache first
     const cachedData = queryClient.getQueryData<InfiniteData<UserListResponse>>(USERS_KEYS.list(params));
     if (cachedData) {
-        const users: User[] = cachedData.pages.flatMap(page => page.data);
+        const users: UserSummary[] = cachedData.pages.flatMap(page => page.data);
         return { users, params };
     }
 
@@ -60,7 +68,7 @@ export const lookupLoader = async (): Promise<UsersContext | Response> => {
             queryFn: ({ pageParam }): Promise<UserListResponse> => usersApi.getUsers({ ...params, page: pageParam }),
             initialPageParam: INITIAL_PAGE_PARAM,
         });
-        const users: User[] = infiniteData.pages.flatMap(page => page.data);
+        const users: UserSummary[] = infiniteData.pages.flatMap(page => page.data);
         return { users, params };
     } catch (error) {
         const errorMessage: string = (error as ApiError)?.message;

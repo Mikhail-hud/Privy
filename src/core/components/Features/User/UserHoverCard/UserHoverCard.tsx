@@ -1,5 +1,6 @@
-import { User } from "@app/core/services";
-import { Popover, Box } from "@mui/material";
+import Box from "@mui/material/Box";
+import { SxProps, Theme } from "@mui/material/styles";
+import Popper from "@mui/material/Popper";
 import Divider from "@mui/material/Divider";
 import { useIsMobile } from "@app/core/hooks";
 import Typography from "@mui/material/Typography";
@@ -9,31 +10,51 @@ import CardContent from "@mui/material/CardContent";
 import { NavigateFunction } from "react-router-dom";
 import { FC, useState, MouseEvent, ReactNode } from "react";
 import { stopEventPropagation } from "@app/core/utils/general.ts";
-import { ContentCardContainer, UserStats } from "@app/core/components";
 import { USER_HANDLE_PREFIX } from "@app/core/constants/pathConstants.ts";
-import { UserProfileAvatar } from "@app/features/userProfile/UserProfileCard/UserProfileAvatar";
+import { Avatar, ContentCardContainer, UserAvatarBadge, UserStats } from "@app/core/components";
 import { UserProfileActions } from "@app/features/userProfile/UserProfileCard/UserProfileActions";
 
 interface UserHoverCardProps {
-    user: User | null;
+    src: string | undefined;
+    fullName: string | undefined | null;
+    userName: string | undefined;
+    isProfileIncognito: boolean | undefined;
     children: ReactNode;
+    followersCount: number | undefined;
+    followingCount: number | undefined;
+    biography: string | undefined;
     disabled: boolean;
+    isFollowedByCurrentUser: boolean | undefined;
     userProfileActionsShown: boolean;
+    sx?: SxProps<Theme>;
 }
 
-export const UserHoverCard: FC<UserHoverCardProps> = ({ user, children, disabled, userProfileActionsShown }) => {
+export const UserHoverCard: FC<UserHoverCardProps> = ({
+    children,
+    disabled,
+    userProfileActionsShown,
+    src,
+    userName,
+    fullName,
+    isProfileIncognito,
+    biography,
+    followingCount,
+    isFollowedByCurrentUser,
+    followersCount,
+    sx,
+}) => {
     const navigate: NavigateFunction = useNavigate();
     const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
     const isMobile: boolean = useIsMobile();
-    const open: boolean = Boolean(anchorEl) && !disabled && Boolean(user);
+    const open: boolean = Boolean(anchorEl) && !disabled;
 
     const handleNavigateToProfilePage = (_event: MouseEvent<HTMLElement>): void => {
-        if (!user?.userName) return;
-        navigate(`/${USER_HANDLE_PREFIX}${user.userName}`);
+        if (!userName) return;
+        navigate(`/${USER_HANDLE_PREFIX}${userName}`);
     };
 
     const handleAction = (event: MouseEvent<HTMLElement>): void => {
-        if (disabled || !user) return;
+        if (disabled) return;
         stopEventPropagation(event);
 
         if (isMobile) {
@@ -41,8 +62,12 @@ export const UserHoverCard: FC<UserHoverCardProps> = ({ user, children, disabled
         }
     };
 
-    if (disabled || !user || isMobile) {
-        return <Box onClick={handleAction}>{children}</Box>;
+    if (disabled || isMobile || !userName) {
+        return (
+            <Box component="span" onClick={handleAction} sx={sx}>
+                {children}
+            </Box>
+        );
     }
 
     const handleOpen = (event: MouseEvent<HTMLElement>): void => {
@@ -56,40 +81,15 @@ export const UserHoverCard: FC<UserHoverCardProps> = ({ user, children, disabled
         setAnchorEl(null);
     };
 
-    const onPaperMouseEnter = (): void => setAnchorEl(anchorEl);
-
     return (
-        <Box component="span" onMouseEnter={handleOpen} onMouseLeave={handleClose} sx={{ display: "inline-block" }}>
+        <Box component="span" onMouseEnter={handleOpen} onMouseLeave={handleClose} sx={sx}>
             {children}
-            <Popover
-                onClick={stopEventPropagation}
+            <Popper
                 open={open}
                 anchorEl={anchorEl}
-                disableRestoreFocus
-                sx={{ pointerEvents: "none" }}
-                anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
-                transformOrigin={{ vertical: "top", horizontal: "left" }}
-                disablePortal={false}
-                slotProps={{
-                    paper: {
-                        onMouseEnter: onPaperMouseEnter,
-                        onMouseLeave: handleClose,
-                        sx: {
-                            pointerEvents: "auto",
-                            overflow: "visible",
-                            "&::before": {
-                                content: '""',
-                                display: "block",
-                                position: "absolute",
-                                top: -32,
-                                left: 0,
-                                right: 0,
-                                height: 32,
-                                background: "transparent",
-                            },
-                        },
-                    },
-                }}
+                sx={{ zIndex: 1300 }}
+                placement="bottom-start"
+                onClick={stopEventPropagation}
             >
                 <ContentCardContainer sx={{ p: 1 }}>
                     <CardHeader
@@ -103,15 +103,13 @@ export const UserHoverCard: FC<UserHoverCardProps> = ({ user, children, disabled
                             },
                         }}
                         avatar={
-                            <UserProfileAvatar
-                                width={70}
-                                height={70}
-                                userName={user?.userName}
-                                publicPhoto={user?.publicPhoto}
-                                privatePhoto={user?.privatePhoto}
-                                canViewFullProfile={user?.canViewFullProfile}
-                                isProfileIncognito={user?.isProfileIncognito}
-                            />
+                            <UserAvatarBadge
+                                onClick={handleNavigateToProfilePage}
+                                sx={{ "&:hover": { cursor: "pointer" } }}
+                                isProfileIncognito={!!isProfileIncognito}
+                            >
+                                <Avatar alt={src} src={src} sx={{ width: 70, height: 70 }} userName={userName} />
+                            </UserAvatarBadge>
                         }
                         title={
                             <Box
@@ -136,11 +134,11 @@ export const UserHoverCard: FC<UserHoverCardProps> = ({ user, children, disabled
                                             },
                                         }}
                                     >
-                                        @{user?.userName}
+                                        @{userName}
                                     </Typography>
-                                    {user?.fullName && (
+                                    {fullName && (
                                         <Typography textOverflow="ellipsis" color="text.secondary">
-                                            {user?.fullName}
+                                            {fullName}
                                         </Typography>
                                     )}
                                 </Box>
@@ -148,14 +146,16 @@ export const UserHoverCard: FC<UserHoverCardProps> = ({ user, children, disabled
                         }
                     />
 
-                    <CardActions disableSpacing>
-                        <UserStats
-                            followersCount={user?.followersCount}
-                            followingCount={user?.followingCount}
-                            userName={user?.userName}
-                        />
-                    </CardActions>
-                    {user?.biography && (
+                    {typeof followersCount !== "undefined" && typeof followingCount !== "undefined" && (
+                        <CardActions disableSpacing>
+                            <UserStats
+                                followersCount={followersCount}
+                                followingCount={followingCount}
+                                userName={userName}
+                            />
+                        </CardActions>
+                    )}
+                    {biography && (
                         <>
                             <Divider textAlign="left">
                                 <Typography variant="subtitle1" color="primary">
@@ -164,20 +164,20 @@ export const UserHoverCard: FC<UserHoverCardProps> = ({ user, children, disabled
                             </Divider>
                             <CardContent>
                                 <Typography variant="body1" color="textPrimary" sx={{ whiteSpace: "pre-wrap" }}>
-                                    {user?.biography}
+                                    {biography}
                                 </Typography>
                             </CardContent>
                         </>
                     )}
-                    {userProfileActionsShown && (
+                    {userProfileActionsShown && typeof isFollowedByCurrentUser !== "undefined" && (
                         <UserProfileActions
-                            userName={user?.userName}
-                            isFollowed={user?.isFollowedByCurrentUser}
+                            userName={userName}
                             sx={{ width: "100%" }}
+                            isFollowed={isFollowedByCurrentUser}
                         />
                     )}
                 </ContentCardContainer>
-            </Popover>
+            </Popper>
         </Box>
     );
 };

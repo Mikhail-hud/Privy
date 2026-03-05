@@ -1,5 +1,7 @@
 export * from "./UserStats";
 export * from "./UserHoverCard";
+export * from "./UserListItem";
+export * from "./UserListItemSkeleton";
 export * from "./RevealsRequests";
 export * from "./ProfileReveals";
 export * from "./UserPhotoGallery";

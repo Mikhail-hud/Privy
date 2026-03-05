@@ -16,13 +16,30 @@ const OutgoingRequestsListItemComponent: FC<OutgoingRequestsListItemProps> = ({
 }) => {
     const {
         status,
-        requestee: { userName, fullName, isProfileIncognito, publicPhoto, privatePhoto, canViewFullProfile },
+        requestee: {
+            userName,
+            fullName,
+            isProfileIncognito,
+            publicPhoto,
+            privatePhoto,
+            canViewFullProfile,
+            biography,
+            followersCount,
+            followingCount,
+            isFollowedByCurrentUser,
+        },
     } = revealRequest;
     const src: string | undefined = canViewFullProfile ? publicPhoto?.src : privatePhoto?.src;
     const alt: string = canViewFullProfile ? `avatar_${publicPhoto?.id}` : `avatar_${privatePhoto?.id}`;
 
     return (
         <UserListItemBase
+            followersCount={followersCount}
+            followingCount={followingCount}
+            isFollowedByCurrentUser={isFollowedByCurrentUser}
+            userProfileActionsShown
+            isUserHoverCardShown
+            biography={biography}
             avatarUrl={src}
             avatarAlt={alt}
             isLast={isLast}

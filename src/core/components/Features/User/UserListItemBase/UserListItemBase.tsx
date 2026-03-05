@@ -7,7 +7,7 @@ import ListItemText from "@mui/material/ListItemText";
 import { Link as RouterLink } from "react-router-dom";
 import ListItemAvatar from "@mui/material/ListItemAvatar";
 import { stopEventPropagation } from "@app/core/utils/general.ts";
-import { UserAvatarBadge, Avatar } from "@app/core/components";
+import { UserAvatarBadge, Avatar, UserHoverCard } from "@app/core/components";
 import { USER_HANDLE_PREFIX } from "@app/core/constants/pathConstants.ts";
 
 interface UserListItemBaseProps {
@@ -16,10 +16,15 @@ interface UserListItemBaseProps {
     action?: ReactNode;
     avatarUrl: string | undefined;
     avatarAlt: string;
-    fullName?: string | null;
+    fullName?: string | null | undefined;
     isProfileIncognito: boolean;
     secondaryContent?: ReactNode;
-    isOwnerUserName?: string;
+    isFollowedByCurrentUser?: boolean;
+    biography?: string;
+    followersCount?: number;
+    followingCount?: number;
+    isUserHoverCardShown?: boolean;
+    userProfileActionsShown?: boolean;
     onListItemClick?: (e: MouseEvent<HTMLAnchorElement>) => void;
 }
 
@@ -32,7 +37,13 @@ const UserListItemBaseComponent: FC<UserListItemBaseProps> = ({
     avatarUrl,
     secondaryContent,
     onListItemClick,
+    isFollowedByCurrentUser,
+    userProfileActionsShown,
+    followersCount,
+    followingCount,
+    biography,
     action,
+    isUserHoverCardShown = false,
 }) => {
     return (
         <>
@@ -67,18 +78,39 @@ const UserListItemBaseComponent: FC<UserListItemBaseProps> = ({
                                     mr: { xxs: 0, sm: 1 },
                                 }}
                             >
-                                <Typography
-                                    variant="subtitle1"
-                                    color="primary"
+                                <UserHoverCard
+                                    userName={userName}
+                                    fullName={fullName}
+                                    src={avatarUrl}
+                                    biography={biography}
+                                    followingCount={followingCount}
+                                    followersCount={followersCount}
+                                    disabled={!isUserHoverCardShown}
+                                    isFollowedByCurrentUser={isFollowedByCurrentUser}
+                                    isProfileIncognito={isProfileIncognito}
+                                    userProfileActionsShown={!!userProfileActionsShown}
                                     sx={{
                                         overflow: "hidden",
-                                        whiteSpace: "nowrap",
                                         textOverflow: "ellipsis",
+                                        whiteSpace: "nowrap",
                                         maxWidth: "100%",
                                     }}
                                 >
-                                    @{userName}
-                                </Typography>
+                                    <Typography
+                                        textOverflow="ellipsis"
+                                        variant="subtitle1"
+                                        color="primary"
+                                        sx={{
+                                            overflow: "hidden",
+                                            whiteSpace: "nowrap",
+                                            textOverflow: "ellipsis",
+                                            maxWidth: "100%",
+                                            "&:hover": { textDecoration: "underline" },
+                                        }}
+                                    >
+                                        @{userName}
+                                    </Typography>
+                                </UserHoverCard>
                                 {fullName && (
                                     <Typography
                                         textOverflow="ellipsis"

@@ -3,9 +3,14 @@ import { UsersContext } from "@app/features";
 import { useLoaderData } from "react-router-dom";
 import { DEBOUNCE_DELAY } from "@app/core/constants/general";
 import { FC, useState, ChangeEvent, ReactElement } from "react";
-import { useGetUsersInfiniteQuery, User } from "@app/core/services";
-import { UserListItem, UserListItemSkeleton } from "@app/features/lookup/components";
-import { ContentCardContainer, InfiniteScrollList, UserSearchField } from "@app/core/components";
+import { useGetUsersInfiniteQuery, UserSummary } from "@app/core/services";
+import {
+    ContentCardContainer,
+    InfiniteScrollList,
+    UserListItem,
+    UserListItemSkeleton,
+    UserSearchField,
+} from "@app/core/components";
 
 export const Lookup: FC = () => {
     const { params } = useLoaderData() as UsersContext;
@@ -16,7 +21,7 @@ export const Lookup: FC = () => {
         query,
     });
 
-    const users: User[] = useMemo<User[]>(() => data?.pages.flatMap(page => page.data) ?? [], [data]);
+    const users: UserSummary[] = useMemo<UserSummary[]>(() => data?.pages.flatMap(page => page.data) ?? [], [data]);
 
     const onSearchQueryChange = (event: ChangeEvent<HTMLInputElement>): void => setSearchQuery(event.target.value);
 
@@ -30,7 +35,7 @@ export const Lookup: FC = () => {
             })}
         >
             <UserSearchField value={searchQuery} onChange={onSearchQueryChange} />
-            <InfiniteScrollList<User>
+            <InfiniteScrollList<UserSummary>
                 data={users}
                 loaderCount={10}
                 isLoading={isLoading}
@@ -39,8 +44,8 @@ export const Lookup: FC = () => {
                 fetchNextPage={fetchNextPage}
                 loader={UserListItemSkeleton}
                 isFetchingNextPage={isFetchingNextPage}
-                renderItem={(user: User, index: number): ReactElement => (
-                    <UserListItem user={user} key={user.id} isLast={index === users.length - 1} />
+                renderItem={(user: UserSummary, index: number): ReactElement => (
+                    <UserListItem user={user} key={user.id} detailed isLast={index === users.length - 1} />
                 )}
             />
         </ContentCardContainer>

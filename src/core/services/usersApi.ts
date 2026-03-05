@@ -11,7 +11,23 @@ import {
 } from "@tanstack/react-query";
 import { apiClient } from "@app/core/services/apiClient";
 import { queryClient } from "@app/core/services/queryClient";
-import { Photo, Profile, RevealRequest, Tag, Thread, ThreadListResponse, UserLink } from "@app/core/services";
+import {
+    Photo,
+    Profile,
+    ProfileRevealByMe,
+    ProfileRevealByMeListResponse,
+    ProfileRevealToMe,
+    ProfileRevealToMeListResponse,
+    RequesteeRevealRequest,
+    RequesteeRevealRequestListResponse,
+    RequesterRevealRequest,
+    RequesterRevealRequestListResponse,
+    RevealRequest,
+    Tag,
+    Thread,
+    ThreadListResponse,
+    UserLink,
+} from "@app/core/services";
 import { INITIAL_PAGE_PARAM, PAGE_SIZE_LIMITS } from "@app/core/constants/ParamsConstants";
 
 export interface User
@@ -27,10 +43,19 @@ export interface User
     isFollowedByCurrentUser: boolean;
 }
 
-export interface UserSummary extends Pick<Profile, "userName" | "id" | "isProfileIncognito"> {
-    fullName?: string;
-    publicPhoto?: Photo | null;
-    privatePhoto?: Photo | null;
+export interface UserSummary
+    extends Pick<
+        Profile,
+        | "userName"
+        | "id"
+        | "isProfileIncognito"
+        | "followingCount"
+        | "followersCount"
+        | "biography"
+        | "fullName"
+        | "publicPhoto"
+        | "privatePhoto"
+    > {
     canViewFullProfile: boolean;
     isFollowedByCurrentUser: boolean;
 }
@@ -42,7 +67,7 @@ export interface PaginatedResponse<T> {
     total: number;
 }
 
-export type UserListResponse = PaginatedResponse<User>;
+export type UserListResponse = PaginatedResponse<UserSummary>;
 export type FollowersListResponse = PaginatedResponse<UserSummary>;
 
 export interface QueryParams {
@@ -73,7 +98,7 @@ const updateUserCacheAfterFollow = (userName: string, isFollowing: boolean) => {
             ...oldData,
             pages: oldData.pages.map((page: UserListResponse) => ({
                 ...page,
-                data: page.data.map((user: User): User => {
+                data: page.data.map((user: UserSummary): UserSummary => {
                     if (user.userName === userName) {
                         return {
                             ...user,
@@ -133,6 +158,134 @@ const updateUserCacheAfterFollow = (userName: string, isFollowing: boolean) => {
             ),
         };
     });
+
+    // Update Revealed To Me Profiles
+    queryClient.setQueriesData<InfiniteData<ProfileRevealToMeListResponse>>(
+        { queryKey: ["reveals", "revealedToMeProfiles"] },
+        oldData => {
+            if (!oldData) return oldData;
+            return {
+                ...oldData,
+                pages: oldData.pages.map(
+                    (page: ProfileRevealToMeListResponse): ProfileRevealToMeListResponse => ({
+                        ...page,
+                        data: page.data.map((profileReaveal: ProfileRevealToMe): ProfileRevealToMe => {
+                            if (profileReaveal.revealer.userName === userName) {
+                                return {
+                                    ...profileReaveal,
+                                    revealer: {
+                                        ...profileReaveal.revealer,
+                                        isFollowedByCurrentUser: isFollowing,
+                                        followersCount: Math.max(
+                                            0,
+                                            profileReaveal.revealer.followersCount + (isFollowing ? 1 : -1)
+                                        ),
+                                    },
+                                };
+                            }
+                            return profileReaveal;
+                        }),
+                    })
+                ),
+            };
+        }
+    );
+
+    // Update Revealed By Me Profiles
+    queryClient.setQueriesData<InfiniteData<ProfileRevealByMeListResponse>>(
+        { queryKey: ["reveals", "revealedByMeProfiles"] },
+        oldData => {
+            if (!oldData) return oldData;
+            return {
+                ...oldData,
+                pages: oldData.pages.map(
+                    (page: ProfileRevealByMeListResponse): ProfileRevealByMeListResponse => ({
+                        ...page,
+                        data: page.data.map((profileReveal: ProfileRevealByMe): ProfileRevealByMe => {
+                            if (profileReveal.revealedTo.userName === userName) {
+                                return {
+                                    ...profileReveal,
+                                    revealedTo: {
+                                        ...profileReveal.revealedTo,
+                                        isFollowedByCurrentUser: isFollowing,
+                                        followersCount: Math.max(
+                                            0,
+                                            profileReveal.revealedTo.followersCount + (isFollowing ? 1 : -1)
+                                        ),
+                                    },
+                                };
+                            }
+                            return profileReveal;
+                        }),
+                    })
+                ),
+            };
+        }
+    );
+
+    // Update Reveal Requests
+    queryClient.setQueriesData<InfiniteData<RequesterRevealRequestListResponse>>(
+        { queryKey: ["reveals", "requests"] },
+        oldData => {
+            if (!oldData) return oldData;
+            return {
+                ...oldData,
+                pages: oldData.pages.map(
+                    (page: RequesterRevealRequestListResponse): RequesterRevealRequestListResponse => ({
+                        ...page,
+                        data: page.data.map((revealRequest: RequesterRevealRequest): RequesterRevealRequest => {
+                            if (revealRequest.requester.userName === userName) {
+                                return {
+                                    ...revealRequest,
+                                    requester: {
+                                        ...revealRequest.requester,
+                                        isFollowedByCurrentUser: isFollowing,
+                                        followersCount: Math.max(
+                                            0,
+                                            revealRequest.requester.followersCount + (isFollowing ? 1 : -1)
+                                        ),
+                                    },
+                                };
+                            }
+                            return revealRequest;
+                        }),
+                    })
+                ),
+            };
+        }
+    );
+
+    // Update Sent Reveal Requests
+    queryClient.setQueriesData<InfiniteData<RequesteeRevealRequestListResponse>>(
+        { queryKey: ["reveals", "sentRequests"] },
+        oldData => {
+            if (!oldData) return oldData;
+            return {
+                ...oldData,
+                pages: oldData.pages.map(
+                    (page: RequesteeRevealRequestListResponse): RequesteeRevealRequestListResponse => ({
+                        ...page,
+                        data: page.data.map((revealRequest: RequesteeRevealRequest): RequesteeRevealRequest => {
+                            if (revealRequest.requestee.userName === userName) {
+                                return {
+                                    ...revealRequest,
+                                    requestee: {
+                                        ...revealRequest.requestee,
+                                        isFollowedByCurrentUser: isFollowing,
+                                        followersCount: Math.max(
+                                            0,
+                                            revealRequest.requestee.followersCount + (isFollowing ? 1 : -1)
+                                        ),
+                                    },
+                                };
+                            }
+                            return revealRequest;
+                        }),
+                    })
+                ),
+            };
+        }
+    );
 
     // // 4. Update Current User Profile
     // queryClient.setQueryData<Profile>(PROFILE_KEYS.getProfile(), myProfile => {

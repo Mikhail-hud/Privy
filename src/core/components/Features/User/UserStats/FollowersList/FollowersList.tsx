@@ -2,17 +2,15 @@ import { useDebounce } from "@app/core/hooks";
 import { DEBOUNCE_DELAY } from "@app/core/constants/general";
 import { FC, useState, ChangeEvent, ReactElement, MouseEvent } from "react";
 import { useGetUserFollowersInfiniteQuery, UserSummary } from "@app/core/services";
-import { UserStatsType, InfiniteScrollList, Spiner, UserSearchField } from "@app/core/components";
-import { UserSummaryListItem } from "@app/core/components/Features/User/UserStats/UserSummaryListItem";
+import { UserStatsType, InfiniteScrollList, Spiner, UserSearchField, UserListItem } from "@app/core/components";
 
 interface FollowersListProps {
     userName: string;
     type: UserStatsType;
-    isOwnerUserName?: string;
     onListItemClick?: (e: MouseEvent<HTMLAnchorElement>) => void;
 }
 
-export const FollowersList: FC<FollowersListProps> = ({ userName, type, isOwnerUserName, onListItemClick }) => {
+export const FollowersList: FC<FollowersListProps> = ({ userName, type, onListItemClick }) => {
     const [searchQuery, setSearchQuery] = useState<string>("");
     const query: string = useDebounce(searchQuery, DEBOUNCE_DELAY);
 
@@ -36,12 +34,11 @@ export const FollowersList: FC<FollowersListProps> = ({ userName, type, isOwnerU
                 fetchNextPage={fetchNextPage}
                 isFetchingNextPage={isFetchingNextPage}
                 renderItem={(user: UserSummary, index: number): ReactElement => (
-                    <UserSummaryListItem
-                        key={user.id}
+                    <UserListItem
                         user={user}
-                        onListItemClick={onListItemClick}
-                        isOwnerUserName={isOwnerUserName}
+                        key={user.id}
                         isLast={index === users.length - 1}
+                        onListItemClick={onListItemClick}
                     />
                 )}
             />

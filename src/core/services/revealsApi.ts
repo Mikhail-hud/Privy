@@ -8,7 +8,15 @@ import {
     UseInfiniteQueryOptions,
 } from "@tanstack/react-query";
 import { INITIAL_PAGE_PARAM, PAGE_SIZE_LIMITS } from "@app/core/constants/ParamsConstants";
-import { apiClient, PaginatedResponse, queryClient, QueryParams, User, USERS_KEYS } from "@app/core/services";
+import {
+    apiClient,
+    PaginatedResponse,
+    queryClient,
+    QueryParams,
+    User,
+    USERS_KEYS,
+    UserSummary,
+} from "@app/core/services";
 
 export enum RevealStatus {
     OWNER = "OWNER",
@@ -34,16 +42,6 @@ export interface RevealRequest {
     requesterId: number;
 }
 
-export type ProfileRevealUser = Pick<
-    User,
-    "id" | "userName" | "isProfileIncognito" | "fullName" | "publicPhoto" | "privatePhoto" | "canViewFullProfile"
->;
-
-export type RevealRequestUser = Pick<
-    User,
-    "id" | "userName" | "isProfileIncognito" | "fullName" | "publicPhoto" | "privatePhoto" | "canViewFullProfile"
->;
-
 interface ProfileRevealWithRevealer<TUser> extends ProfileReveal {
     revealer: TUser;
 }
@@ -58,12 +56,12 @@ interface RevealRequestWithRequestee<TUser> extends RevealRequest {
     requestee: TUser;
 }
 
-export type RequesterRevealRequest = RevealRequestWithRequester<RevealRequestUser>;
+export type RequesterRevealRequest = RevealRequestWithRequester<UserSummary>;
 
-export type RequesteeRevealRequest = RevealRequestWithRequestee<RevealRequestUser>;
+export type RequesteeRevealRequest = RevealRequestWithRequestee<UserSummary>;
 
-export type ProfileRevealByMe = ProfileRevealWithRevealedTo<ProfileRevealUser>;
-export type ProfileRevealToMe = ProfileRevealWithRevealer<ProfileRevealUser>;
+export type ProfileRevealByMe = ProfileRevealWithRevealedTo<UserSummary>;
+export type ProfileRevealToMe = ProfileRevealWithRevealer<UserSummary>;
 
 export interface RevealQueryParams extends QueryParams {
     status?: RevealStatus;

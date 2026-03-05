@@ -101,9 +101,16 @@ const ThreadListItemComponent: FC<ThreadListItemProps> = ({
                                 }}
                             >
                                 <UserHoverCard
-                                    user={author}
+                                    src={src}
+                                    fullName={author?.fullName}
+                                    userName={author?.userName}
+                                    biography={author?.biography}
+                                    followingCount={author?.followingCount}
+                                    followersCount={author?.followersCount}
                                     userProfileActionsShown={!isOwnedByCurrentUser}
                                     disabled={!isOwnedByCurrentUser && isIncognito}
+                                    isProfileIncognito={author?.isProfileIncognito}
+                                    isFollowedByCurrentUser={!!author?.isFollowedByCurrentUser}
                                 >
                                     <Typography
                                         variant="subtitle1"
