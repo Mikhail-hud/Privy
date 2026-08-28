@@ -1,6 +1,8 @@
+import Box from "@mui/material/Box";
 import { FC, MouseEvent } from "react";
 import { Photo, Profile } from "@app/core/services";
 import { PhotoActionsMenu } from "@app/core/components";
+import { useInfiniteScrollTrigger } from "@app/core/hooks";
 import { PhotoGrid } from "@app/core/components/Features/User/UserPhotoGallery/PhotoGrid";
 import { PhotoViewer } from "@app/core/components/Features/User/UserPhotoGallery/PhotoViewer";
 
@@ -8,9 +10,23 @@ interface UserPhotoGalleryProps {
     profile: Profile;
     photos: Photo[];
     isOwner?: boolean;
+    isLoading?: boolean;
+    isFetching?: boolean;
+    isFetchingNextPage?: boolean;
+    hasNextPage?: boolean;
+    fetchNextPage?: () => void;
 }
 
-export const UserPhotoGallery: FC<UserPhotoGalleryProps> = ({ photos, profile, isOwner = false }) => {
+export const UserPhotoGallery: FC<UserPhotoGalleryProps> = ({
+    photos,
+    profile,
+    isOwner = false,
+    isLoading = false,
+    isFetching = false,
+    isFetchingNextPage = false,
+    hasNextPage = false,
+    fetchNextPage,
+}) => {
     const [selectedImageIndex, setSelectedImageIndex] = useState<number | null>(null);
     const [photo, setPhoto] = useState<Photo | null>(null);
     const [activePhotoInViewer, setActivePhotoInViewer] = useState<Photo | null>(null);
@@ -49,9 +65,26 @@ export const UserPhotoGallery: FC<UserPhotoGalleryProps> = ({ photos, profile, i
         [photos]
     );
 
+    const loaderNodeRef = useInfiniteScrollTrigger({
+        isLoading,
+        isFetching,
+        fetchNextPage,
+        hasNextPage,
+        isFetchingNextPage,
+        enabled: !!photos.length,
+    });
+
     return (
         <>
-            <PhotoGrid photos={photos} isOwner={isOwner} onImageClick={handleImageClick} onMenuOpen={handleMenuOpen} />
+            <PhotoGrid
+                photos={photos}
+                isOwner={isOwner}
+                isLoading={isLoading}
+                isFetchingNextPage={isFetchingNextPage}
+                onImageClick={handleImageClick}
+                onMenuOpen={handleMenuOpen}
+            />
+            {hasNextPage && <Box ref={loaderNodeRef} />}
             {isOwner && (
                 <PhotoActionsMenu photo={photo} profile={profile} anchorEl={anchorEl} handleClose={handleMenuClose} />
             )}

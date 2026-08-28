@@ -1,4 +1,5 @@
 import { Box } from "@mui/material";
+import { SystemStyleObject, Theme } from "@mui/system";
 import { useVirtualization } from "@app/core/components";
 import { FC, ReactNode, RefObject, useLayoutEffect, useRef, useState } from "react";
 
@@ -7,9 +8,10 @@ const heightCache = new Map<string | number, number>();
 interface VirtualizedItemProps {
     children: ReactNode;
     id: string | number;
+    sx?: SystemStyleObject<Theme>;
 }
 
-export const VirtualizedItem: FC<VirtualizedItemProps> = ({ children, id }) => {
+export const VirtualizedItem: FC<VirtualizedItemProps> = ({ children, id, sx }) => {
     const ref: RefObject<HTMLDivElement | null> = useRef<HTMLDivElement>(null);
     const { register, unregister } = useVirtualization();
     const [hasInit, setHasInit] = useState(false);
@@ -56,6 +58,7 @@ export const VirtualizedItem: FC<VirtualizedItemProps> = ({ children, id }) => {
                 boxSizing: "border-box",
                 contain: shouldRenderChildren ? "none" : "strict",
                 minHeight: !shouldRenderChildren && measuredHeight ? `${measuredHeight}px` : undefined,
+                ...sx,
             }}
         >
             {shouldRenderChildren ? children : null}

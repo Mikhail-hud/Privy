@@ -4,7 +4,6 @@ import { Photo } from "@app/core/services";
 import Skeleton from "@mui/material/Skeleton";
 import EditIcon from "@mui/icons-material/Edit";
 import { ActionIconButton } from "@app/core/components";
-import ImageListItem from "@mui/material/ImageListItem";
 import ImageListItemBar from "@mui/material/ImageListItemBar";
 import { FC, MouseEvent, MouseEventHandler, useState } from "react";
 
@@ -12,26 +11,24 @@ interface PhotoGridItemProps {
     photo: Photo;
     index: number;
     isOwner: boolean;
-    ration: number;
     onMenuOpen: (photo: Photo) => (event: MouseEvent<HTMLElement>) => void;
     onImageClick: (index: number, photo: Photo) => MouseEventHandler<HTMLImageElement> | undefined;
 }
 
-export const PhotoGridItem: FC<PhotoGridItemProps> = ({ photo, index, isOwner, ration, onImageClick, onMenuOpen }) => {
+export const PhotoGridItem: FC<PhotoGridItemProps> = ({ photo, index, isOwner, onImageClick, onMenuOpen }) => {
     const [isLoaded, setIsLoaded] = useState(false);
-
-    const aspectRatio: string | number = photo.width && photo.height ? `${photo.width} / ${photo.height}` : ration;
 
     const handleLoad = (): void => setIsLoaded(true);
 
     return (
-        <ImageListItem>
+        <Box sx={{ position: "relative", width: "100%", height: "100%" }}>
             <Box
                 sx={{
                     position: "relative",
+                    width: "100%",
+                    height: "100%",
                     borderRadius: "8px",
                     overflow: "hidden",
-                    aspectRatio: aspectRatio,
                     cursor: "pointer",
                 }}
                 onClick={onImageClick(index, photo)}
@@ -76,6 +73,6 @@ export const PhotoGridItem: FC<PhotoGridItemProps> = ({ photo, index, isOwner, r
                     actionIcon={<ActionIconButton icon={<EditIcon />} onClick={onMenuOpen(photo)} />}
                 />
             )}
-        </ImageListItem>
+        </Box>
     );
 };

@@ -1,5 +1,6 @@
 import List from "@mui/material/List";
-import { FC, ReactElement, useRef, memo } from "react";
+import { FC, ReactElement, memo } from "react";
+import { useInfiniteScrollTrigger } from "@app/core/hooks";
 import { Spiner, VirtualizationProvider, VirtualizedItem } from "@app/core/components";
 
 interface InfiniteScrollListProps<T> {
@@ -25,23 +26,14 @@ const InfiniteScrollListComponent = <T extends { id: number | string }>({
     loader: Loader,
     loaderCount = 1,
 }: InfiniteScrollListProps<T>): ReactElement => {
-    const observerRef = useRef<IntersectionObserver | null>(null);
-    const loaderNodeRef = useRef<HTMLDivElement | null>(null);
-
-    useEffect(() => {
-        if (!loaderNodeRef.current) return;
-        if (data.length === 0) return;
-
-        observerRef.current = new IntersectionObserver(([entry]) => {
-            if (entry.isIntersecting && hasNextPage && !isFetchingNextPage && !isLoading && !isFetching) {
-                fetchNextPage();
-            }
-        });
-
-        observerRef.current.observe(loaderNodeRef.current);
-
-        return () => observerRef.current?.disconnect();
-    }, [fetchNextPage, hasNextPage, isFetchingNextPage, isLoading, isFetching, data.length]);
+    const loaderNodeRef = useInfiniteScrollTrigger({
+        isLoading,
+        isFetching,
+        fetchNextPage,
+        hasNextPage,
+        isFetchingNextPage,
+        enabled: !!data.length,
+    });
 
     return (
         <VirtualizationProvider>

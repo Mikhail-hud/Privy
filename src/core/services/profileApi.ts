@@ -1,12 +1,16 @@
-import { apiClient, AUTH_KEYS, queryClient, Tag, UserGender, UserRole } from "@app/core/services";
+import { apiClient, AUTH_KEYS, PaginatedResponse, queryClient, Tag, UserGender, UserRole } from "@app/core/services";
 import {
     useQuery,
     useMutation,
+    InfiniteData,
     UseQueryResult,
     UseQueryOptions,
+    useInfiniteQuery,
     UseMutationResult,
     UseMutationOptions,
+    UseInfiniteQueryOptions,
 } from "@tanstack/react-query";
+import { INITIAL_PAGE_PARAM, PAGE_SIZE_LIMITS } from "@app/core/constants/ParamsConstants";
 
 export interface UserLink {
     id: number;
@@ -70,10 +74,17 @@ export type ProfileUpdatePayload = Partial<
     Pick<Profile, "fullName" | "biography" | "birthDate" | "gender" | "isProfileIncognito">
 >;
 
+export type PhotoListResponse = PaginatedResponse<Photo>;
+
+export interface PhotoQueryParams {
+    limit?: number;
+    page?: number;
+}
+
 export const PROFILE_KEYS = {
     all: ["profile"] as const,
     getProfile: () => [...PROFILE_KEYS.all, "getProfile"] as const,
-    photos: () => [...PROFILE_KEYS.all, "photos"] as const,
+    photos: (params: PhotoQueryParams) => [...PROFILE_KEYS.all, "photos", params] as const,
 };
 
 const updateProfileQueryData = <K extends keyof Profile>(key: readonly string[], field: K, value: Profile[K]): void => {
@@ -127,8 +138,11 @@ export const profileApi = {
         });
     },
 
-    getProfilePhotos: async (): Promise<Photo[]> => {
-        return apiClient<Photo[]>({ url: "profile/photos" });
+    getProfilePhotos: async ({
+        limit = PAGE_SIZE_LIMITS.DEFAULT,
+        page = INITIAL_PAGE_PARAM,
+    }: PhotoQueryParams): Promise<PhotoListResponse> => {
+        return apiClient<PhotoListResponse>({ url: "profile/photos", params: { page, limit } });
     },
 
     uploadPhoto: async ({ file, type }: UploadPhotoPayload): Promise<Photo> => {
@@ -253,12 +267,21 @@ export const useDeleteLinkMutation = (
     });
 };
 
-export const useGetProfilePhotosQuery = (
-    options?: Omit<UseQueryOptions<Photo[]>, "queryKey" | "queryFn">
-): UseQueryResult<Photo[], Error> => {
-    return useQuery({
-        queryKey: PROFILE_KEYS.photos(),
-        queryFn: profileApi.getProfilePhotos,
+export const useGetProfilePhotosInfiniteQuery = (
+    params: PhotoQueryParams,
+    options?: Omit<
+        UseInfiniteQueryOptions<PhotoListResponse, Error, InfiniteData<PhotoListResponse>>,
+        "queryKey" | "queryFn" | "getNextPageParam" | "initialPageParam"
+    >
+) => {
+    return useInfiniteQuery({
+        queryKey: PROFILE_KEYS.photos(params),
+        queryFn: ({ pageParam }) => profileApi.getProfilePhotos({ ...params, page: pageParam as number }),
+        initialPageParam: INITIAL_PAGE_PARAM,
+        getNextPageParam: (lastPage, _allPages, lastPageParam) => {
+            const totalPages: number = Math.ceil(lastPage.total / lastPage.limit);
+            return (lastPageParam as number) < totalPages ? (lastPageParam as number) + 1 : undefined;
+        },
         ...options,
     });
 };
@@ -278,10 +301,7 @@ export const useUploadPhotoMutation = (
                 updateProfileQueryData(AUTH_KEYS.me(), "publicPhoto", photo);
             }
 
-            queryClient.setQueryData<Photo[]>(PROFILE_KEYS.photos(), photos => {
-                if (!photos) return photos;
-                return [photo, ...photos];
-            });
+            queryClient.invalidateQueries({ queryKey: [...PROFILE_KEYS.all, "photos"] });
         },
         ...options,
     });
@@ -293,10 +313,19 @@ export const useDeleteProfilePhotoMutation = (
     return useMutation({
         mutationFn: profileApi.deleteProfilePhoto,
         onSuccess: (_void: void, photoId: string): void => {
-            queryClient.setQueryData<Photo[]>(PROFILE_KEYS.photos(), oldPhotos => {
-                if (!oldPhotos) return undefined;
-                return oldPhotos.filter((photo: Photo): boolean => photo.id !== photoId);
-            });
+            queryClient.setQueriesData<InfiniteData<PhotoListResponse>>(
+                { queryKey: [...PROFILE_KEYS.all, "photos"] },
+                oldData => {
+                    if (!oldData) return oldData;
+                    return {
+                        ...oldData,
+                        pages: oldData.pages.map((page: PhotoListResponse) => ({
+                            ...page,
+                            data: page.data.filter((photo: Photo): boolean => photo.id !== photoId),
+                        })),
+                    };
+                }
+            );
 
             const updateProfileCache = (key: readonly string[]) => {
                 queryClient.setQueryData<Profile>(key, oldProfile => {

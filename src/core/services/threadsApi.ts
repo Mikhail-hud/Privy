@@ -15,6 +15,12 @@ export enum MediaType {
     GIF = "GIF",
 }
 
+export enum MediaStatus {
+    PROCESSING = "PROCESSING",
+    READY = "READY",
+    FAILED = "FAILED",
+}
+
 export interface Metadata {
     index: number;
     width: number;
@@ -37,6 +43,8 @@ export interface ThreadMedia {
     posterKey: null | string;
     posterUrl: null | string;
     type: MediaType;
+    mediaConvertJobId?: string;
+    status?: MediaStatus;
     originalFilename: "string";
 }
 

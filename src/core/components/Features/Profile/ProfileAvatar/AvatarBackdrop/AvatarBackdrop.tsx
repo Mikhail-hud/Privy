@@ -63,7 +63,6 @@ export const AvatarBackdrop: React.FC<AvatarBackdropContentProps> = ({
                         width: "100%",
                         height: "100%",
                         overflow: "hidden",
-                        p: 1,
                     }}
                 >
                     {src ? (
@@ -74,7 +73,6 @@ export const AvatarBackdrop: React.FC<AvatarBackdropContentProps> = ({
                                 maxWidth: "100%",
                                 maxHeight: "100%",
                                 objectFit: "contain",
-                                borderRadius: "12px",
                             }}
                         />
                     ) : (
