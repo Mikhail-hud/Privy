@@ -5,6 +5,7 @@ import ListItemText from "@mui/material/ListItemText";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import { Photo, PhotoAudience } from "@app/core/services";
 import CircularProgress from "@mui/material/CircularProgress";
+import Typography from "@mui/material/Typography";
 
 export const PHOTO_AUDIENCE_LABELS: Record<PhotoAudience, string> = {
     [PhotoAudience.PUBLIC]: "Public profile only",
@@ -30,6 +31,16 @@ export const blockedReason = (
         return "Used as your incognito avatar";
     }
     return null;
+};
+
+const widenNote = (photo: Photo | null): ReactElement[] => {
+    if (!photo || photo.audience === PhotoAudience.BOTH) return [];
+
+    return [
+        <Typography key="widen-note" color="primary" variant="inherit" sx={{ mb: 0.5, px: 2 }}>
+            Setting this photo as an avatar adds that profile here. It never removes one.
+        </Typography>,
+    ];
 };
 
 interface PhotoAudienceMenuItemsProps extends AvatarSlots {
@@ -65,5 +76,6 @@ export const PhotoAudienceMenuItems = ({
                 </MenuItem>
             );
         }),
+        ...widenNote(photo),
     ];
 };
