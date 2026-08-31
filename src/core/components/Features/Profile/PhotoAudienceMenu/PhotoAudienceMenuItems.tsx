@@ -57,6 +57,7 @@ export const PhotoAudienceMenuItems = ({
     isPrivateAvatar,
 }: PhotoAudienceMenuItemsProps): ReactElement[] => {
     return [
+        ...widenNote(photo),
         ...PHOTO_AUDIENCE_ORDER.map((audience: PhotoAudience): ReactElement => {
             const isCurrent: boolean = photo?.audience === audience;
             const reason: string | null = blockedReason(audience, { isPublicAvatar, isPrivateAvatar });
@@ -76,6 +77,5 @@ export const PhotoAudienceMenuItems = ({
                 </MenuItem>
             );
         }),
-        ...widenNote(photo),
     ];
 };
