@@ -13,7 +13,7 @@ interface PhotoAudienceButtonProps extends AvatarSlots {
 export const PhotoAudienceButton: FC<PhotoAudienceButtonProps> = ({
     photo,
     isPublicAvatar,
-    isIncognitoAvatar,
+    isPrivateAvatar,
     onSelect,
     isLoading,
 }) => {
@@ -49,7 +49,7 @@ export const PhotoAudienceButton: FC<PhotoAudienceButtonProps> = ({
                     isLoading={isLoading}
                     onSelect={onSelect}
                     isPublicAvatar={isPublicAvatar}
-                    isIncognitoAvatar={isIncognitoAvatar}
+                    isPrivateAvatar={isPrivateAvatar}
                 />
             </Menu>
         </>

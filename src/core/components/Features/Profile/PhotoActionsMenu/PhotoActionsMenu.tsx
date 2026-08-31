@@ -91,7 +91,7 @@ export const PhotoActionsMenu: FC<PhotoActionsMenuProps> = memo(({ photo, handle
                             <PrivateIcon fontSize="small" />
                         )}
                     </ListItemIcon>
-                    Unset Private Profile Photo
+                    Unset Incognito Profile Photo
                 </MenuItem>
             ) : (
                 <MenuItem onClick={handleSetPhotoAsPrivate} disabled={isSettingAsPrivate}>
@@ -102,7 +102,7 @@ export const PhotoActionsMenu: FC<PhotoActionsMenuProps> = memo(({ photo, handle
                             <PrivateIcon fontSize="small" />
                         )}
                     </ListItemIcon>
-                    Set as Private Profile Photo
+                    Set as Incognito Profile Photo
                 </MenuItem>
             )}
             <Divider />
@@ -114,7 +114,7 @@ export const PhotoActionsMenu: FC<PhotoActionsMenuProps> = memo(({ photo, handle
                 onSelect={handleSetAudience}
                 isLoading={isSettingAudience}
                 isPublicAvatar={isPublicPhoto}
-                isIncognitoAvatar={isPrivatePhoto}
+                isPrivateAvatar={isPrivatePhoto}
             />
             <Divider />
             <MenuItem onClick={handleDownloadPhoto}>

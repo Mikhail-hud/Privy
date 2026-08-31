@@ -7,26 +7,26 @@ import { Photo, PhotoAudience } from "@app/core/services";
 import CircularProgress from "@mui/material/CircularProgress";
 
 export const PHOTO_AUDIENCE_LABELS: Record<PhotoAudience, string> = {
-    [PhotoAudience.REAL]: "Public profile only",
-    [PhotoAudience.INCOGNITO]: "Incognito only",
+    [PhotoAudience.PUBLIC]: "Public profile only",
+    [PhotoAudience.PRIVATE]: "Incognito profile only",
     [PhotoAudience.BOTH]: "Both profiles",
 };
 
-export const PHOTO_AUDIENCE_ORDER: PhotoAudience[] = [PhotoAudience.REAL, PhotoAudience.INCOGNITO, PhotoAudience.BOTH];
+export const PHOTO_AUDIENCE_ORDER: PhotoAudience[] = [PhotoAudience.PUBLIC, PhotoAudience.PRIVATE, PhotoAudience.BOTH];
 
 export interface AvatarSlots {
     isPublicAvatar: boolean;
-    isIncognitoAvatar: boolean;
+    isPrivateAvatar: boolean;
 }
 
 export const blockedReason = (
     audience: PhotoAudience,
-    { isPublicAvatar, isIncognitoAvatar }: AvatarSlots
+    { isPublicAvatar, isPrivateAvatar }: AvatarSlots
 ): string | null => {
-    if (audience === PhotoAudience.INCOGNITO && isPublicAvatar) {
+    if (audience === PhotoAudience.PRIVATE && isPublicAvatar) {
         return "Used as your public avatar";
     }
-    if (audience === PhotoAudience.REAL && isIncognitoAvatar) {
+    if (audience === PhotoAudience.PUBLIC && isPrivateAvatar) {
         return "Used as your incognito avatar";
     }
     return null;
@@ -43,12 +43,12 @@ export const PhotoAudienceMenuItems = ({
     isLoading,
     onSelect,
     isPublicAvatar,
-    isIncognitoAvatar,
+    isPrivateAvatar,
 }: PhotoAudienceMenuItemsProps): ReactElement[] => {
     return [
         ...PHOTO_AUDIENCE_ORDER.map((audience: PhotoAudience): ReactElement => {
             const isCurrent: boolean = photo?.audience === audience;
-            const reason: string | null = blockedReason(audience, { isPublicAvatar, isIncognitoAvatar });
+            const reason: string | null = blockedReason(audience, { isPublicAvatar, isPrivateAvatar });
 
             return (
                 <MenuItem

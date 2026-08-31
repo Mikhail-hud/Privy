@@ -55,8 +55,8 @@ export const AvatarBackdrop: React.FC<AvatarBackdropContentProps> = ({
             <Box onWheel={onClose} sx={{ width: "100%", height: "100%", display: "flex", flexDirection: "column" }}>
                 <Box sx={{ p: 2, width: "100%", display: "flex", justifyContent: "space-between", position: "fixed" }}>
                     <ActionIconButton icon={<CloseIcon />} onClick={onClose} />
-                    <Typography component="h1" variant="h3" color="white">
-                        {isPublicPhoto ? "Public Photo" : "Private Photo"}
+                    <Typography component="h1" variant="subtitle1" color="white">
+                        {isPublicPhoto ? "Public Profile Photo" : "Incognito Profile Photo"}
                     </Typography>
                 </Box>
                 <Box
@@ -111,7 +111,7 @@ export const AvatarBackdrop: React.FC<AvatarBackdropContentProps> = ({
                                 onClick={onUnsetPhoto}
                                 loading={isUnSetting}
                                 icon={isPublicPhoto ? <PublicIcon /> : <PrivateIcon />}
-                                label={isPublicPhoto ? "Unset Public" : "Unset Private"}
+                                label={isPublicPhoto ? "Unset Public" : "Unset Incognito"}
                             />
                         )}
                         {currentPhotoId && (

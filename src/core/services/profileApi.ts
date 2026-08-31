@@ -34,8 +34,8 @@ export enum PhotoUploadType {
 }
 
 export enum PhotoAudience {
-    REAL = "REAL",
-    INCOGNITO = "INCOGNITO",
+    PUBLIC = "PUBLIC",
+    PRIVATE = "PRIVATE",
     BOTH = "BOTH",
 }
 

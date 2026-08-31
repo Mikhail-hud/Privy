@@ -20,7 +20,10 @@ import { useMediaQuery } from "@mui/material";
 import { Theme } from "@mui/material/styles";
 import { useTheme } from "@app/core/providers";
 
-const DEFAULT_AUDIENCE: PhotoAudience = PhotoAudience.REAL;
+// Matches the server-side column default: the incognito identity is the one a profile shows by
+// default. Note this is NOT the more conservative option -- PRIVATE photos are served to viewers
+// who cannot see the real profile, so a preselection nobody reads reaches strangers.
+const DEFAULT_AUDIENCE: PhotoAudience = PhotoAudience.PRIVATE;
 
 interface GalleryPhotoUploadProps {
     open: boolean;

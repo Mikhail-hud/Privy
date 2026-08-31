@@ -160,7 +160,7 @@ export const ProfileAvatar: FC<ProfileAvatarProps> = ({ profile }) => {
                 anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
                 badgeContent={
                     <Avatar
-                        alt="private_photo"
+                        alt="incognito_photo"
                         userName={profile?.userName}
                         loading={isUploadingPrivatePhoto}
                         skeleton={{ width: 50, height: 50 }}

@@ -71,7 +71,7 @@ export const ProfilePhotoActions: FC<ProfilePhotoActionsProps> = ({ isPublicPhot
             <ActionIconButton
                 icon={<PrivateIcon />}
                 loading={isSettingAsPrivate || isUnSettingAsPrivate}
-                label={isPrivatePhoto ? "Unset Private" : "Set Private"}
+                label={isPrivatePhoto ? "Unset Incognito" : "Set Incognito"}
                 onClick={isPrivatePhoto ? handleUnsetPrivatePhoto : handleSetPhotoAsPrivate}
             />
             <PhotoAudienceButton
@@ -79,7 +79,7 @@ export const ProfilePhotoActions: FC<ProfilePhotoActionsProps> = ({ isPublicPhot
                 isLoading={isSettingAudience}
                 isPublicAvatar={isPublicPhoto}
                 onSelect={handleChangeAudience}
-                isIncognitoAvatar={isPrivatePhoto}
+                isPrivateAvatar={isPrivatePhoto}
             />
             <ActionIconButton label="Download" onClick={handleDownloadPhoto} icon={<DownloadIcon fontSize="small" />} />
             <ActionIconButton
