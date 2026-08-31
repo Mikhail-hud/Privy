@@ -1,10 +1,10 @@
 import { FC } from "react";
 import Box from "@mui/material/Box";
-import { Photo } from "@app/core/services";
+import { Photo, PhotoAudience } from "@app/core/services";
 import DeleteIcon from "@mui/icons-material/Delete";
 import DownloadIcon from "@mui/icons-material/Download";
 import { PublicIcon, PrivateIcon } from "@app/core/assets/icons";
-import { ActionIconButton, useProfileActions } from "@app/core/components";
+import { ActionIconButton, PhotoAudienceButton, useProfileActions } from "@app/core/components";
 
 interface ProfilePhotoActionsProps {
     photo: Photo | null;
@@ -19,6 +19,7 @@ export const ProfilePhotoActions: FC<ProfilePhotoActionsProps> = ({ isPublicPhot
         setPrivate: { isLoading: isSettingAsPrivate, handler: setPhotoAsPrivate },
         unsetPublic: { isLoading: isUnSettingAsPublic, handler: unsetPublicPhoto },
         unsetPrivate: { isLoading: isUnSettingAsPrivate, handler: unsetPrivatePhoto },
+        setAudience: { isLoading: isSettingAudience, handler: setAudience },
         downloadPhoto,
     } = useProfileActions();
 
@@ -44,6 +45,11 @@ export const ProfilePhotoActions: FC<ProfilePhotoActionsProps> = ({ isPublicPhot
         downloadPhoto(photo);
     };
 
+    const handleChangeAudience = (audience: PhotoAudience) => async (): Promise<void> => {
+        if (!photo) return;
+        await setAudience({ photoId: photo.id, audience });
+    };
+
     return (
         <Box
             sx={{
@@ -67,6 +73,13 @@ export const ProfilePhotoActions: FC<ProfilePhotoActionsProps> = ({ isPublicPhot
                 loading={isSettingAsPrivate || isUnSettingAsPrivate}
                 label={isPrivatePhoto ? "Unset Private" : "Set Private"}
                 onClick={isPrivatePhoto ? handleUnsetPrivatePhoto : handleSetPhotoAsPrivate}
+            />
+            <PhotoAudienceButton
+                photo={photo}
+                isLoading={isSettingAudience}
+                isPublicAvatar={isPublicPhoto}
+                onSelect={handleChangeAudience}
+                isIncognitoAvatar={isPrivatePhoto}
             />
             <ActionIconButton label="Download" onClick={handleDownloadPhoto} icon={<DownloadIcon fontSize="small" />} />
             <ActionIconButton

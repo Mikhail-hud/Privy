@@ -1,11 +1,11 @@
 import Box from "@mui/material/Box";
-import { FC, MouseEvent } from "react";
+import { FC, MouseEvent, WheelEventHandler } from "react";
 import { Photo, Profile } from "@app/core/services";
 import { PhotoActionsMenu } from "@app/core/components";
 import { useInfiniteScrollTrigger } from "@app/core/hooks";
 import { PhotoGrid } from "@app/core/components/Features/User/UserPhotoGallery/PhotoGrid";
 import { PhotoViewer } from "@app/core/components/Features/User/UserPhotoGallery/PhotoViewer";
-
+import { EmptyGallery } from "@app/core/components/Features/User/UserPhotoGallery/EmptyGallery";
 interface UserPhotoGalleryProps {
     profile: Profile;
     photos: Photo[];
@@ -15,6 +15,7 @@ interface UserPhotoGalleryProps {
     isFetchingNextPage?: boolean;
     hasNextPage?: boolean;
     fetchNextPage?: () => void;
+    onUploadClick?: () => void;
 }
 
 export const UserPhotoGallery: FC<UserPhotoGalleryProps> = ({
@@ -26,44 +27,55 @@ export const UserPhotoGallery: FC<UserPhotoGalleryProps> = ({
     isFetchingNextPage = false,
     hasNextPage = false,
     fetchNextPage,
+    onUploadClick,
 }) => {
     const [selectedImageIndex, setSelectedImageIndex] = useState<number | null>(null);
-    const [photo, setPhoto] = useState<Photo | null>(null);
-    const [activePhotoInViewer, setActivePhotoInViewer] = useState<Photo | null>(null);
+    const [activePhotoIndex, setActivePhotoIndex] = useState<number | null>(null);
+    const [photoId, setPhotoId] = useState<string | null>(null);
     const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
+
+    const photo: Photo | null = useMemo(
+        () => photos.find(candidate => candidate.id === photoId) ?? null,
+        [photos, photoId]
+    );
+
+    const activePhotoInViewer: Photo | null = useMemo(
+        () => (activePhotoIndex !== null ? (photos[activePhotoIndex] ?? null) : null),
+        [photos, activePhotoIndex]
+    );
 
     const handleMenuOpen = useCallback(
         (photo: Photo) =>
             (event: MouseEvent<HTMLElement>): void => {
-                setPhoto(photo);
+                setPhotoId(photo.id);
                 setAnchorEl(event.currentTarget);
             },
         []
     );
 
     const handleImageClick = useCallback(
-        (index: number, photo: Photo) =>
+        (index: number, _photo: Photo) =>
             (_event: MouseEvent<HTMLImageElement>): void => {
-                setActivePhotoInViewer(photo);
                 setSelectedImageIndex(index);
+                setActivePhotoIndex(index);
             },
         []
     );
 
     const handleMenuClose = useCallback((): void => {
         setAnchorEl(null);
-        setPhoto(null);
+        setPhotoId(null);
     }, []);
 
-    const handleCloseBackdrop = useCallback((_e: MouseEvent<HTMLElement>): void => {
-        setSelectedImageIndex(null);
-        setActivePhotoInViewer(null);
-    }, []);
-
-    const onSlideChange = useCallback(
-        (currentSlideIndex: number): void => setActivePhotoInViewer(photos[currentSlideIndex] || null),
-        [photos]
+    const handleCloseBackdrop = useCallback(
+        (_e: MouseEvent<HTMLElement> | WheelEventHandler<HTMLDivElement> | undefined): void => {
+            setSelectedImageIndex(null);
+            setActivePhotoIndex(null);
+        },
+        []
     );
+
+    const onSlideChange = useCallback((currentSlideIndex: number): void => setActivePhotoIndex(currentSlideIndex), []);
 
     const loaderNodeRef = useInfiniteScrollTrigger({
         isLoading,
@@ -74,16 +86,22 @@ export const UserPhotoGallery: FC<UserPhotoGalleryProps> = ({
         enabled: !!photos.length,
     });
 
+    const isEmpty: boolean = !isLoading && !photos.length;
+
     return (
         <>
-            <PhotoGrid
-                photos={photos}
-                isOwner={isOwner}
-                isLoading={isLoading}
-                isFetchingNextPage={isFetchingNextPage}
-                onImageClick={handleImageClick}
-                onMenuOpen={handleMenuOpen}
-            />
+            {isEmpty ? (
+                <EmptyGallery isOwner={isOwner} onUploadClick={onUploadClick} />
+            ) : (
+                <PhotoGrid
+                    photos={photos}
+                    isOwner={isOwner}
+                    isLoading={isLoading}
+                    isFetchingNextPage={isFetchingNextPage}
+                    onImageClick={handleImageClick}
+                    onMenuOpen={handleMenuOpen}
+                />
+            )}
             {hasNextPage && <Box ref={loaderNodeRef} />}
             {isOwner && (
                 <PhotoActionsMenu photo={photo} profile={profile} anchorEl={anchorEl} handleClose={handleMenuClose} />

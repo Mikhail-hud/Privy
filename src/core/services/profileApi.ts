@@ -33,9 +33,21 @@ export enum PhotoUploadType {
     SHARED = "SHARED",
 }
 
+export enum PhotoAudience {
+    REAL = "REAL",
+    INCOGNITO = "INCOGNITO",
+    BOTH = "BOTH",
+}
+
 export interface UploadPhotoPayload {
     file: File;
     type: PhotoUploadType;
+    audience?: PhotoAudience;
+}
+
+export interface UpdatePhotoAudiencePayload {
+    photoId: string;
+    audience: PhotoAudience;
 }
 
 export interface Photo {
@@ -48,6 +60,7 @@ export interface Photo {
     blurHash: string;
     fileSize: number;
     src: string;
+    audience: PhotoAudience;
 }
 
 export interface Profile {
@@ -91,6 +104,41 @@ const updateProfileQueryData = <K extends keyof Profile>(key: readonly string[],
     queryClient.setQueryData<Profile>(key, oldProfile => {
         if (!oldProfile) return oldProfile;
         return { ...oldProfile, [field]: value };
+    });
+};
+
+const updatePhotoInGalleryCache = (photo: Photo): void => {
+    queryClient.setQueriesData<InfiniteData<PhotoListResponse>>(
+        { queryKey: [...PROFILE_KEYS.all, "photos"] },
+        oldData => {
+            if (!oldData) return oldData;
+            return {
+                ...oldData,
+                pages: oldData.pages.map((page: PhotoListResponse) => ({
+                    ...page,
+                    data: page.data.map((item: Photo): Photo => (item.id === photo.id ? photo : item)),
+                })),
+            };
+        }
+    );
+};
+
+const syncPhotoIntoProfileCache = (photo: Photo): void => {
+    [PROFILE_KEYS.getProfile(), AUTH_KEYS.me()].forEach((key: readonly string[]): void => {
+        queryClient.setQueryData<Profile>(key, oldProfile => {
+            if (!oldProfile) return oldProfile;
+
+            const isPublicMatch: boolean = oldProfile.publicPhoto?.id === photo.id;
+            const isPrivateMatch: boolean = oldProfile.privatePhoto?.id === photo.id;
+
+            if (!isPublicMatch && !isPrivateMatch) return oldProfile;
+
+            return {
+                ...oldProfile,
+                publicPhoto: isPublicMatch ? photo : oldProfile.publicPhoto,
+                privatePhoto: isPrivateMatch ? photo : oldProfile.privatePhoto,
+            };
+        });
     });
 };
 
@@ -145,14 +193,27 @@ export const profileApi = {
         return apiClient<PhotoListResponse>({ url: "profile/photos", params: { page, limit } });
     },
 
-    uploadPhoto: async ({ file, type }: UploadPhotoPayload): Promise<Photo> => {
+    uploadPhoto: async ({ file, type, audience }: UploadPhotoPayload): Promise<Photo> => {
         const formData = new FormData();
         formData.append("photo", file);
         formData.append("type", type);
+        // Only SHARED carries an audience; sending one alongside PUBLIC or PRIVATE would be ignored,
+        // since the avatar slot decides.
+        if (type === PhotoUploadType.SHARED && audience) {
+            formData.append("audience", audience);
+        }
         return await apiClient<Photo>({
             url: "profile/photo",
             method: "POST",
             body: formData,
+        });
+    },
+
+    updatePhotoAudience: async ({ photoId, audience }: UpdatePhotoAudiencePayload): Promise<Photo> => {
+        return await apiClient<Photo>({
+            url: `profile/photos/${photoId}/audience`,
+            method: "PATCH",
+            body: { audience },
         });
     },
 
@@ -359,6 +420,7 @@ export const useSetPrivatePhotoMutation = (
         onSuccess: (photo: Photo): void => {
             updateProfileQueryData(PROFILE_KEYS.getProfile(), "privatePhoto", photo);
             updateProfileQueryData(AUTH_KEYS.me(), "privatePhoto", photo);
+            updatePhotoInGalleryCache(photo);
         },
         ...options,
     });
@@ -372,6 +434,20 @@ export const useSetPublicPhotoMutation = (
         onSuccess: (photo: Photo): void => {
             updateProfileQueryData(PROFILE_KEYS.getProfile(), "publicPhoto", photo);
             updateProfileQueryData(AUTH_KEYS.me(), "publicPhoto", photo);
+            updatePhotoInGalleryCache(photo);
+        },
+        ...options,
+    });
+};
+
+export const useUpdatePhotoAudienceMutation = (
+    options?: UseMutationOptions<Photo, Error, UpdatePhotoAudiencePayload>
+): UseMutationResult<Photo, Error, UpdatePhotoAudiencePayload> => {
+    return useMutation({
+        mutationFn: profileApi.updatePhotoAudience,
+        onSuccess: (photo: Photo): void => {
+            updatePhotoInGalleryCache(photo);
+            syncPhotoIntoProfileCache(photo);
         },
         ...options,
     });

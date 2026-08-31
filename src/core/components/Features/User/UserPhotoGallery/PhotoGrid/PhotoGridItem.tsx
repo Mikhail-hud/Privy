@@ -64,7 +64,6 @@ export const PhotoGridItem: FC<PhotoGridItemProps> = ({ photo, index, isOwner, o
                     }}
                 />
             </Box>
-
             {isOwner && (
                 <ImageListItemBar
                     position="top"

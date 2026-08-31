@@ -1,10 +1,12 @@
 import {
     Photo,
+    UpdatePhotoAudiencePayload,
     useSetPublicPhotoMutation,
     useSetPrivatePhotoMutation,
     useUnsetPublicPhotoMutation,
     useUnsetPrivatePhotoMutation,
     useDeleteProfilePhotoMutation,
+    useUpdatePhotoAudienceMutation,
     ApiError,
 } from "@app/core/services";
 import { enqueueSnackbar } from "notistack";
@@ -26,6 +28,7 @@ type MutationHookResultWithoutArg<T> = { mutateAsync: () => Promise<T>; isPendin
 export interface UseProfilActions {
     setPublic: ActionHandler<Photo, string>;
     setPrivate: ActionHandler<Photo, string>;
+    setAudience: ActionHandler<Photo, UpdatePhotoAudiencePayload>;
     unsetPublic: ActionHandlerWithoutArg;
     unsetPrivate: ActionHandlerWithoutArg;
     delete: ActionHandler<void, string>;
@@ -38,6 +41,7 @@ export const useProfileActions = (): UseProfilActions => {
     const setPrivateMutation = useSetPrivatePhotoMutation();
     const unsetPublicMutation = useUnsetPublicPhotoMutation();
     const unsetPrivateMutation = useUnsetPrivatePhotoMutation();
+    const setAudienceMutation = useUpdatePhotoAudienceMutation();
 
     const handleAction = async <T>(action: () => Promise<T>, onSuccess?: () => void): Promise<T | void> => {
         try {
@@ -69,6 +73,7 @@ export const useProfileActions = (): UseProfilActions => {
         delete: buildAction(deletePhotoMutation),
         setPublic: buildAction(setPublicMutation),
         setPrivate: buildAction(setPrivateMutation),
+        setAudience: buildAction(setAudienceMutation),
         unsetPublic: buildActionWithoutArg(unsetPublicMutation),
         unsetPrivate: buildActionWithoutArg(unsetPrivateMutation),
     };

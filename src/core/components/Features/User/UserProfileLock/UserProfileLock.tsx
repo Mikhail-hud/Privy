@@ -15,6 +15,7 @@ export const UserProfileLock: FC<UserProfileLockProps> = ({ userName, status }) 
         <Box sx={{ textAlign: "center" }}>
             <Box
                 sx={{
+                    mt: 1,
                     gap: 1,
                     display: "flex",
                     alignItems: "center",

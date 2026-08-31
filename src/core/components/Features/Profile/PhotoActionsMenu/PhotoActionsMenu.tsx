@@ -1,13 +1,15 @@
 import { FC } from "react";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
-import { Photo, Profile } from "@app/core/services";
+import Divider from "@mui/material/Divider";
 import DeleteIcon from "@mui/icons-material/Delete";
 import ListItemIcon from "@mui/material/ListItemIcon";
+import ListSubheader from "@mui/material/ListSubheader";
 import DownloadIcon from "@mui/icons-material/Download";
-import { useProfileActions } from "@app/core/components";
+import { Photo, PhotoAudience, Profile } from "@app/core/services";
 import CircularProgress from "@mui/material/CircularProgress";
 import { PublicIcon, PrivateIcon } from "@app/core/assets/icons";
+import { useProfileActions, PhotoAudienceMenuItems } from "@app/core/components";
 
 interface PhotoActionsMenuProps {
     profile: Profile;
@@ -25,9 +27,14 @@ export const PhotoActionsMenu: FC<PhotoActionsMenuProps> = memo(({ photo, handle
         setPrivate: { isLoading: isSettingAsPrivate, handler: setPhotoAsPrivate },
         unsetPublic: { isLoading: isUnSettingAsPublic, handler: unsetPublicPhoto },
         unsetPrivate: { isLoading: isUnSettingAsPrivate, handler: unsetPrivatePhoto },
+        setAudience: { isLoading: isSettingAudience, handler: setPhotoAudience },
         downloadPhoto,
     } = useProfileActions();
 
+    const handleSetAudience = (audience: PhotoAudience) => async (): Promise<void> => {
+        if (!photo) return;
+        await setPhotoAudience({ photoId: photo.id, audience });
+    };
     const handleSetPhotoAsPublic = async (): Promise<void> => {
         if (!photo) return;
         await setPhotoAsPublic(photo.id);
@@ -98,6 +105,18 @@ export const PhotoActionsMenu: FC<PhotoActionsMenuProps> = memo(({ photo, handle
                     Set as Private Profile Photo
                 </MenuItem>
             )}
+            <Divider />
+            <ListSubheader sx={{ lineHeight: 2, color: "text.primary", fontWeight: 400, mb: 0.5 }}>
+                Visible on:
+            </ListSubheader>
+            <PhotoAudienceMenuItems
+                photo={photo}
+                onSelect={handleSetAudience}
+                isLoading={isSettingAudience}
+                isPublicAvatar={isPublicPhoto}
+                isIncognitoAvatar={isPrivatePhoto}
+            />
+            <Divider />
             <MenuItem onClick={handleDownloadPhoto}>
                 <ListItemIcon>
                     <DownloadIcon fontSize="small" />

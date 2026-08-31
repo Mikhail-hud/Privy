@@ -1,9 +1,10 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { useAuth } from "@app/core/hooks";
-import { UserPhotoGallery } from "@app/core/components";
 import { useLoaderData } from "react-router-dom";
+import { UserPhotoGallery } from "@app/core/components";
 import { Photo, useGetProfilePhotosInfiniteQuery } from "@app/core/services";
 import { UserPhotosContext } from "@app/features/profile/ProfileCard/ProfileTabs/loaders";
+import { GalleryPhotoUpload } from "@app/core/components/Features/User/UserPhotoGallery/GalleryPhotoUpload";
 
 export const ProfilePhotos = () => {
     const { profile } = useAuth();
@@ -11,18 +12,24 @@ export const ProfilePhotos = () => {
     const { data, fetchNextPage, hasNextPage, isLoading, isFetching, isFetchingNextPage } =
         useGetProfilePhotosInfiniteQuery(params);
 
+    const [uploadOpen, setUploadOpen] = useState<boolean>(false);
+
     const photos: Photo[] = useMemo(() => data?.pages.flatMap(page => page.data) ?? [], [data]);
 
     return (
-        <UserPhotoGallery
-            photos={photos}
-            profile={profile}
-            isOwner
-            isLoading={isLoading}
-            isFetching={isFetching}
-            isFetchingNextPage={isFetchingNextPage}
-            hasNextPage={hasNextPage}
-            fetchNextPage={fetchNextPage}
-        />
+        <>
+            <GalleryPhotoUpload open={uploadOpen} onOpenChange={setUploadOpen} />
+            <UserPhotoGallery
+                isOwner
+                photos={photos}
+                profile={profile}
+                isLoading={isLoading}
+                isFetching={isFetching}
+                isFetchingNextPage={isFetchingNextPage}
+                hasNextPage={hasNextPage}
+                fetchNextPage={fetchNextPage}
+                onUploadClick={() => setUploadOpen(true)}
+            />
+        </>
     );
 };

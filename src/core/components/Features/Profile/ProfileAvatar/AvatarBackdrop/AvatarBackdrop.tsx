@@ -47,8 +47,12 @@ export const AvatarBackdrop: React.FC<AvatarBackdropContentProps> = ({
     const isDeleting = isPublicPhoto ? isDeletingProfilePhoto : isDeletingIncognitoPhoto;
 
     return (
-        <Backdrop open={open} sx={{ zIndex: theme => theme.zIndex.drawer + 1, background: "black" }}>
-            <Box sx={{ width: "100%", height: "100%", display: "flex", flexDirection: "column" }}>
+        <Backdrop
+            open={open}
+            transitionDuration={400}
+            sx={{ zIndex: theme => theme.zIndex.drawer + 1, background: "black" }}
+        >
+            <Box onWheel={onClose} sx={{ width: "100%", height: "100%", display: "flex", flexDirection: "column" }}>
                 <Box sx={{ p: 2, width: "100%", display: "flex", justifyContent: "space-between", position: "fixed" }}>
                     <ActionIconButton icon={<CloseIcon />} onClick={onClose} />
                     <Typography component="h1" variant="h3" color="white">
