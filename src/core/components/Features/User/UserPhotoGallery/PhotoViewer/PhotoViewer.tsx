@@ -1,6 +1,6 @@
 import { Backdrop, Box } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
-import { Photo, Profile } from "@app/core/services";
+import { Photo, PhotoSlots } from "@app/core/services";
 import { useBodyOverflowLock } from "@app/core/hooks";
 import { FC, MouseEvent, WheelEventHandler } from "react";
 import { PublicIcon, PrivateIcon } from "@app/core/assets/icons";
@@ -10,7 +10,7 @@ interface PhotoViewerProps {
     open: boolean;
     photo: Photo | null;
     photos: Photo[];
-    profile: Profile;
+    photoSlots: PhotoSlots;
     isOwner: boolean;
     initialSlide: number | null;
     onSlideChange: (index: number) => void;
@@ -18,10 +18,10 @@ interface PhotoViewerProps {
 }
 
 export const PhotoViewer: FC<PhotoViewerProps> = memo(
-    ({ open, onClose, photo, photos, initialSlide, onSlideChange, isOwner, profile }) => {
+    ({ open, onClose, photo, photos, initialSlide, onSlideChange, isOwner, photoSlots }) => {
         useBodyOverflowLock(open);
-        const isPublicPhoto: boolean = profile?.publicPhoto?.id === photo?.id;
-        const isPrivatePhoto: boolean = profile?.privatePhoto?.id === photo?.id;
+        const isPublicPhoto: boolean = photoSlots?.publicPhoto?.id === photo?.id;
+        const isPrivatePhoto: boolean = photoSlots?.privatePhoto?.id === photo?.id;
         return (
             <Backdrop
                 transitionDuration={400}

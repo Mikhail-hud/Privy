@@ -6,7 +6,14 @@ import {
     UseInfiniteQueryOptions,
 } from "@tanstack/react-query";
 import { INITIAL_PAGE_PARAM, PAGE_SIZE_LIMITS } from "@app/core/constants/ParamsConstants.ts";
-import { apiClient, PaginatedResponse, queryClient, QueryParams, User } from "@app/core/services";
+import {
+    apiClient,
+    PaginatedResponse,
+    queryClient,
+    QueryParams,
+    User,
+    UsersParamsWithUserName,
+} from "@app/core/services";
 
 export enum MediaType {
     IMAGE = "IMAGE",
@@ -73,12 +80,8 @@ export type ThreadListResponse = PaginatedResponse<Thread>;
 export const THREADS_KEYS = {
     all: ["threads"] as const,
     list: (params: QueryParams) => [...THREADS_KEYS.all, "list", params] as const,
-    // Deliberately still a `["threads", "list", ...]` key, with the scope pushed into the params
-    // object rather than into the key path. The like / update / delete mutations below patch every
-    // cached feed by the `["threads", "list"]` prefix, so a key shaped `[..., "profile", "list"]`
-    // would silently opt the profile tab out of those updates: liking a post there would leave the
-    // count stale until a refetch.
     profileList: (params: QueryParams) => [...THREADS_KEYS.all, "list", { ...params, scope: "profile" }] as const,
+    userList: (params: UsersParamsWithUserName) => [...THREADS_KEYS.all, "list", { ...params, scope: "user" }] as const,
 };
 
 export const threadsApi = {
@@ -143,6 +146,18 @@ export const threadsApi = {
     }: QueryParams): Promise<ThreadListResponse> => {
         return apiClient<ThreadListResponse>({
             url: "profile/threads",
+            params: { query, page, limit },
+        });
+    },
+
+    getUserThreads: async ({
+        userName,
+        query = "",
+        limit = PAGE_SIZE_LIMITS.DEFAULT,
+        page = INITIAL_PAGE_PARAM,
+    }: UsersParamsWithUserName): Promise<ThreadListResponse> => {
+        return apiClient<ThreadListResponse>({
+            url: `users/${userName}/threads`,
             params: { query, page, limit },
         });
     },
@@ -288,6 +303,17 @@ export const useGetProfileThreadsInfiniteQuery = (params: QueryParams, options?:
         queryFn: ({ pageParam }) => threadsApi.getProfileThreads({ ...params, page: pageParam as number }),
         initialPageParam: INITIAL_PAGE_PARAM,
         getNextPageParam: getNextThreadPageParam,
+        ...options,
+    });
+};
+
+export const useGetUserThreadsInfiniteQuery = (params: UsersParamsWithUserName, options?: ThreadFeedQueryOptions) => {
+    return useInfiniteQuery({
+        queryKey: THREADS_KEYS.userList(params),
+        queryFn: ({ pageParam }) => threadsApi.getUserThreads({ ...params, page: pageParam as number }),
+        initialPageParam: INITIAL_PAGE_PARAM,
+        getNextPageParam: getNextThreadPageParam,
+        enabled: !!params.userName,
         ...options,
     });
 };

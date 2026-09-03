@@ -83,6 +83,11 @@ export interface Profile {
     links: UserLink[];
 }
 
+export interface PhotoSlots {
+    publicPhoto?: Photo | null;
+    privatePhoto?: Photo | null;
+}
+
 export type ProfileUpdatePayload = Partial<
     Pick<Profile, "fullName" | "biography" | "birthDate" | "gender" | "isProfileIncognito">
 >;

@@ -1,6 +1,8 @@
 import { FC } from "react";
+import { Outlet } from "react-router-dom";
 import { User } from "@app/core/services";
 import { ProfileCardContainer, UserProfileLock, UserStats } from "@app/core/components";
+import { UserProfileTabs } from "@app/features/userProfile/UserProfileCard/UserProfileTabs";
 import { UserProfileAvatar } from "@app/features/userProfile/UserProfileCard/UserProfileAvatar";
 import { UserProfileActions } from "@app/features/userProfile/UserProfileCard/UserProfileActions";
 
@@ -48,6 +50,8 @@ export const UserProfileCard: FC<ProfileCardProps> = memo(({ user }) => {
             interests={userInterests}
         >
             {!canViewFullProfile && <UserProfileLock userName={userName} status={revealRequestStatus?.status} />}
+            <UserProfileTabs />
+            <Outlet />
         </ProfileCardContainer>
     );
 });

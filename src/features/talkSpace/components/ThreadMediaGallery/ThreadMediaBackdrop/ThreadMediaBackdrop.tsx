@@ -67,6 +67,7 @@ const ThreadMediaBackdropComponent: FC<ThreadMediaBackdropProps> = ({ onClose, o
                             alt={media?.src}
                             src={media?.src}
                             style={{
+                                borderRadius: "12px",
                                 maxWidth: "100%",
                                 maxHeight: "100%",
                                 objectFit: "cover",
