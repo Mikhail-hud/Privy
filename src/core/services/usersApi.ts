@@ -13,6 +13,8 @@ import { apiClient } from "@app/core/services/apiClient";
 import { queryClient } from "@app/core/services/queryClient";
 import {
     Photo,
+    PhotoListResponse,
+    PhotoQueryParams,
     Profile,
     ProfileRevealByMe,
     ProfileRevealByMeListResponse,
@@ -77,6 +79,10 @@ export interface QueryParams {
 }
 
 export interface UsersParamsWithUserName extends QueryParams {
+    userName: string;
+}
+
+export interface UserPhotosParams extends PhotoQueryParams {
     userName: string;
 }
 
@@ -311,6 +317,7 @@ export const USERS_KEYS = {
     profile: (userName: string) => [...USERS_KEYS.all, "profile", userName] as const,
     followers: (params: UsersParamsWithUserName) => [...USERS_KEYS.all, "followers", params] as const,
     following: (params: UsersParamsWithUserName) => [...USERS_KEYS.all, "following", params] as const,
+    photos: (params: UserPhotosParams) => [...USERS_KEYS.all, "photos", params] as const,
 };
 // API Functions
 export const usersApi = {
@@ -352,6 +359,17 @@ export const usersApi = {
         return apiClient<FollowersListResponse>({
             url: `users/${userName}/following`,
             params: { query, page, limit },
+        });
+    },
+
+    getUserPhotos: async ({
+        userName,
+        limit = PAGE_SIZE_LIMITS.DEFAULT,
+        page = INITIAL_PAGE_PARAM,
+    }: UserPhotosParams): Promise<PhotoListResponse> => {
+        return apiClient<PhotoListResponse>({
+            url: `users/${userName}/photos`,
+            params: { page, limit },
         });
     },
 
@@ -441,6 +459,27 @@ export const useGetUserFollowingInfiniteQuery = (
             const totalPages: number = Math.ceil(lastPage.total / lastPage.limit);
             return (lastPageParam as number) < totalPages ? (lastPageParam as number) + 1 : undefined;
         },
+        ...options,
+    });
+};
+
+export const useGetUserPhotosInfiniteQuery = (
+    params: UserPhotosParams,
+    options?: Omit<
+        UseInfiniteQueryOptions<PhotoListResponse, Error, InfiniteData<PhotoListResponse>>,
+        "queryKey" | "queryFn" | "getNextPageParam" | "initialPageParam"
+    >
+) => {
+    return useInfiniteQuery({
+        queryKey: USERS_KEYS.photos(params),
+        queryFn: ({ pageParam }): Promise<PhotoListResponse> =>
+            usersApi.getUserPhotos({ ...params, page: pageParam as number }),
+        initialPageParam: INITIAL_PAGE_PARAM,
+        getNextPageParam: (lastPage, _allPages, lastPageParam) => {
+            const totalPages: number = Math.ceil(lastPage.total / lastPage.limit);
+            return (lastPageParam as number) < totalPages ? (lastPageParam as number) + 1 : undefined;
+        },
+        enabled: !!params.userName,
         ...options,
     });
 };

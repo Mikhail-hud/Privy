@@ -16,6 +16,10 @@ export const NOT_FOUND_PAGE_PATH = "*";
 
 export const USER_HANDLE_PREFIX = "@";
 export const USER_PROFILE_PAGE_PATH = "/:userName";
+export const USER_PROFILE_PHOTOS_TAB_PATH = "/:userName/photos";
+
+export const userProfilePath = (userHandle: string): string => `/${userHandle}`;
+export const userProfilePhotosPath = (userHandle: string): string => `/${userHandle}/photos`;
 
 export const PUBLIC_ROUTES = [RESET_PASSWORD_PATH, SIGN_IN_PAGE_PATH, SIGN_UP_PAGE_PATH] as const;
 

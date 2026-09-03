@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 import { useAuth } from "@app/core/hooks";
 import { useLoaderData } from "react-router-dom";
 import { UserPhotoGallery } from "@app/core/components";
-import { Photo, useGetProfilePhotosInfiniteQuery } from "@app/core/services";
+import { Photo, PhotoSlots, useGetProfilePhotosInfiniteQuery } from "@app/core/services";
 import { UserPhotosContext } from "@app/features/profile/ProfileCard/ProfileTabs/loaders";
 import { GalleryPhotoUpload } from "@app/core/components/Features/User/UserPhotoGallery/GalleryPhotoUpload";
 
@@ -16,6 +16,11 @@ export const ProfilePhotos = () => {
 
     const photos: Photo[] = useMemo(() => data?.pages.flatMap(page => page.data) ?? [], [data]);
 
+    const photoSlots: PhotoSlots = useMemo<PhotoSlots>(
+        (): PhotoSlots => ({ publicPhoto: profile?.publicPhoto, privatePhoto: profile?.privatePhoto }),
+        [profile?.publicPhoto, profile?.privatePhoto]
+    );
+
     const handleOnUploadClick = (): void => setUploadOpen(true);
 
     return (
@@ -24,7 +29,7 @@ export const ProfilePhotos = () => {
             <UserPhotoGallery
                 isOwner
                 photos={photos}
-                profile={profile}
+                photoSlots={photoSlots}
                 isLoading={isLoading}
                 isFetching={isFetching}
                 hasNextPage={hasNextPage}

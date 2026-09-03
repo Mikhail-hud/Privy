@@ -1,13 +1,13 @@
 import Box from "@mui/material/Box";
 import { FC, MouseEvent, WheelEventHandler } from "react";
-import { Photo, Profile } from "@app/core/services";
+import { Photo, PhotoSlots } from "@app/core/services";
 import { PhotoActionsMenu } from "@app/core/components";
 import { useInfiniteScrollTrigger } from "@app/core/hooks";
 import { PhotoGrid } from "@app/core/components/Features/User/UserPhotoGallery/PhotoGrid";
 import { PhotoViewer } from "@app/core/components/Features/User/UserPhotoGallery/PhotoViewer";
 import { EmptyGalleryFallback } from "@app/core/components/Features/User/UserPhotoGallery/EmptyGalleryFallback";
 interface UserPhotoGalleryProps {
-    profile: Profile;
+    photoSlots: PhotoSlots;
     photos: Photo[];
     isOwner?: boolean;
     isLoading?: boolean;
@@ -20,7 +20,7 @@ interface UserPhotoGalleryProps {
 
 export const UserPhotoGallery: FC<UserPhotoGalleryProps> = ({
     photos,
-    profile,
+    photoSlots,
     isOwner = false,
     isLoading = false,
     isFetching = false,
@@ -104,11 +104,16 @@ export const UserPhotoGallery: FC<UserPhotoGalleryProps> = ({
             )}
             {hasNextPage && <Box ref={loaderNodeRef} />}
             {isOwner && (
-                <PhotoActionsMenu photo={photo} profile={profile} anchorEl={anchorEl} handleClose={handleMenuClose} />
+                <PhotoActionsMenu
+                    photo={photo}
+                    photoSlots={photoSlots}
+                    anchorEl={anchorEl}
+                    handleClose={handleMenuClose}
+                />
             )}
             <PhotoViewer
                 photos={photos}
-                profile={profile}
+                photoSlots={photoSlots}
                 isOwner={isOwner}
                 photo={activePhotoInViewer}
                 onClose={handleCloseBackdrop}

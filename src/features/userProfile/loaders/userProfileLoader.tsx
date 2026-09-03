@@ -7,7 +7,8 @@
 import { enqueueSnackbar } from "notistack";
 import { LoaderFunctionArgs, redirect } from "react-router-dom";
 import { usersApi, User, queryClient, USERS_KEYS, ApiError } from "@app/core/services";
-import { LOOKUP_PAGE_PATH, USER_HANDLE_PREFIX } from "@app/core/constants/pathConstants";
+import { LOOKUP_PAGE_PATH } from "@app/core/constants/pathConstants";
+import { resolveUserHandle } from "@app/features/userProfile/loaders/userHandle";
 
 /**
  * Data shape provided to route elements after successful profile load.
@@ -43,12 +44,11 @@ export interface UserProfileLoaderData {
  * },
  */
 export const userProfileLoader = async ({ params }: LoaderFunctionArgs): Promise<UserProfileLoaderData | Response> => {
-    const { userName } = params;
+    const planedUserName: string | null = resolveUserHandle(params.userName);
 
-    if (!userName || !userName.startsWith(USER_HANDLE_PREFIX)) {
+    if (!planedUserName) {
         return redirect(LOOKUP_PAGE_PATH);
     }
-    const planedUserName: string = userName.replace(new RegExp(`^${USER_HANDLE_PREFIX}`), "");
 
     // Check cache first
     const cachedUser: User | undefined = queryClient.getQueryData<User>(USERS_KEYS.profile(planedUserName));

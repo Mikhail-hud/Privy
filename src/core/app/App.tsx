@@ -14,6 +14,7 @@ import {
     TALK_SPACE_PAGE_PATH,
     USER_PROFILE_PAGE_PATH,
     PROFILE_PHOTOS_TAB_PATH,
+    USER_PROFILE_PHOTOS_TAB_PATH,
     PROFILE_REPLIES_TAB_PATH,
     SIGN_OUT_ACTION_ONLY_PATH,
     PROFILE_FAVORITES_TAB_PATH,
@@ -46,6 +47,12 @@ import {
     profilePhotosLoader,
     profileThreadsLoader,
 } from "@app/features/profile/ProfileCard/ProfileTabs";
+import {
+    UserPhotos,
+    UserThreads,
+    userPhotosLoader,
+    userThreadsLoader,
+} from "@app/features/userProfile/UserProfileCard/UserProfileTabs";
 import { VideoFeedProvider } from "@app/features/talkSpace/components";
 
 // Lazy-loaded components to optimize initial load time
@@ -96,6 +103,24 @@ const router = createBrowserRouter([
                         path: USER_PROFILE_PAGE_PATH,
                         loader: userProfileLoader,
                         element: <UserProfile />,
+                        children: [
+                            {
+                                index: true,
+                                loader: userThreadsLoader,
+                                handle: { tab: USER_PROFILE_PAGE_PATH },
+                                element: (
+                                    <VideoFeedProvider>
+                                        <UserThreads />
+                                    </VideoFeedProvider>
+                                ),
+                            },
+                            {
+                                path: USER_PROFILE_PHOTOS_TAB_PATH,
+                                loader: userPhotosLoader,
+                                element: <UserPhotos />,
+                                handle: { tab: USER_PROFILE_PHOTOS_TAB_PATH },
+                            },
+                        ],
                     },
                 ],
             },
@@ -108,9 +133,6 @@ const router = createBrowserRouter([
                         loader: profileThreadsLoader,
                         handle: { tab: PROFILE_PAGE_PATH },
                         element: (
-                            // `ThreadFeed` calls `useVideoFeed`, which throws without a provider. Scoped to
-                            // this tab rather than the whole profile route so the other tabs, which have no
-                            // video, do not carry the pause state.
                             <VideoFeedProvider>
                                 <ProfileThreads />
                             </VideoFeedProvider>
