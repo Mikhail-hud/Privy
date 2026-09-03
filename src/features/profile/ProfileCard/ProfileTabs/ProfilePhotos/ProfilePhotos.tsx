@@ -16,6 +16,8 @@ export const ProfilePhotos = () => {
 
     const photos: Photo[] = useMemo(() => data?.pages.flatMap(page => page.data) ?? [], [data]);
 
+    const handleOnUploadClick = (): void => setUploadOpen(true);
+
     return (
         <>
             <GalleryPhotoUpload open={uploadOpen} onOpenChange={setUploadOpen} />
@@ -25,10 +27,10 @@ export const ProfilePhotos = () => {
                 profile={profile}
                 isLoading={isLoading}
                 isFetching={isFetching}
-                isFetchingNextPage={isFetchingNextPage}
                 hasNextPage={hasNextPage}
                 fetchNextPage={fetchNextPage}
-                onUploadClick={() => setUploadOpen(true)}
+                onUploadClick={handleOnUploadClick}
+                isFetchingNextPage={isFetchingNextPage}
             />
         </>
     );

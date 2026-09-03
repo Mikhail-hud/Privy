@@ -40,7 +40,12 @@ import {
     UserProfile,
     userProfileLoader,
 } from "@app/features";
-import { ProfilePhotos, profilePhotosLoader } from "@app/features/profile/ProfileCard/ProfileTabs";
+import {
+    ProfilePhotos,
+    ProfileThreads,
+    profilePhotosLoader,
+    profileThreadsLoader,
+} from "@app/features/profile/ProfileCard/ProfileTabs";
 import { VideoFeedProvider } from "@app/features/talkSpace/components";
 
 // Lazy-loaded components to optimize initial load time
@@ -100,8 +105,16 @@ const router = createBrowserRouter([
                 children: [
                     {
                         index: true,
+                        loader: profileThreadsLoader,
                         handle: { tab: PROFILE_PAGE_PATH },
-                        element: <TabContainer title="Threads" />,
+                        element: (
+                            // `ThreadFeed` calls `useVideoFeed`, which throws without a provider. Scoped to
+                            // this tab rather than the whole profile route so the other tabs, which have no
+                            // video, do not carry the pause state.
+                            <VideoFeedProvider>
+                                <ProfileThreads />
+                            </VideoFeedProvider>
+                        ),
                     },
                     {
                         path: PROFILE_FAVORITES_TAB_PATH,

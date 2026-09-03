@@ -5,7 +5,7 @@ import { PhotoActionsMenu } from "@app/core/components";
 import { useInfiniteScrollTrigger } from "@app/core/hooks";
 import { PhotoGrid } from "@app/core/components/Features/User/UserPhotoGallery/PhotoGrid";
 import { PhotoViewer } from "@app/core/components/Features/User/UserPhotoGallery/PhotoViewer";
-import { EmptyGallery } from "@app/core/components/Features/User/UserPhotoGallery/EmptyGallery";
+import { EmptyGalleryFallback } from "@app/core/components/Features/User/UserPhotoGallery/EmptyGalleryFallback";
 interface UserPhotoGalleryProps {
     profile: Profile;
     photos: Photo[];
@@ -91,7 +91,7 @@ export const UserPhotoGallery: FC<UserPhotoGalleryProps> = ({
     return (
         <>
             {isEmpty ? (
-                <EmptyGallery isOwner={isOwner} onUploadClick={onUploadClick} />
+                <EmptyGalleryFallback isOwner={isOwner} onUploadClick={onUploadClick} />
             ) : (
                 <PhotoGrid
                     photos={photos}

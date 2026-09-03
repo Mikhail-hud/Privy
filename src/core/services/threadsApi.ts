@@ -73,6 +73,12 @@ export type ThreadListResponse = PaginatedResponse<Thread>;
 export const THREADS_KEYS = {
     all: ["threads"] as const,
     list: (params: QueryParams) => [...THREADS_KEYS.all, "list", params] as const,
+    // Deliberately still a `["threads", "list", ...]` key, with the scope pushed into the params
+    // object rather than into the key path. The like / update / delete mutations below patch every
+    // cached feed by the `["threads", "list"]` prefix, so a key shaped `[..., "profile", "list"]`
+    // would silently opt the profile tab out of those updates: liking a post there would leave the
+    // count stale until a refetch.
+    profileList: (params: QueryParams) => [...THREADS_KEYS.all, "list", { ...params, scope: "profile" }] as const,
 };
 
 export const threadsApi = {
@@ -119,6 +125,24 @@ export const threadsApi = {
     }: QueryParams): Promise<ThreadListResponse> => {
         return apiClient<ThreadListResponse>({
             url: "threads",
+            params: { query, page, limit },
+        });
+    },
+
+    /**
+     * The current user's own threads, incognito ones included.
+     *
+     * A different endpoint rather than `getThreads` with a filter: the server decides what belongs in
+     * an owner's tab, and incognito threads are exactly what a client-side filter over the global
+     * feed could never recover — they arrive there with no author at all.
+     */
+    getProfileThreads: async ({
+        query = "",
+        limit = PAGE_SIZE_LIMITS.DEFAULT,
+        page = INITIAL_PAGE_PARAM,
+    }: QueryParams): Promise<ThreadListResponse> => {
+        return apiClient<ThreadListResponse>({
+            url: "profile/threads",
             params: { query, page, limit },
         });
     },
@@ -230,22 +254,40 @@ export const useUnlikeThreadMutation = (options?: UseMutationOptions<void, Error
     });
 };
 
+type ThreadFeedQueryOptions = Omit<
+    UseInfiniteQueryOptions<ThreadListResponse, Error, InfiniteData<ThreadListResponse>>,
+    "queryKey" | "queryFn" | "getNextPageParam" | "initialPageParam"
+>;
+
+/**
+ * Stops paging once the last requested page reached the reported total.
+ */
+const getNextThreadPageParam = (
+    lastPage: ThreadListResponse,
+    _allPages: ThreadListResponse[],
+    lastPageParam: unknown
+): number | undefined => {
+    const totalPages: number = Math.ceil(lastPage.total / lastPage.limit);
+    return (lastPageParam as number) < totalPages ? (lastPageParam as number) + 1 : undefined;
+};
+
 // React Hooks
-export const useGetThreadsInfiniteQuery = (
-    params: QueryParams,
-    options?: Omit<
-        UseInfiniteQueryOptions<ThreadListResponse, Error, InfiniteData<ThreadListResponse>>,
-        "queryKey" | "queryFn" | "getNextPageParam" | "initialPageParam"
-    >
-) => {
+export const useGetThreadsInfiniteQuery = (params: QueryParams, options?: ThreadFeedQueryOptions) => {
     return useInfiniteQuery({
         queryKey: THREADS_KEYS.list(params),
         queryFn: ({ pageParam }) => threadsApi.getThreads({ ...params, page: pageParam as number }),
         initialPageParam: INITIAL_PAGE_PARAM,
-        getNextPageParam: (lastPage, _allPages, lastPageParam) => {
-            const totalPages: number = Math.ceil(lastPage.total / lastPage.limit);
-            return (lastPageParam as number) < totalPages ? (lastPageParam as number) + 1 : undefined;
-        },
+        getNextPageParam: getNextThreadPageParam,
+        ...options,
+    });
+};
+
+export const useGetProfileThreadsInfiniteQuery = (params: QueryParams, options?: ThreadFeedQueryOptions) => {
+    return useInfiniteQuery({
+        queryKey: THREADS_KEYS.profileList(params),
+        queryFn: ({ pageParam }) => threadsApi.getProfileThreads({ ...params, page: pageParam as number }),
+        initialPageParam: INITIAL_PAGE_PARAM,
+        getNextPageParam: getNextThreadPageParam,
         ...options,
     });
 };

@@ -1,16 +1,13 @@
 import { useDebounce } from "@app/core/hooks";
 import { useLoaderData } from "react-router-dom";
+import { FC, useState, ChangeEvent, useMemo } from "react";
 import { DEBOUNCE_DELAY } from "@app/core/constants/general";
+import { ThreadFeed } from "@app/features/talkSpace/components";
 import { ThreadsContext } from "@app/features/talkSpace/loaders";
-import { FC, useState, ChangeEvent, ReactElement, useCallback, useMemo } from "react";
-import { ContentCardContainer, InfiniteScrollList, UserSearchField } from "@app/core/components";
-import { Thread, ThreadListResponse, ThreadMedia, useGetThreadsInfiniteQuery } from "@app/core/services";
-import { ThreadListItem, ThreadListItemSkeleton, useVideoFeed } from "@app/features/talkSpace/components";
-import { ThreadMediaBackdrop } from "@app/features/talkSpace/components/ThreadMediaGallery/ThreadMediaBackdrop";
-import { ThreadMediaGalleryBackdrop } from "@app/features/talkSpace/components/ThreadMediaGallery/ThreadMediaGalleryBackdrop";
+import { ContentCardContainer, UserSearchField } from "@app/core/components";
+import { Thread, ThreadListResponse, useGetThreadsInfiniteQuery } from "@app/core/services";
 
 export const TalkSpace: FC = () => {
-    const { setGlobalPause } = useVideoFeed();
     const { params } = useLoaderData() as ThreadsContext;
     const [searchQuery, setSearchQuery] = useState<string>("");
     const query: string = useDebounce(searchQuery, DEBOUNCE_DELAY);
@@ -18,50 +15,6 @@ export const TalkSpace: FC = () => {
         ...params,
         query,
     });
-
-    const [mediaGalleryState, setMediaGalleryState] = useState<{
-        isOpen: boolean;
-        media: ThreadMedia[];
-        initialSlide: number;
-    }>({
-        isOpen: false,
-        media: [],
-        initialSlide: 0,
-    });
-
-    const [threadMediaState, setThreadMediaState] = useState<{
-        media: ThreadMedia | null;
-        open: boolean;
-    }>({
-        media: null,
-        open: false,
-    });
-
-    const handleOpenThreadMediaGalleryBackdrop = useCallback(
-        (media: ThreadMedia[], index: number): void => {
-            const activeMedia: ThreadMedia = media[index];
-            setGlobalPause(true, activeMedia?.id);
-            setMediaGalleryState({ isOpen: true, media, initialSlide: index });
-        },
-        [setGlobalPause]
-    );
-    const handleCloseMediaGalleryBackdrop = useCallback((): void => {
-        setGlobalPause(false);
-        setMediaGalleryState({ media: [], isOpen: false, initialSlide: 0 });
-    }, [setGlobalPause]);
-
-    const handleOpenThreadMediaBackdrop = useCallback(
-        (media: ThreadMedia): void => {
-            setGlobalPause(true, media?.id);
-            setThreadMediaState({ media, open: true });
-        },
-        [setGlobalPause]
-    );
-
-    const handleCloseThreadMediaBackdrop = useCallback((): void => {
-        setGlobalPause(false);
-        setThreadMediaState({ media: null, open: false });
-    }, [setGlobalPause]);
 
     const threads: Thread[] = useMemo<Thread[]>(
         (): Thread[] => data?.pages.flatMap((page: ThreadListResponse): Thread[] => page.data) ?? [],
@@ -71,48 +24,24 @@ export const TalkSpace: FC = () => {
     const onSearchQueryChange = (event: ChangeEvent<HTMLInputElement>): void => setSearchQuery(event.target.value);
 
     return (
-        <>
-            <ContentCardContainer
-                sx={theme => ({
-                    minHeight: "100vh",
-                    padding: theme.spacing(3),
-                    [theme.breakpoints.down("sm")]: {
-                        padding: theme.spacing(1.5, 2),
-                    },
-                })}
-            >
-                <UserSearchField value={searchQuery} onChange={onSearchQueryChange} />
-                <InfiniteScrollList<Thread>
-                    data={threads}
-                    loaderCount={10}
-                    isLoading={isLoading}
-                    isFetching={isFetching}
-                    hasNextPage={hasNextPage}
-                    fetchNextPage={fetchNextPage}
-                    loader={ThreadListItemSkeleton}
-                    isFetchingNextPage={isFetchingNextPage}
-                    renderItem={(thread: Thread, index: number): ReactElement => (
-                        <ThreadListItem
-                            thread={thread}
-                            key={thread.id}
-                            isLast={index === threads.length - 1}
-                            handleOpenThreadMediaBackdrop={handleOpenThreadMediaBackdrop}
-                            handleOpenThreadMediaGalleryBackdrop={handleOpenThreadMediaGalleryBackdrop}
-                        />
-                    )}
-                />
-            </ContentCardContainer>
-            <ThreadMediaGalleryBackdrop
-                open={mediaGalleryState.isOpen}
-                media={mediaGalleryState.media}
-                onClose={handleCloseMediaGalleryBackdrop}
-                initialSlide={mediaGalleryState.initialSlide}
+        <ContentCardContainer
+            sx={theme => ({
+                minHeight: "100vh",
+                padding: theme.spacing(3),
+                [theme.breakpoints.down("sm")]: {
+                    padding: theme.spacing(1.5, 2),
+                },
+            })}
+        >
+            <ThreadFeed
+                threads={threads}
+                isLoading={isLoading}
+                isFetching={isFetching}
+                hasNextPage={hasNextPage}
+                fetchNextPage={fetchNextPage}
+                isFetchingNextPage={isFetchingNextPage}
+                header={<UserSearchField value={searchQuery} onChange={onSearchQueryChange} />}
             />
-            <ThreadMediaBackdrop
-                open={threadMediaState.open}
-                media={threadMediaState.media}
-                onClose={handleCloseThreadMediaBackdrop}
-            />
-        </>
+        </ContentCardContainer>
     );
 };
