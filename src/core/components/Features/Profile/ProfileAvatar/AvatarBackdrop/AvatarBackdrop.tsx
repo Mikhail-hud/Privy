@@ -52,7 +52,11 @@ export const AvatarBackdrop: React.FC<AvatarBackdropContentProps> = ({
             transitionDuration={400}
             sx={{ zIndex: theme => theme.zIndex.drawer + 1, background: "black" }}
         >
-            <Box onWheel={onClose} sx={{ width: "100%", height: "100%", display: "flex", flexDirection: "column" }}>
+            <Box
+                onClick={onClose}
+                onWheel={onClose}
+                sx={{ width: "100%", height: "100%", display: "flex", flexDirection: "column" }}
+            >
                 <Box sx={{ p: 2, width: "100%", display: "flex", justifyContent: "space-between", position: "fixed" }}>
                     <ActionIconButton icon={<CloseIcon />} onClick={onClose} />
                     <Typography component="h1" variant="subtitle1" color="white">
@@ -60,6 +64,7 @@ export const AvatarBackdrop: React.FC<AvatarBackdropContentProps> = ({
                     </Typography>
                 </Box>
                 <Box
+                    onClick={e => e.stopPropagation()}
                     sx={{
                         display: "flex",
                         justifyContent: "center",
@@ -77,6 +82,7 @@ export const AvatarBackdrop: React.FC<AvatarBackdropContentProps> = ({
                                 maxWidth: "100%",
                                 maxHeight: "100%",
                                 objectFit: "contain",
+                                borderRadius: "12px",
                             }}
                         />
                     ) : (

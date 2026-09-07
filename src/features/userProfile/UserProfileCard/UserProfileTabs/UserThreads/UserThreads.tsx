@@ -1,7 +1,14 @@
 import { FC, useMemo } from "react";
 import { useLoaderData } from "react-router-dom";
 import { EmptyThreadFallback, ThreadFeed } from "@app/features/talkSpace/components";
-import { Thread, ThreadListResponse, useGetUserThreadsInfiniteQuery } from "@app/core/services";
+import { useLiveThreadPage } from "@app/core/hooks";
+import {
+    Thread,
+    ThreadListResponse,
+    THREADS_KEYS,
+    threadsApi,
+    useGetUserThreadsInfiniteQuery,
+} from "@app/core/services";
 import { UserProfileThreadsContext } from "@app/features/userProfile/UserProfileCard/UserProfileTabs/loaders";
 
 export const UserThreads: FC = () => {
@@ -13,6 +20,10 @@ export const UserThreads: FC = () => {
         (): Thread[] => data?.pages.flatMap((page: ThreadListResponse): Thread[] => page.data) ?? [],
         [data]
     );
+
+    const feedKey = useMemo(() => THREADS_KEYS.userList(params), [params]);
+
+    useLiveThreadPage({ data, params, fetchPage: threadsApi.getUserThreads, queryKey: feedKey });
 
     const showEmptyFallback: boolean = !isLoading && threads.length === 0;
 

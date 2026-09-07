@@ -64,8 +64,8 @@ const ThreadMediaBackdropComponent: FC<ThreadMediaBackdropProps> = ({ onClose, o
                         <img
                             onClick={handleImageClick}
                             loading="lazy"
-                            alt={media?.src}
-                            src={media?.src}
+                            alt="thread_media_backdrop_img"
+                            src={media?.src ?? undefined}
                             style={{
                                 borderRadius: "12px",
                                 maxWidth: "100%",

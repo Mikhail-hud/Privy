@@ -11,7 +11,9 @@ import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import { stopEventPropagation } from "@app/core/utils/general.ts";
 import { useVideoFeed } from "@app/features/talkSpace/components";
 import { RATIO_16_9, RATIO_4_3 } from "@app/core/constants/general.ts";
+import { isMediaPlayable } from "@app/core/utils/threadMedia.ts";
 import { FC, MouseEvent, useEffect, useRef, useState, useMemo, RefObject, useLayoutEffect } from "react";
+import { GalleryVideoPlayerPlaceholder } from "@app/features/talkSpace/components/ThreadMediaGallery/GalleryVideoPlayer/components";
 
 interface GalleryVideoPlayerProps {
     item: ThreadMedia;
@@ -20,6 +22,7 @@ interface GalleryVideoPlayerProps {
 
 export const GalleryVideoPlayer: FC<GalleryVideoPlayerProps> = ({ item, isActive }) => {
     const isMobile: boolean = useIsMobile();
+    const isPlayable: boolean = isMediaPlayable(item);
     const { toggleGlobalMute, isGlobalMuted, getFeedVideoElement, setGlobalPause } = useVideoFeed();
     const isInitialMount: RefObject<boolean> = useRef<boolean>(true);
 
@@ -103,7 +106,7 @@ export const GalleryVideoPlayer: FC<GalleryVideoPlayerProps> = ({ item, isActive
         if (isActive) {
             isInitialMount.current = false;
             setGlobalPause(true, item.id);
-            activeVideo.play();
+            void activeVideo.play().catch((): void => undefined);
         } else {
             if (!isInitialMount.current) {
                 activeVideo.pause();
@@ -116,7 +119,7 @@ export const GalleryVideoPlayer: FC<GalleryVideoPlayerProps> = ({ item, isActive
         stopEventPropagation(e);
         if (!activeVideo) return;
         if (activeVideo.paused) {
-            activeVideo.play();
+            void activeVideo.play().catch((): void => undefined);
         } else {
             activeVideo.pause();
         }
@@ -126,6 +129,10 @@ export const GalleryVideoPlayer: FC<GalleryVideoPlayerProps> = ({ item, isActive
         stopEventPropagation(e);
         toggleGlobalMute(e);
     };
+
+    if (!isPlayable) {
+        return <GalleryVideoPlayerPlaceholder mediaItem={item} ratio={defaultRatio} />;
+    }
 
     return (
         <Box
@@ -155,8 +162,8 @@ export const GalleryVideoPlayer: FC<GalleryVideoPlayerProps> = ({ item, isActive
                 ) : (
                     <video
                         ref={fallbackVideoRef}
-                        src={item.src}
-                        poster={item?.posterUrl ?? ""}
+                        src={item.src ?? undefined}
+                        poster={item.posterUrl ?? undefined}
                         style={{
                             height: "100%",
                             width: "auto",

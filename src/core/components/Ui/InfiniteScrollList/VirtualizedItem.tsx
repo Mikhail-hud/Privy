@@ -52,6 +52,7 @@ export const VirtualizedItem: FC<VirtualizedItemProps> = ({ children, id, sx }) 
     return (
         <Box
             ref={ref}
+            data-item-id={id}
             data-virtualized={!shouldRenderChildren}
             sx={{
                 overflow: "hidden",

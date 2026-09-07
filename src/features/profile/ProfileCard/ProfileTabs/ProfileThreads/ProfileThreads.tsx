@@ -3,7 +3,14 @@ import { useLoaderData } from "react-router-dom";
 import { ThreadDialogForm } from "@app/core/components";
 import { EmptyThreadFallback, ThreadFeed } from "@app/features/talkSpace/components";
 import { ProfileThreadsContext } from "@app/features/profile/ProfileCard/ProfileTabs/loaders";
-import { Thread, ThreadListResponse, useGetProfileThreadsInfiniteQuery } from "@app/core/services";
+import { useLiveThreadPage } from "@app/core/hooks";
+import {
+    Thread,
+    ThreadListResponse,
+    THREADS_KEYS,
+    threadsApi,
+    useGetProfileThreadsInfiniteQuery,
+} from "@app/core/services";
 
 export const ProfileThreads: FC = () => {
     const { params } = useLoaderData() as ProfileThreadsContext;
@@ -14,6 +21,10 @@ export const ProfileThreads: FC = () => {
         (): Thread[] => data?.pages.flatMap((page: ThreadListResponse): Thread[] => page.data) ?? [],
         [data]
     );
+
+    const feedKey = useMemo(() => THREADS_KEYS.profileList(params), [params]);
+
+    useLiveThreadPage({ data, params, fetchPage: threadsApi.getProfileThreads, queryKey: feedKey });
 
     const showEmptyFallback: boolean = !isLoading && threads.length === 0;
     const [open, setOpen] = useState<boolean>(false);

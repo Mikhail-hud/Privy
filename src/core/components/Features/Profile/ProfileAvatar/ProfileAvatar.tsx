@@ -1,11 +1,11 @@
 import {
     Profile,
+    ApiError,
     PhotoUploadType,
     useUploadPhotoMutation,
     useUnsetPublicPhotoMutation,
     useUnsetPrivatePhotoMutation,
     useDeleteProfilePhotoMutation,
-    ApiError,
 } from "@app/core/services";
 import Badge from "@mui/material/Badge";
 import { enqueueSnackbar } from "notistack";

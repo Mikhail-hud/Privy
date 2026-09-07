@@ -128,9 +128,9 @@ const ThreadMediaGalleryBackdropComponent: FC<ThreadMediaGalleryBackdropProps> =
                                                 }}
                                             >
                                                 <img
-                                                    src={item.src}
+                                                    src={item.src ?? undefined}
                                                     draggable={false}
-                                                    alt={item.src}
+                                                    alt="thread_media_gallery_img"
                                                     style={{
                                                         maxWidth: "100%",
                                                         maxHeight: "100%",

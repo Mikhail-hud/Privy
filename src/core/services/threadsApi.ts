@@ -4,6 +4,7 @@ import {
     useInfiniteQuery,
     UseMutationOptions,
     UseInfiniteQueryOptions,
+    QueryKey,
 } from "@tanstack/react-query";
 import { INITIAL_PAGE_PARAM, PAGE_SIZE_LIMITS } from "@app/core/constants/ParamsConstants.ts";
 import {
@@ -38,7 +39,7 @@ export interface Metadata {
 export interface ThreadMedia {
     id: string;
     key: string;
-    src: string;
+    src: null | string;
     order: number;
     fileSize: number;
     threadId: string;
@@ -46,13 +47,13 @@ export interface ThreadMedia {
     createdAt: string;
     width: number;
     height: number;
-    blurHash: string;
+    blurHash: null | string;
     posterKey: null | string;
     posterUrl: null | string;
     type: MediaType;
     mediaConvertJobId?: string;
     status?: MediaStatus;
-    originalFilename: "string";
+    originalFilename: string;
 }
 
 export interface Thread {
@@ -77,11 +78,14 @@ export interface CreateThreadPayload {
 
 export type ThreadListResponse = PaginatedResponse<Thread>;
 
+export type ThreadPageFetcher<TParams extends QueryParams> = (params: TParams) => Promise<ThreadListResponse>;
+
 export const THREADS_KEYS = {
     all: ["threads"] as const,
     list: (params: QueryParams) => [...THREADS_KEYS.all, "list", params] as const,
     profileList: (params: QueryParams) => [...THREADS_KEYS.all, "list", { ...params, scope: "profile" }] as const,
     userList: (params: UsersParamsWithUserName) => [...THREADS_KEYS.all, "list", { ...params, scope: "user" }] as const,
+    livePage: (feedKey: QueryKey, page: number) => [...THREADS_KEYS.all, "live", feedKey, page] as const,
 };
 
 export const threadsApi = {
@@ -132,13 +136,6 @@ export const threadsApi = {
         });
     },
 
-    /**
-     * The current user's own threads, incognito ones included.
-     *
-     * A different endpoint rather than `getThreads` with a filter: the server decides what belongs in
-     * an owner's tab, and incognito threads are exactly what a client-side filter over the global
-     * feed could never recover — they arrive there with no author at all.
-     */
     getProfileThreads: async ({
         query = "",
         limit = PAGE_SIZE_LIMITS.DEFAULT,
