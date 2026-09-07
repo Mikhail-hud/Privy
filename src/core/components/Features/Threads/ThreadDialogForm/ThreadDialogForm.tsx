@@ -15,7 +15,6 @@ import Typography from "@mui/material/Typography";
 import DialogContent from "@mui/material/DialogContent";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { VALIDATE_RELES } from "@app/core/constants/rulesConstants.ts";
-// import { ThreadMediaGallery } from "@app/features/talkSpace/components";
 import { ChangeEvent, FC, ReactNode, SyntheticEvent, useRef } from "react";
 import { compressImage, isImageFile, isVideoFile } from "@app/core/utils/fileUtils.ts";
 import { stopEventPropagation, transformServerErrors } from "@app/core/utils/general.ts";

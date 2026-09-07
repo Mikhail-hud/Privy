@@ -1,7 +1,6 @@
 import { FC, useMemo, useState } from "react";
 import { useLoaderData } from "react-router-dom";
-import { ThreadDialogForm } from "@app/core/components";
-import { EmptyThreadFallback, ThreadFeed } from "@app/features/talkSpace/components";
+import { EmptyThreadFallback, ThreadDialogForm, ThreadFeed } from "@app/core/components";
 import { ProfileThreadsContext } from "@app/features/profile/ProfileCard/ProfileTabs/loaders";
 import { useLiveThreadPage } from "@app/core/hooks";
 import {

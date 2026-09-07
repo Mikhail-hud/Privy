@@ -4,16 +4,15 @@ import "swiper/css/pagination";
 import Box from "@mui/material/Box";
 import { useIsMobile } from "@app/core/hooks";
 import { ThreadMedia } from "@app/core/services";
-import { ActionIconButton } from "@app/core/components";
+import { ActionIconButton, useVideoFeed } from "@app/core/components";
 import VolumeUpIcon from "@mui/icons-material/VolumeUp";
 import VolumeOffIcon from "@mui/icons-material/VolumeOff";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import { stopEventPropagation } from "@app/core/utils/general.ts";
-import { useVideoFeed } from "@app/features/talkSpace/components";
 import { RATIO_16_9, RATIO_4_3 } from "@app/core/constants/general.ts";
 import { isMediaPlayable } from "@app/core/utils/threadMedia.ts";
 import { FC, MouseEvent, useEffect, useRef, useState, useMemo, RefObject, useLayoutEffect } from "react";
-import { GalleryVideoPlayerPlaceholder } from "@app/features/talkSpace/components/ThreadMediaGallery/GalleryVideoPlayer/components";
+import { GalleryVideoPlayerPlaceholder } from "@app/core/components/Features/Threads/ThreadMediaGallery/GalleryVideoPlayer/components";
 
 interface GalleryVideoPlayerProps {
     item: ThreadMedia;

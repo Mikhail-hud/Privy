@@ -2,7 +2,7 @@ import Box from "@mui/material/Box";
 import { FC, MouseEvent } from "react";
 import { ThreadMedia } from "@app/core/services";
 import { stopEventPropagation } from "@app/core/utils/general.ts";
-import { MediaItem } from "@app/features/talkSpace/components/ThreadMediaGallery/MediaItem";
+import { MediaItem } from "@app/core/components/Features/Threads/ThreadMediaGallery/MediaItem";
 
 interface SingleThreadMediaProps {
     media: ThreadMedia;

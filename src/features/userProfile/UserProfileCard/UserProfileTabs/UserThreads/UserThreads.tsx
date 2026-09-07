@@ -1,6 +1,5 @@
 import { FC, useMemo } from "react";
 import { useLoaderData } from "react-router-dom";
-import { EmptyThreadFallback, ThreadFeed } from "@app/features/talkSpace/components";
 import { useLiveThreadPage } from "@app/core/hooks";
 import {
     Thread,
@@ -10,6 +9,7 @@ import {
     useGetUserThreadsInfiniteQuery,
 } from "@app/core/services";
 import { UserProfileThreadsContext } from "@app/features/userProfile/UserProfileCard/UserProfileTabs/loaders";
+import { EmptyThreadFallback, ThreadFeed } from "@app/core/components";
 
 export const UserThreads: FC = () => {
     const { params } = useLoaderData() as UserProfileThreadsContext;

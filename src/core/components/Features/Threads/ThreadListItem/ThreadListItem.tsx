@@ -5,9 +5,16 @@ import { getRelativeTime } from "@app/core/utils/dateUtils.ts";
 import { stopEventPropagation } from "@app/core/utils/general.ts";
 import { Link as RouterLink, NavigateFunction } from "react-router-dom";
 import { USER_HANDLE_PREFIX } from "@app/core/constants/pathConstants.ts";
-import { Avatar, ReadMore, UserAvatarBadge, UserHoverCard } from "@app/core/components";
+import {
+    Avatar,
+    ReadMore,
+    ThreadListActions,
+    ThreadListMoreMenu,
+    ThreadMediaGallery,
+    UserAvatarBadge,
+    UserHoverCard,
+} from "@app/core/components";
 import { Box, ListItem, Typography, Divider, ListItemText, ListItemAvatar } from "@mui/material";
-import { ThreadListActions, ThreadListMoreMenu, ThreadMediaGallery } from "@app/features/talkSpace/components";
 
 interface ThreadListItemProps {
     thread: Thread;

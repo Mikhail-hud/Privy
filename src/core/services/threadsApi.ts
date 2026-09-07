@@ -1,8 +1,10 @@
 import {
     useMutation,
+    useQuery,
     InfiniteData,
     useInfiniteQuery,
     UseMutationOptions,
+    UseQueryOptions,
     UseInfiniteQueryOptions,
     QueryKey,
 } from "@tanstack/react-query";
@@ -86,6 +88,7 @@ export const THREADS_KEYS = {
     profileList: (params: QueryParams) => [...THREADS_KEYS.all, "list", { ...params, scope: "profile" }] as const,
     userList: (params: UsersParamsWithUserName) => [...THREADS_KEYS.all, "list", { ...params, scope: "user" }] as const,
     livePage: (feedKey: QueryKey, page: number) => [...THREADS_KEYS.all, "live", feedKey, page] as const,
+    detail: (id: string) => [...THREADS_KEYS.all, "detail", id] as const,
 };
 
 export const threadsApi = {
@@ -134,6 +137,10 @@ export const threadsApi = {
             url: "threads",
             params: { query, page, limit },
         });
+    },
+
+    getThread: async (id: string): Promise<Thread> => {
+        return apiClient<Thread>({ url: `threads/${id}` });
     },
 
     getProfileThreads: async ({
@@ -266,6 +273,8 @@ export const useUnlikeThreadMutation = (options?: UseMutationOptions<void, Error
     });
 };
 
+type ThreadQueryOptions = Omit<UseQueryOptions<Thread, Error>, "queryKey" | "queryFn">;
+
 type ThreadFeedQueryOptions = Omit<
     UseInfiniteQueryOptions<ThreadListResponse, Error, InfiniteData<ThreadListResponse>>,
     "queryKey" | "queryFn" | "getNextPageParam" | "initialPageParam"
@@ -290,6 +299,15 @@ export const useGetThreadsInfiniteQuery = (params: QueryParams, options?: Thread
         queryFn: ({ pageParam }) => threadsApi.getThreads({ ...params, page: pageParam as number }),
         initialPageParam: INITIAL_PAGE_PARAM,
         getNextPageParam: getNextThreadPageParam,
+        ...options,
+    });
+};
+
+export const useGetThreadQuery = (id: string, options?: ThreadQueryOptions) => {
+    return useQuery({
+        queryKey: THREADS_KEYS.detail(id),
+        queryFn: (): Promise<Thread> => threadsApi.getThread(id),
+        enabled: !!id,
         ...options,
     });
 };

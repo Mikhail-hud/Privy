@@ -3,9 +3,8 @@ import { QueryKey } from "@tanstack/react-query";
 import { FC, useState, ChangeEvent, useMemo } from "react";
 import { DEBOUNCE_DELAY } from "@app/core/constants/general";
 import { useDebounce, useLiveThreadPage } from "@app/core/hooks";
-import { ThreadFeed } from "@app/features/talkSpace/components";
 import { ThreadsContext } from "@app/features/talkSpace/loaders";
-import { ContentCardContainer, UserSearchField } from "@app/core/components";
+import { ContentCardContainer, ThreadFeed, UserSearchField } from "@app/core/components";
 import { Thread, ThreadListResponse, THREADS_KEYS, threadsApi, useGetThreadsInfiniteQuery } from "@app/core/services";
 
 export const TalkSpace: FC = () => {

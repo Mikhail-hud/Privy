@@ -1,18 +1,17 @@
 import Box from "@mui/material/Box";
 import { useIsMobile } from "@app/core/hooks";
 import VolumeUpIcon from "@mui/icons-material/VolumeUp";
-import { ActionIconButton } from "@app/core/components";
+import { ActionIconButton, useVideoFeed } from "@app/core/components";
 import VolumeOffIcon from "@mui/icons-material/VolumeOff";
 import { MediaType, ThreadMedia } from "@app/core/services";
 import { stopEventPropagation } from "@app/core/utils/general.ts";
-import { useVideoFeed } from "@app/features/talkSpace/components";
 import { RATIO_16_9, RATIO_4_3 } from "@app/core/constants/general.ts";
 import { isMediaFailed, isMediaPlayable } from "@app/core/utils/threadMedia.ts";
 import { FC, MouseEvent, useState, useRef, useEffect, RefObject } from "react";
 import {
     MediaItemLoader,
     VideoStatusPlaceholder,
-} from "@app/features/talkSpace/components/ThreadMediaGallery/MediaItem/components";
+} from "@app/core/components/Features/Threads/ThreadMediaGallery/MediaItem/components";
 
 interface MediaItemProps {
     media: ThreadMedia;

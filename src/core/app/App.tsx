@@ -19,7 +19,7 @@ import {
     SIGN_OUT_ACTION_ONLY_PATH,
     PROFILE_FAVORITES_TAB_PATH,
 } from "@app/core/constants/pathConstants";
-import { AppLayout, RedirectIfOwner, Spiner, TabContainer } from "@app/core/components";
+import { AppLayout, RedirectIfOwner, Spiner, TabContainer, VideoFeedProvider } from "@app/core/components";
 import { createBrowserRouter, RouterProvider, Navigate, redirect } from "react-router-dom";
 import {
     SignIn,
@@ -53,7 +53,6 @@ import {
     userPhotosLoader,
     userThreadsLoader,
 } from "@app/features/userProfile/UserProfileCard/UserProfileTabs";
-import { VideoFeedProvider } from "@app/features/talkSpace/components";
 
 // Lazy-loaded components to optimize initial load time
 const RequireAdmin = lazy(() => import("@app/core/components/Hocs").then(module => ({ default: module.RequireAdmin })));

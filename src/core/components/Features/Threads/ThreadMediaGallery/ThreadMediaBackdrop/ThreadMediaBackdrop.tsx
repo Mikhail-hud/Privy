@@ -6,7 +6,7 @@ import { ActionIconButton } from "@app/core/components";
 import { MediaType, ThreadMedia } from "@app/core/services";
 import { stopEventPropagation } from "@app/core/utils/general.ts";
 import { memo, MouseEvent, FC, useCallback, WheelEventHandler } from "react";
-import { GalleryVideoPlayer } from "@app/features/talkSpace/components/ThreadMediaGallery/GalleryVideoPlayer";
+import { GalleryVideoPlayer } from "@app/core/components/Features/Threads/ThreadMediaGallery/GalleryVideoPlayer";
 
 interface ThreadMediaBackdropProps {
     onClose: (e: MouseEvent<HTMLElement> | WheelEventHandler<HTMLDivElement> | undefined) => void;

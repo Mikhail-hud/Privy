@@ -6,8 +6,8 @@ import { ThreadMedia } from "@app/core/services";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { CSSProperties, FC, MouseEvent } from "react";
 import { stopEventPropagation } from "@app/core/utils/general.ts";
-import { MediaItem } from "@app/features/talkSpace/components/ThreadMediaGallery/MediaItem";
-import { SingleThreadMedia } from "@app/features/talkSpace/components/ThreadMediaGallery/SingleThreadMedia";
+import { SingleThreadMedia } from "@app/core/components/Features/Threads/ThreadMediaGallery/SingleThreadMedia";
+import { MediaItem } from "@app/core/components/Features/Threads/ThreadMediaGallery/MediaItem";
 
 interface ThreadMediaGalleryProps {
     threadMedia: ThreadMedia[];

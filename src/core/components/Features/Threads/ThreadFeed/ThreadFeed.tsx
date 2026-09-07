@@ -1,9 +1,8 @@
 import { Thread, ThreadMedia } from "@app/core/services";
-import { InfiniteScrollList } from "@app/core/components";
+import { InfiniteScrollList, ThreadListItem, ThreadListItemSkeleton, useVideoFeed } from "@app/core/components";
 import { FC, ReactElement, ReactNode, useCallback, useState } from "react";
-import { ThreadListItem, ThreadListItemSkeleton, useVideoFeed } from "@app/features/talkSpace/components";
-import { ThreadMediaBackdrop } from "@app/features/talkSpace/components/ThreadMediaGallery/ThreadMediaBackdrop";
-import { ThreadMediaGalleryBackdrop } from "@app/features/talkSpace/components/ThreadMediaGallery/ThreadMediaGalleryBackdrop";
+import { ThreadMediaGalleryBackdrop } from "@app/core/components/Features/Threads/ThreadMediaGallery/ThreadMediaGalleryBackdrop";
+import { ThreadMediaBackdrop } from "@app/core/components/Features/Threads/ThreadMediaGallery/ThreadMediaBackdrop";
 
 interface ThreadFeedProps {
     threads: Thread[];
