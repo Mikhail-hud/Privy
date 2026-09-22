@@ -11,7 +11,12 @@ export const FULL_NAME_MAX_LENGTH = 100;
 
 export const VALIDATE_RELES = {
     THREAD_CONTENT: {
-        required: "Content is required",
+        maxLength: {
+            value: 10000,
+            message: "Content cannot exceed 10000 characters",
+        },
+    },
+    REPLY_CONTENT: {
         maxLength: {
             value: 10000,
             message: "Content cannot exceed 10000 characters",

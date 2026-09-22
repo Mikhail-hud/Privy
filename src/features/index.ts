@@ -8,3 +8,4 @@ export * from "./userProfile";
 export * from "./lookup";
 export * from "./dashboard";
 export * from "./errorElement";
+export * from "./threadDetails";

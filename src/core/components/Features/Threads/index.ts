@@ -3,6 +3,7 @@ export * from "./ThreadFeed";
 export * from "./EmptyThreadFallback";
 export * from "./ThreadListItem";
 export * from "./VideoFeedContext";
+export * from "./useMediaBackdrops";
 export * from "./ThreadMediaGallery";
 export * from "./ThreadListItemSkeleton";
 export * from "./ThreadListItemActions";

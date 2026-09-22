@@ -12,6 +12,7 @@ type ThreadDialogFooterProps<T extends FieldValues> = {
     control: Control<T>;
     isCreatingMode: boolean;
     handleClose: (event: SyntheticEvent) => void;
+    onSubmitClick?: (event: SyntheticEvent) => void;
 };
 
 export const ThreadDialogFooter = <T extends FieldValues>({
@@ -21,6 +22,7 @@ export const ThreadDialogFooter = <T extends FieldValues>({
     handleClose,
     name,
     label,
+    onSubmitClick,
 }: ThreadDialogFooterProps<T>) => (
     <DialogActions sx={{ pt: 1, pb: 2, px: 2, gap: 1, display: "flex", flexDirection: "column", width: "100%" }}>
         <Box sx={{ width: "100%" }}>
@@ -35,7 +37,7 @@ export const ThreadDialogFooter = <T extends FieldValues>({
             <Button onClick={handleClose} disabled={loading}>
                 Cancel
             </Button>
-            <Button variant="contained" type="submit" loadingPosition="start" loading={loading}>
+            <Button variant="contained" type="submit" loadingPosition="start" loading={loading} onClick={onSubmitClick}>
                 {isCreatingMode ? "Post" : "Update"}
             </Button>
         </Box>

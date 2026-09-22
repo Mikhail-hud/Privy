@@ -1,60 +1,61 @@
 import { FC, memo, MouseEvent } from "react";
 import { PrivateIcon } from "@app/core/assets/icons";
-import { Thread, ThreadMedia } from "@app/core/services";
+import { Reply, Thread, ThreadMedia } from "@app/core/services";
 import { getRelativeTime } from "@app/core/utils/dateUtils.ts";
 import { stopEventPropagation } from "@app/core/utils/general.ts";
-import { Link as RouterLink, NavigateFunction, useLocation, useNavigate } from "react-router-dom";
+// import { NavigateFunction, useNavigate } from "react-router-dom";
+// import { USER_HANDLE_PREFIX } from "@app/core/constants/pathConstants.ts";
 import { getAuthorAvatarSrc, getAuthorDisplayName } from "@app/core/utils/authorUtils.ts";
-import { PROFILE_PAGE_PATH, threadDetailsPath, USER_HANDLE_PREFIX } from "@app/core/constants/pathConstants.ts";
+import { Box, ListItem, Typography, Divider, ListItemText, ListItemAvatar } from "@mui/material";
 import {
     Avatar,
     ReadMore,
-    ThreadListActions,
-    ThreadListMoreMenu,
+    ReplyListActions,
+    ReplyListMoreMenu,
     ThreadMediaGallery,
     UserAvatarBadge,
     UserHoverCard,
 } from "@app/core/components";
-import { Box, ListItem, Typography, Divider, ListItemText, ListItemAvatar } from "@mui/material";
+import Chip from "@mui/material/Chip";
+import { AuthorLikeAvatarBadge } from "@app/core/components/Features/Replies/ReplyListItem/components";
 
-interface ThreadListItemProps {
+interface ReplyListItemProps {
+    reply: Reply;
     thread: Thread;
     isLast: boolean;
-    disableNavigation?: boolean;
     handleOpenThreadMediaBackdrop: (media: ThreadMedia) => void;
     handleOpenThreadMediaGalleryBackdrop: (media: ThreadMedia[], index: number) => void;
 }
 
-const ThreadListItemComponent: FC<ThreadListItemProps> = ({
-    thread,
+const ReplyListItemComponent: FC<ReplyListItemProps> = ({
+    reply,
     isLast,
-    disableNavigation = false,
+    thread,
     handleOpenThreadMediaBackdrop,
     handleOpenThreadMediaGalleryBackdrop,
 }) => {
-    const { pathname } = useLocation();
-    const navigate: NavigateFunction = useNavigate();
-    const { author, isIncognito, isOwnedByCurrentUser, isLikedByCurrentUser, likeCount, replyCount, media } = thread;
+    // const navigate: NavigateFunction = useNavigate();
+    const { author, isIncognito, isOwnedByCurrentUser, isLikedByCurrentUser, likeCount, childCount, media } = reply;
 
     const showMediaGallery: boolean = Array.isArray(media) && media.length > 0;
-    const titleUserName: string = getAuthorDisplayName(thread);
-    const src: string | undefined = getAuthorAvatarSrc(thread);
-    const isProfileContext: boolean =
-        pathname.startsWith(PROFILE_PAGE_PATH) || pathname.startsWith(`/${USER_HANDLE_PREFIX}`);
+    const titleUserName: string = getAuthorDisplayName(reply);
+    const src: string | undefined = getAuthorAvatarSrc(reply);
+    const authorAvatarSrc: string | undefined = getAuthorAvatarSrc(thread);
+    const isAuthorLinkDisabled: boolean = isIncognito && !isOwnedByCurrentUser;
 
     const handleNavigateToProfilePage = (e: MouseEvent<HTMLSpanElement>): void => {
-        if (isProfileContext) {
+        if (isAuthorLinkDisabled) {
             return;
         }
         stopEventPropagation(e);
-        navigate(`/${USER_HANDLE_PREFIX}${thread?.author?.userName}`);
+        // TODO: Implement navigation to reply item page
+        // navigate(`/${USER_HANDLE_PREFIX}${author?.userName}`);
     };
 
     return (
         <>
             <ListItem
                 alignItems="flex-start"
-                {...(disableNavigation ? {} : { component: RouterLink, to: threadDetailsPath(thread.id) })}
                 sx={{
                     "&:hover": {
                         backgroundColor: "transparent",
@@ -95,8 +96,8 @@ const ThreadListItemComponent: FC<ThreadListItemProps> = ({
                                     biography={author?.biography}
                                     followingCount={author?.followingCount}
                                     followersCount={author?.followersCount}
+                                    disabled={isAuthorLinkDisabled}
                                     userProfileActionsShown={!isOwnedByCurrentUser}
-                                    disabled={(!isOwnedByCurrentUser && isIncognito) || isProfileContext}
                                     isProfileIncognito={author?.isProfileIncognito}
                                     isFollowedByCurrentUser={!!author?.isFollowedByCurrentUser}
                                 >
@@ -105,10 +106,7 @@ const ThreadListItemComponent: FC<ThreadListItemProps> = ({
                                         color="primary"
                                         sx={{
                                             "&:hover": {
-                                                textDecoration:
-                                                    (!isOwnedByCurrentUser && isIncognito) || isProfileContext
-                                                        ? "none"
-                                                        : "underline",
+                                                textDecoration: isAuthorLinkDisabled ? "none" : "underline",
                                             },
                                         }}
                                     >
@@ -124,29 +122,49 @@ const ThreadListItemComponent: FC<ThreadListItemProps> = ({
                                         textOverflow: "ellipsis",
                                     }}
                                 >
-                                    {getRelativeTime(thread.createdAt)}
+                                    {getRelativeTime(reply.createdAt)}
                                 </Typography>
+                                {reply?.isAuthorReply && <Chip label="Author" size="small" color="primary" />}
                             </Box>
-                            <ThreadListMoreMenu thread={thread} />
+                            <Box
+                                sx={{
+                                    display: "flex",
+                                    flexWrap: "nowrap",
+                                }}
+                            >
+                                {reply?.isLikedByAuthor && (
+                                    <AuthorLikeAvatarBadge>
+                                        {thread?.isIncognito && !thread?.isOwnedByCurrentUser ? (
+                                            <PrivateIcon color="info" sx={{ width: 25, height: 25 }} />
+                                        ) : (
+                                            <Avatar
+                                                alt={authorAvatarSrc}
+                                                src={authorAvatarSrc}
+                                                sx={{ width: 25, height: 25 }}
+                                            />
+                                        )}
+                                    </AuthorLikeAvatarBadge>
+                                )}
+                                <ReplyListMoreMenu reply={reply} />
+                            </Box>
                         </Box>
                     }
                     slotProps={{ secondary: { component: "div" } }}
                     secondary={
                         <Box sx={{ mt: 0.5 }}>
-                            <ReadMore text={thread.content} />
+                            <ReadMore text={reply.content} />
                             {showMediaGallery && (
                                 <ThreadMediaGallery
-                                    threadMedia={thread.media}
+                                    threadMedia={media}
                                     handleOpenThreadMediaBackdrop={handleOpenThreadMediaBackdrop}
                                     handleOpenThreadMediaGalleryBackdrop={handleOpenThreadMediaGalleryBackdrop}
                                 />
                             )}
-                            <ThreadListActions
-                                id={thread.id}
+                            <ReplyListActions
+                                id={reply.id}
                                 likeCount={likeCount}
-                                replyCount={replyCount}
+                                childCount={childCount}
                                 isLikedByCurrentUser={isLikedByCurrentUser}
-                                isOwnedByCurrentUser={isOwnedByCurrentUser}
                             />
                         </Box>
                     }
@@ -157,4 +175,4 @@ const ThreadListItemComponent: FC<ThreadListItemProps> = ({
     );
 };
 
-export const ThreadListItem = memo(ThreadListItemComponent);
+export const ReplyListItem = memo(ReplyListItemComponent);

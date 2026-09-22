@@ -5,4 +5,5 @@ export * from "./authApi.ts";
 export * from "./revealsApi.ts";
 export * from "./tagsApi.ts";
 export * from "./threadsApi.ts";
+export * from "./repliesApi.ts";
 export * from "./usersApi.ts";

@@ -167,6 +167,22 @@ export const threadsApi = {
     },
 };
 
+const patchCachedThread = (threadId: string, patch: (thread: Thread) => Thread): void => {
+    queryClient.setQueriesData<InfiniteData<ThreadListResponse>>({ queryKey: ["threads", "list"] }, oldData => {
+        if (!oldData || !oldData.pages) return oldData;
+        return {
+            ...oldData,
+            pages: oldData.pages.map((page: ThreadListResponse) => ({
+                ...page,
+                data: page.data.map((thread: Thread): Thread => (thread.id === threadId ? patch(thread) : thread)),
+            })),
+        };
+    });
+    queryClient.setQueryData<Thread>(THREADS_KEYS.detail(threadId), (thread?: Thread) =>
+        thread ? patch(thread) : thread
+    );
+};
+
 export const useCreateThreadMutation = (options?: UseMutationOptions<Thread, Error, CreateThreadPayload>) => {
     return useMutation({
         mutationFn: threadsApi.createThread,
@@ -183,18 +199,7 @@ export const useUpdateThreadMutation = (
     return useMutation({
         mutationFn: ({ id, data }): Promise<Thread> => threadsApi.updateThead(id, data),
         onSuccess: (updatedThread: Thread): void => {
-            queryClient.setQueriesData<InfiniteData<ThreadListResponse>>({ queryKey: ["threads", "list"] }, oldData => {
-                if (!oldData || !oldData.pages) return oldData;
-                return {
-                    ...oldData,
-                    pages: oldData.pages.map((page: ThreadListResponse) => ({
-                        ...page,
-                        data: page.data.map(
-                            (thread: Thread): Thread => (thread.id === updatedThread.id ? updatedThread : thread)
-                        ),
-                    })),
-                };
-            });
+            patchCachedThread(updatedThread.id, (): Thread => updatedThread);
         },
         ...options,
     });
@@ -214,6 +219,7 @@ export const useDeleteThreadMutation = (options?: UseMutationOptions<void, Error
                     })),
                 };
             });
+            queryClient.removeQueries({ queryKey: THREADS_KEYS.detail(thredId) });
         },
         ...options,
     });
@@ -223,24 +229,14 @@ export const useLikeThreadMutation = (options?: UseMutationOptions<void, Error, 
     return useMutation({
         mutationFn: threadsApi.likeThread,
         onSuccess: (_data: void, threadId: string): void => {
-            queryClient.setQueriesData<InfiniteData<ThreadListResponse>>({ queryKey: ["threads", "list"] }, oldData => {
-                if (!oldData || !oldData.pages) return oldData;
-                return {
-                    ...oldData,
-                    pages: oldData.pages.map((page: ThreadListResponse) => ({
-                        ...page,
-                        data: page.data.map((thread: Thread) =>
-                            thread.id === threadId
-                                ? {
-                                      ...thread,
-                                      isLikedByCurrentUser: true,
-                                      likeCount: thread.likeCount + 1,
-                                  }
-                                : thread
-                        ),
-                    })),
-                };
-            });
+            patchCachedThread(
+                threadId,
+                (thread: Thread): Thread => ({
+                    ...thread,
+                    isLikedByCurrentUser: true,
+                    likeCount: thread.likeCount + 1,
+                })
+            );
         },
         ...options,
     });
@@ -250,24 +246,14 @@ export const useUnlikeThreadMutation = (options?: UseMutationOptions<void, Error
     return useMutation({
         mutationFn: threadsApi.unlikeThread,
         onSuccess: (_data: void, threadId: string): void => {
-            queryClient.setQueriesData<InfiniteData<ThreadListResponse>>({ queryKey: ["threads", "list"] }, oldData => {
-                if (!oldData || !oldData.pages) return oldData;
-                return {
-                    ...oldData,
-                    pages: oldData.pages.map((page: ThreadListResponse) => ({
-                        ...page,
-                        data: page.data.map((thread: Thread) =>
-                            thread.id === threadId
-                                ? {
-                                      ...thread,
-                                      isLikedByCurrentUser: false,
-                                      likeCount: thread.likeCount - 1,
-                                  }
-                                : thread
-                        ),
-                    })),
-                };
-            });
+            patchCachedThread(
+                threadId,
+                (thread: Thread): Thread => ({
+                    ...thread,
+                    isLikedByCurrentUser: false,
+                    likeCount: thread.likeCount - 1,
+                })
+            );
         },
         ...options,
     });
@@ -280,12 +266,9 @@ type ThreadFeedQueryOptions = Omit<
     "queryKey" | "queryFn" | "getNextPageParam" | "initialPageParam"
 >;
 
-/**
- * Stops paging once the last requested page reached the reported total.
- */
-const getNextThreadPageParam = (
-    lastPage: ThreadListResponse,
-    _allPages: ThreadListResponse[],
+export const getNextPaginatedPageParam = <T>(
+    lastPage: PaginatedResponse<T>,
+    _allPages: PaginatedResponse<T>[],
     lastPageParam: unknown
 ): number | undefined => {
     const totalPages: number = Math.ceil(lastPage.total / lastPage.limit);
@@ -298,7 +281,7 @@ export const useGetThreadsInfiniteQuery = (params: QueryParams, options?: Thread
         queryKey: THREADS_KEYS.list(params),
         queryFn: ({ pageParam }) => threadsApi.getThreads({ ...params, page: pageParam as number }),
         initialPageParam: INITIAL_PAGE_PARAM,
-        getNextPageParam: getNextThreadPageParam,
+        getNextPageParam: getNextPaginatedPageParam,
         ...options,
     });
 };
@@ -317,7 +300,7 @@ export const useGetProfileThreadsInfiniteQuery = (params: QueryParams, options?:
         queryKey: THREADS_KEYS.profileList(params),
         queryFn: ({ pageParam }) => threadsApi.getProfileThreads({ ...params, page: pageParam as number }),
         initialPageParam: INITIAL_PAGE_PARAM,
-        getNextPageParam: getNextThreadPageParam,
+        getNextPageParam: getNextPaginatedPageParam,
         ...options,
     });
 };
@@ -327,7 +310,7 @@ export const useGetUserThreadsInfiniteQuery = (params: UsersParamsWithUserName, 
         queryKey: THREADS_KEYS.userList(params),
         queryFn: ({ pageParam }) => threadsApi.getUserThreads({ ...params, page: pageParam as number }),
         initialPageParam: INITIAL_PAGE_PARAM,
-        getNextPageParam: getNextThreadPageParam,
+        getNextPageParam: getNextPaginatedPageParam,
         enabled: !!params.userName,
         ...options,
     });

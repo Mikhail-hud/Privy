@@ -4,3 +4,4 @@ export * from "./useDebounce.ts";
 export * from "./useBodyOverflowLock.ts";
 export * from "./useInfiniteScrollTrigger.ts";
 export * from "./useLiveThreadPage.ts";
+export * from "./useMediaSelection.ts";

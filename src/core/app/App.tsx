@@ -12,6 +12,7 @@ import {
     NOT_FOUND_PAGE_PATH,
     RESET_PASSWORD_PATH,
     TALK_SPACE_PAGE_PATH,
+    THREAD_DETAILS_PAGE_PATH,
     USER_PROFILE_PAGE_PATH,
     PROFILE_PHOTOS_TAB_PATH,
     USER_PROFILE_PHOTOS_TAB_PATH,
@@ -40,6 +41,8 @@ import {
     publicRoutesLoader,
     UserProfile,
     userProfileLoader,
+    ThreadDetails,
+    threadDetailsLoader,
 } from "@app/features";
 import {
     ProfilePhotos,
@@ -170,6 +173,15 @@ const router = createBrowserRouter([
                 element: (
                     <VideoFeedProvider>
                         <TalkSpace />
+                    </VideoFeedProvider>
+                ),
+            },
+            {
+                loader: threadDetailsLoader,
+                path: THREAD_DETAILS_PAGE_PATH,
+                element: (
+                    <VideoFeedProvider>
+                        <ThreadDetails />
                     </VideoFeedProvider>
                 ),
             },

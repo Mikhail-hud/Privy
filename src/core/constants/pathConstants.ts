@@ -14,6 +14,10 @@ export const SIGN_UP_PAGE_PATH = "/sign-up";
 export const RESET_PASSWORD_PATH = "/reset-password";
 export const NOT_FOUND_PAGE_PATH = "*";
 
+export const THREAD_DETAILS_PAGE_PATH = "/thread/:threadId";
+
+export const threadDetailsPath = (threadId: string): string => `/thread/${threadId}`;
+
 export const USER_HANDLE_PREFIX = "@";
 export const USER_PROFILE_PAGE_PATH = "/:userName";
 export const USER_PROFILE_PHOTOS_TAB_PATH = "/:userName/photos";

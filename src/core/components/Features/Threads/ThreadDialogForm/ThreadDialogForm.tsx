@@ -1,32 +1,24 @@
 import Box from "@mui/material/Box";
-import { useAuth } from "@app/core/hooks";
 import Dialog from "@mui/material/Dialog";
-import { enqueueSnackbar } from "notistack";
 import Divider from "@mui/material/Divider";
-import {
-    ALLOWED_POST_MIME_TYPES,
-    COMPRESSED_IMAGE_SIZE,
-    MAX_FILES_COUNT,
-    MAX_IMAGE_INPUT_SIZE,
-    MAX_VIDEO_INPUT_SIZE,
-} from "@app/core/constants/patterns.ts";
-import { TextField } from "@app/core/components";
 import Typography from "@mui/material/Typography";
 import DialogContent from "@mui/material/DialogContent";
 import { SubmitHandler, useForm } from "react-hook-form";
+import CircularProgress from "@mui/material/CircularProgress";
+import { useAuth, useMediaSelection } from "@app/core/hooks";
 import { VALIDATE_RELES } from "@app/core/constants/rulesConstants.ts";
-import { ChangeEvent, FC, ReactNode, SyntheticEvent, useRef } from "react";
-import { compressImage, isImageFile, isVideoFile } from "@app/core/utils/fileUtils.ts";
+import { appendMediaToFormData } from "@app/core/utils/mediaFormData.ts";
+import { closeSnackbar, enqueueSnackbar, SnackbarKey } from "notistack";
+import { TextField, ThreadMediaGallery, VideoFeedProvider } from "@app/core/components";
+import { FC, ReactNode, RefObject, SyntheticEvent, useEffect, useRef, useState } from "react";
 import { stopEventPropagation, transformServerErrors } from "@app/core/utils/general.ts";
 import {
     Thread,
     ApiError,
-    Metadata,
     CreateThreadPayload,
     useCreateThreadMutation,
     useUpdateThreadMutation,
 } from "@app/core/services";
-import { getVideoMetadata, VideoMetadata } from "@app/core/utils/mediaMetadata.ts";
 import { MediaPreview } from "@app/core/components/Features/Threads/ThreadDialogForm/MediaPreview";
 import { ThreadActionIcons } from "@app/core/components/Features/Threads/ThreadDialogForm/ThreadActionIcons";
 import { ThreadDialogTitle } from "@app/core/components/Features/Threads/ThreadDialogForm/ThreadDialogTitle";
@@ -58,22 +50,28 @@ export const THREAD_DIALOG_FORM_FIELDS = {
     isIncognito: { name: "isIncognito", label: "Incognito" },
 } as const;
 
-export const ThreadDialogForm: FC<ThreadDialogProps> = ({ open, setOpen, mode = "create", thread, action }) => {
+// TODO: FIX Video Provider to Pause exact item in Feed
+export const ThreadDialogForm: FC<ThreadDialogProps> = props => (
+    <VideoFeedProvider>
+        <ThreadDialogFormContent {...props} />
+    </VideoFeedProvider>
+);
+
+const ThreadDialogFormContent: FC<ThreadDialogProps> = ({ open, setOpen, mode = "create", thread, action }) => {
     const { profile } = useAuth();
     const isCreatingMode: boolean = mode === "create";
+    const [valid, setValid] = useState<boolean>(true);
 
-    const [isProcessingFiles, setIsProcessingFiles] = useState(false);
+    const contentInputRef: RefObject<HTMLInputElement | null> = useRef<HTMLInputElement>(null);
+    const fileInputRef: RefObject<HTMLInputElement | null> = useRef<HTMLInputElement>(null);
 
-    const contentInputRef = useRef<HTMLInputElement>(null);
-    const fileInputRef = useRef<HTMLInputElement>(null);
-
-    const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+    const { selectedFiles, isProcessingFiles, handleFileSelect, handleRemoveFile, resetFiles } = useMediaSelection();
 
     const { mutateAsync: createThread, isPending: isCreating, error: createThreadError } = useCreateThreadMutation();
     const { mutateAsync: updateThread, isPending: isUpdating, error: updateTreadError } = useUpdateThreadMutation();
 
     const isMediaPreviewShown: boolean = !!selectedFiles.length && isCreatingMode;
-    // const isTreadMediaShown: boolean = !!thread?.media?.length && !isCreatingMode;
+    const isThreadMediaShown: boolean = !!thread?.media?.length && !isCreatingMode;
 
     const { control, handleSubmit, reset, watch } = useForm<ThreadFormValues>({
         mode: "onChange",
@@ -89,138 +87,69 @@ export const ThreadDialogForm: FC<ThreadDialogProps> = ({ open, setOpen, mode = 
         stopEventPropagation(event);
         setOpen(false);
         reset();
-        setSelectedFiles([]);
-    };
-    const handleFileSelect = async (e: ChangeEvent<HTMLInputElement>): Promise<void> => {
-        const files = e.target.files;
-        if (!files || files.length === 0) return;
-
-        if (selectedFiles.length + files.length > MAX_FILES_COUNT) {
-            enqueueSnackbar(`You can upload a maximum of ${MAX_FILES_COUNT} files per post`, { variant: "warning" });
-            if (e.target) e.target.value = "";
-            return;
-        }
-
-        setIsProcessingFiles(true);
-
-        try {
-            const newFiles: File[] = Array.from(files);
-            const processedFiles: File[] = [];
-
-            for (const file of newFiles) {
-                if (!ALLOWED_POST_MIME_TYPES.test(file.type)) {
-                    enqueueSnackbar(`File type not supported: ${file.name}`, { variant: "error" });
-                    console.warn(`Skipped disallowed type: ${file.type}`);
-                    continue;
-                }
-                if (isVideoFile(file)) {
-                    if (file.size > MAX_VIDEO_INPUT_SIZE) {
-                        const sizeMB: number = Math.round(MAX_VIDEO_INPUT_SIZE / 1024 / 1024);
-                        enqueueSnackbar(`Video ${file.name} is too large (Max ${sizeMB}MB)`, { variant: "error" });
-                        continue;
-                    }
-                    processedFiles.push(file);
-                    continue;
-                }
-
-                if (isImageFile(file)) {
-                    if (file.size > MAX_IMAGE_INPUT_SIZE) {
-                        const sizeMB: number = Math.round(MAX_IMAGE_INPUT_SIZE / 1024 / 1024);
-                        enqueueSnackbar(`Image ${file.name} is too large (Max ${sizeMB}MB input)`, {
-                            variant: "error",
-                        });
-                        continue;
-                    }
-
-                    try {
-                        const compressed: File = await compressImage(file);
-
-                        if (compressed.size > COMPRESSED_IMAGE_SIZE) {
-                            enqueueSnackbar(`Image ${file.name} is still too large after compression`, {
-                                variant: "error",
-                            });
-                            continue;
-                        }
-                        processedFiles.push(compressed);
-                    } catch (err) {
-                        console.error("Compression error", err);
-                        enqueueSnackbar(`Failed to process image ${file.name}`, { variant: "error" });
-                    }
-                    continue;
-                }
-                enqueueSnackbar(`File type not supported: ${file.name}`, { variant: "error" });
-            }
-
-            setSelectedFiles((prev: File[]): File[] => [...prev, ...processedFiles]);
-        } catch (error) {
-            console.error(error);
-            enqueueSnackbar("An error occurred while processing files", { variant: "error" });
-        } finally {
-            setIsProcessingFiles(false);
-            if (e.target) e.target.value = "";
-        }
-    };
-
-    const handleRemoveFile = (indexToRemove: number): void => {
-        setSelectedFiles((files: File[]): File[] =>
-            files.filter((_file: File, index: number): boolean => index !== indexToRemove)
-        );
+        resetFiles();
     };
 
     const handleAttachClick = (): void => fileInputRef.current?.click();
 
     const handleDialogEntered = (): void => {
-        setSelectedFiles([]);
+        resetFiles();
         contentInputRef.current?.focus();
     };
 
     const isIncognito: boolean = watch(THREAD_DIALOG_FORM_FIELDS.isIncognito.name);
+    const content: string = watch(THREAD_DIALOG_FORM_FIELDS.content.name);
+
+    const onSubmitClick = (): void => {
+        const isContentAvailable: boolean = !!content?.trim() || !!selectedFiles.length;
+        setValid(isContentAvailable);
+    };
+
+    useEffect((): void => {
+        if (!!content?.trim() || !!selectedFiles.length) {
+            setValid(true);
+        }
+    }, [content, selectedFiles.length]);
+
+    const isSubmitDisabled: boolean =
+        isCreating || isUpdating || isProcessingFiles || (!content?.trim() && !selectedFiles.length);
 
     const onSubmit: SubmitHandler<ThreadFormValues> = async ({
         content,
         isIncognito,
     }: ThreadFormValues): Promise<void> => {
+        if (isSubmitDisabled) {
+            return;
+        }
+        setOpen(false);
+        const publishingKey: SnackbarKey = enqueueSnackbar(
+            mode === "edit" ? "Updating post..." : "Publishing post...",
+            {
+                persist: true,
+                variant: "info",
+                action: <CircularProgress size={16} color="inherit" />,
+            }
+        );
         try {
-            setOpen(false);
             if (mode === "edit" && thread) {
                 await updateThread({ id: thread.id, data: { content, isIncognito } });
+                closeSnackbar(publishingKey);
                 enqueueSnackbar("Post updated successfully", { variant: "success" });
                 reset();
-                setOpen(false);
                 return;
             }
             const formData = new FormData();
             formData.append("content", content);
             formData.append("isIncognito", String(isIncognito));
-            const metadataList: Metadata[] = [];
-            for (let i = 0; i < selectedFiles.length; i++) {
-                const file: File = selectedFiles[i];
-                formData.append("media", file);
+            await appendMediaToFormData(formData, selectedFiles);
 
-                if (isVideoFile(file)) {
-                    try {
-                        const meta: VideoMetadata = await getVideoMetadata(file);
-                        metadataList.push({
-                            index: i,
-                            width: meta.width,
-                            height: meta.height,
-                            duration: Math.round(meta.duration),
-                        });
-                    } catch (_error) {
-                        enqueueSnackbar(`Could not read metadata for ${file.name}`, { variant: "error" });
-                    }
-                }
-            }
-
-            if (metadataList.length > 0) {
-                formData.append("mediaMetadata", JSON.stringify(metadataList));
-            }
             await createThread(formData as unknown as CreateThreadPayload);
-            enqueueSnackbar("Post created successfully", { variant: "success" });
+            closeSnackbar(publishingKey);
+            enqueueSnackbar("Post published successfully", { variant: "success" });
             reset();
-            setSelectedFiles([]);
-            setOpen(false);
+            resetFiles();
         } catch (error) {
+            closeSnackbar(publishingKey);
             const errorMessage: string = (error as ApiError)?.message;
             enqueueSnackbar(errorMessage, { variant: "error" });
         }
@@ -240,13 +169,13 @@ export const ThreadDialogForm: FC<ThreadDialogProps> = ({ open, setOpen, mode = 
                 onClick={e => e.stopPropagation()}
                 slotProps={{
                     transition: { onEntered: handleDialogEntered },
-                    paper: { sx: { width: "100%", maxWidth: 750 } },
+                    paper: { sx: { width: "100%", maxWidth: 750, overflowX: "hidden" } },
                 }}
             >
                 <ThreadDialogTitle isCreatingMode={isCreatingMode} handleClose={handleClose} />
                 <form onSubmit={handleSubmit(onSubmit)}>
                     <Divider />
-                    <DialogContent sx={{ overflow: "auto" }}>
+                    <DialogContent>
                         <Box sx={{ display: "flex", gap: 2 }}>
                             <ThreadDialogUserAvatar
                                 avatarSrc={avatarUrl}
@@ -269,10 +198,15 @@ export const ThreadDialogForm: FC<ThreadDialogProps> = ({ open, setOpen, mode = 
                                     slotProps={{ input: { disableUnderline: true } }}
                                     placeholder={THREAD_DIALOG_FORM_FIELDS.content.placeholder}
                                 />
+                                {!valid && (
+                                    <Typography variant="body1" color="error">
+                                        Write a reply or attach media to continue.
+                                    </Typography>
+                                )}
                                 {isMediaPreviewShown && (
                                     <MediaPreview files={selectedFiles} onRemove={handleRemoveFile} />
                                 )}
-                                {/*{isTreadMediaShown && <ThreadMediaGallery threadMedia={thread?.media || []} />}*/}
+                                {isThreadMediaShown && <ThreadMediaGallery threadMedia={thread?.media || []} />}
                                 {isCreatingMode && (
                                     <ThreadActionIcons
                                         fileInputRef={fileInputRef}
@@ -288,6 +222,7 @@ export const ThreadDialogForm: FC<ThreadDialogProps> = ({ open, setOpen, mode = 
                     <ThreadDialogFooter<ThreadFormValues>
                         control={control}
                         handleClose={handleClose}
+                        onSubmitClick={onSubmitClick}
                         isCreatingMode={isCreatingMode}
                         loading={isCreating || isUpdating}
                         label={THREAD_DIALOG_FORM_FIELDS.isIncognito.label}

@@ -6,7 +6,9 @@ import SendIcon from "@mui/icons-material/Send";
 import IconButton from "@mui/material/IconButton";
 import RepeatIcon from "@mui/icons-material/Repeat";
 import FavoriteIcon from "@mui/icons-material/Favorite";
+import { NavigateFunction, useNavigate } from "react-router-dom";
 import { stopEventPropagation } from "@app/core/utils/general.ts";
+import { threadDetailsPath } from "@app/core/constants/pathConstants.ts";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import ChatBubbleOutlineIcon from "@mui/icons-material/ChatBubbleOutline";
 import { ApiError, useLikeThreadMutation, useUnlikeThreadMutation } from "@app/core/services";
@@ -24,6 +26,7 @@ const ThreadListActionsComponent: FC<ThreadListActionsActionsProps> = ({
     likeCount,
     replyCount,
 }) => {
+    const navigate: NavigateFunction = useNavigate();
     const { mutateAsync: likeThread, isPending: isLiking } = useLikeThreadMutation();
     const { mutateAsync: unLikeThread, isPending: isUnliking } = useUnlikeThreadMutation();
 
@@ -39,9 +42,8 @@ const ThreadListActionsComponent: FC<ThreadListActionsActionsProps> = ({
             enqueueSnackbar(errorMessage, { variant: "error" });
         }
     };
-    const handleReply = () => {
-        // TODO: Implement reply logic
-        console.log("Reply clicked");
+    const handleReply = (): void => {
+        navigate(threadDetailsPath(id));
     };
     const handleRepost = () => {
         // TODO: Implement repost logic
@@ -74,10 +76,10 @@ const ThreadListActionsComponent: FC<ThreadListActionsActionsProps> = ({
                     </Typography>
                 )}
             </IconButton>
-            <IconButton size="small" onClick={handleRepost}>
+            <IconButton disabled size="small" onClick={handleRepost}>
                 <RepeatIcon fontSize="small" color="action" />
             </IconButton>
-            <IconButton size="small" onClick={handleSend}>
+            <IconButton disabled size="small" onClick={handleSend}>
                 <SendIcon fontSize="small" color="action" />
             </IconButton>
         </Box>

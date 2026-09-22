@@ -1,8 +1,6 @@
-import { Thread, ThreadMedia } from "@app/core/services";
-import { InfiniteScrollList, ThreadListItem, ThreadListItemSkeleton, useVideoFeed } from "@app/core/components";
-import { FC, ReactElement, ReactNode, useCallback, useState } from "react";
-import { ThreadMediaGalleryBackdrop } from "@app/core/components/Features/Threads/ThreadMediaGallery/ThreadMediaGalleryBackdrop";
-import { ThreadMediaBackdrop } from "@app/core/components/Features/Threads/ThreadMediaGallery/ThreadMediaBackdrop";
+import { Thread } from "@app/core/services";
+import { FC, ReactElement, ReactNode } from "react";
+import { InfiniteScrollList, ThreadListItem, ThreadListItemSkeleton, useMediaBackdrops } from "@app/core/components";
 
 interface ThreadFeedProps {
     threads: Thread[];
@@ -31,52 +29,7 @@ export const ThreadFeed: FC<ThreadFeedProps> = ({
     loaderCount = 10,
     showEmptyFallback,
 }) => {
-    const { setGlobalPause } = useVideoFeed();
-
-    const [mediaGalleryState, setMediaGalleryState] = useState<{
-        isOpen: boolean;
-        media: ThreadMedia[];
-        initialSlide: number;
-    }>({
-        isOpen: false,
-        media: [],
-        initialSlide: 0,
-    });
-
-    const [threadMediaState, setThreadMediaState] = useState<{
-        media: ThreadMedia | null;
-        open: boolean;
-    }>({
-        media: null,
-        open: false,
-    });
-
-    const handleOpenThreadMediaGalleryBackdrop = useCallback(
-        (media: ThreadMedia[], index: number): void => {
-            const activeMedia: ThreadMedia = media[index];
-            setGlobalPause(true, activeMedia?.id);
-            setMediaGalleryState({ isOpen: true, media, initialSlide: index });
-        },
-        [setGlobalPause]
-    );
-
-    const handleCloseMediaGalleryBackdrop = useCallback((): void => {
-        setGlobalPause(false);
-        setMediaGalleryState({ media: [], isOpen: false, initialSlide: 0 });
-    }, [setGlobalPause]);
-
-    const handleOpenThreadMediaBackdrop = useCallback(
-        (media: ThreadMedia): void => {
-            setGlobalPause(true, media?.id);
-            setThreadMediaState({ media, open: true });
-        },
-        [setGlobalPause]
-    );
-
-    const handleCloseThreadMediaBackdrop = useCallback((): void => {
-        setGlobalPause(false);
-        setThreadMediaState({ media: null, open: false });
-    }, [setGlobalPause]);
+    const { handleOpenThreadMediaBackdrop, handleOpenThreadMediaGalleryBackdrop, backdrops } = useMediaBackdrops();
 
     return (
         <>
@@ -104,17 +57,7 @@ export const ThreadFeed: FC<ThreadFeedProps> = ({
                     )}
                 />
             )}
-            <ThreadMediaGalleryBackdrop
-                open={mediaGalleryState.isOpen}
-                media={mediaGalleryState.media}
-                onClose={handleCloseMediaGalleryBackdrop}
-                initialSlide={mediaGalleryState.initialSlide}
-            />
-            <ThreadMediaBackdrop
-                open={threadMediaState.open}
-                media={threadMediaState.media}
-                onClose={handleCloseThreadMediaBackdrop}
-            />
+            {backdrops}
         </>
     );
 };

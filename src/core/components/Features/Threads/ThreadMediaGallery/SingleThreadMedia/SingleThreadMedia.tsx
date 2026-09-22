@@ -6,13 +6,13 @@ import { MediaItem } from "@app/core/components/Features/Threads/ThreadMediaGall
 
 interface SingleThreadMediaProps {
     media: ThreadMedia;
-    handleOpenThreadMediaBackdrop: (media: ThreadMedia) => void;
+    handleOpenThreadMediaBackdrop?: (media: ThreadMedia) => void;
 }
 
 export const SingleThreadMedia: FC<SingleThreadMediaProps> = memo(({ media, handleOpenThreadMediaBackdrop }) => {
     const handleOpen = (e: MouseEvent<HTMLElement>): void => {
         stopEventPropagation(e);
-        handleOpenThreadMediaBackdrop(media);
+        handleOpenThreadMediaBackdrop?.(media);
     };
     return (
         <Box sx={{ my: 1, borderRadius: "12px" }}>

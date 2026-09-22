@@ -11,8 +11,8 @@ import { MediaItem } from "@app/core/components/Features/Threads/ThreadMediaGall
 
 interface ThreadMediaGalleryProps {
     threadMedia: ThreadMedia[];
-    handleOpenThreadMediaBackdrop: (media: ThreadMedia) => void;
-    handleOpenThreadMediaGalleryBackdrop: (media: ThreadMedia[], index: number) => void;
+    handleOpenThreadMediaBackdrop?: (media: ThreadMedia) => void;
+    handleOpenThreadMediaGalleryBackdrop?: (media: ThreadMedia[], index: number) => void;
 }
 
 export const ThreadMediaGallery: FC<ThreadMediaGalleryProps> = ({
